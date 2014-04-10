@@ -15,19 +15,19 @@ NULL
 #' integrated version of the quantile spectral density kernels
 #' [cf. \code{\link{IntegrQuantileSD}} for an implementation], and
 #' estimators of it [cf. \code{\link{QuantilePG}} and \code{\link{SmoothedPG}}
-#' for implementations]. 
+#' for implementations].
 #'
 #' @name   QSpecQuantity-class
 #' @aliases QSpecQuantity
 #' @exportClass QSpecQuantity
-#' 
+#'
 #' @keywords S4-classes
-#' 
+#'
 #' @slot values The array holding the values \eqn{f(\omega; x_1, x_2)}{f(w; x1, x2)}.
 #' @slot frequencies The frequencies \eqn{\omega}{w} for which the values are
-#' 								   available.
+#'                    available.
 #' @slot levels A list of vectors containing the levels \eqn{x_i}{xi} serving
-#' 							as argument for the estimator.
+#'               as argument for the estimator.
 #'
 ################################################################################
 
@@ -36,72 +36,72 @@ setClass(
     representation=representation(
         values = "array",
         frequencies = "numeric",
-        levels = "list"				# a list of "numeric"s
+        levels = "list"        # a list of "numeric"s
     )
 )
 
 ################################################################################
 #' Get attribute \code{frequencies} from a \code{QSpecQuantity}.
-#' 
+#'
 #' @name getFrequencies-QSpecQuantity
 #' @aliases getFrequencies,QSpecQuantity-method
-#' 
+#'
 #' @keywords Access-functions
-#' 
+#'
 #' @param object \code{QSpecQuantity} from which to get the \code{frequencies}.
 #' @return Returns the frequencies attribute, as a vector of real numbers.
-#' 
+#'
 #' @examples
 #' qPG  <- quantilePG(rnorm(10), levels.1=c(0.25,0.5))
 #' freq <- getFrequencies(qPG)
 ################################################################################
 setMethod(f = "getFrequencies",
-		signature = "QSpecQuantity",
-		definition = function(object) {
-			return(object@frequencies)
-		}
+    signature = "QSpecQuantity",
+    definition = function(object) {
+      return(object@frequencies)
+    }
 )
 
 ################################################################################
 #' Get attribute \code{levels} from a \code{QSpecQuantity}.
-#' 
+#'
 #' If the optional parameter \code{j} is supplied, then the \code{j}th vector of
 #' levels will be returned, a list with all vectors otherwise.
-#' 
+#'
 #' @name getLevels-QSpecQuantity
 #' @aliases getLevels,QSpecQuantity-method
-#' 
+#'
 #' @keywords Access-functions
-#' 
+#'
 #' @param object \code{QSpecQuantity} from which to get the \code{levels}.
 #' @param j Index pointing to a set of levels in the list; optional.
-#' 
+#'
 #' @return Returns levels attribute, as a vector of real numbers.
-#' 
+#'
 #' @examples
 #' qPG         <- quantilePG(rnorm(10), levels.1=c(0.25,0.5))
 #' levels.list <- getLevels(qPG)
 #' levels.1    <- getLevels(qPG,1)
 ################################################################################
 setMethod(f = "getLevels",
-		signature = "QSpecQuantity",
-		definition = function(object,j) {
-			if (missing("j")) {
-				return(object@levels)
-			} else {
-				if (!(j==1 | j==2)) {
-					error("Index needs to be either 1 or 2.")
-				} else {
-					return(object@levels[[1]])
-				}
-			}
-		}
+    signature = "QSpecQuantity",
+    definition = function(object,j) {
+      if (missing("j")) {
+        return(object@levels)
+      } else {
+        if (!(j==1 | j==2)) {
+          error("Index needs to be either 1 or 2.")
+        } else {
+          return(object@levels[[1]])
+        }
+      }
+    }
 )
 
 setMethod(f = "show",
     signature = "QSpecQuantity",
     definition = function(object) {
-      
+
     values <- getValues(object, frequencies = object@frequencies,
         levels.1=object@levels[[1]], levels.2=object@levels[[2]])
     J <- length(object@frequencies)
@@ -110,7 +110,7 @@ setMethod(f = "show",
     B <- dim(values)[4]
 
     cat(paste("\n",class(object)," (J=",J,", K1=",K1,", K2=",K2,", B=",B,")\n", sep=""))
-    
+
     if (J <= 7) {
       cat("Frequencies: ", object@frequencies,"\n")
     } else {
@@ -128,9 +128,9 @@ setMethod(f = "show",
     } else {
       cat("Levels 2   : ", object@levels[[2]][1:5],"..",object@levels[[2]][(K2-4):K2],"\n")
     }
-    
+
       cat("\nValues:\n")
-    
+
     resultMatr <- matrix(nrow=J, ncol=K1*K2)
     cn <- rep(0,K1*K2)
     for (k1 in 1:K1) {
@@ -139,14 +139,14 @@ setMethod(f = "show",
         cn[k1+(k2-1)*K1] <- paste(object@levels[[1]][k1],"/",object@levels[[2]][k2], sep="")
       }
     }
-		nrowShow <- min(10,nrow(resultMatr))
-		ncolShow <- min(5,ncol(resultMatr))
-		
-		res <- apply(resultMatr[1:nrowShow, 1:ncolShow, drop=FALSE],c(1,2),
-				function(x){complex(real=round(Re(x),3), imaginary=round(Im(x),3))})
+    nrowShow <- min(10,nrow(resultMatr))
+    ncolShow <- min(5,ncol(resultMatr))
+
+    res <- apply(resultMatr[1:nrowShow, 1:ncolShow, drop=FALSE],c(1,2),
+        function(x){complex(real=round(Re(x),3), imaginary=round(Im(x),3))})
     rownames(res) <- round(object@frequencies,3)[1:nrowShow]
     colnames(res) <- cn[1:ncolShow]
 
-		show(res)
+    show(res)
   }
 )

@@ -9,37 +9,37 @@ NULL
 #' \code{QuantilePG} is an S4 class that implements the necessary
 #' calculations to determine one of the periodogram-like statistics defined in
 #' Dette et. al (2014) and Kley et. al (2014).
-#' 
+#'
 #' Performs all the calculations to determine a quantile periodogram from a
 #' \code{FreqRep} object upon initizalization (and on request
 #' stores the values for faster access).
 #' The two methods available for the estimation are the ones implemented as
 #' subclasses of \code{\link{FreqRep}}:
 #' \itemize{
-#' 		\item the Fourier transformation of the clipped time series
-#' 					\eqn{(\{I\{Y_t \leq q\})}{(I{Y_t <= q})} [cf. \code{\link{ClippedFT}}], or
-#' 		\item the weighted \eqn{L_1}{L1}-projection of \eqn{(Y_t)} onto an harmonic
-#' 					basis [cf. \code{\link{QRegEstimator}}].  
+#'     \item the Fourier transformation of the clipped time series
+#'           \eqn{(\{I\{Y_t \leq q\})}{(I{Y_t <= q})} [cf. \code{\link{ClippedFT}}], or
+#'     \item the weighted \eqn{L_1}{L1}-projection of \eqn{(Y_t)} onto an harmonic
+#'           basis [cf. \code{\link{QRegEstimator}}].
 #' }
-#' 
+#'
 #' All remarks made in the documentation of the super-class
 #' \code{\link{QSpecQuantity}} apply.
 #'
 #' @name   QuantilePG-class
 #' @aliases QuantilePG
 #' @exportClass QuantilePG
-#' 
+#'
 #' @keywords S4-classes
-#' 
+#'
 #' @references
 #' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
 #' spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
-#' 
+#'
 #' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
 #' \url{http://arxiv.org/abs/1401.8104}.
-#' 
+#'
 #' @example
 #' inst/examples/QuantilePG.R
 ################################################################################
@@ -55,21 +55,21 @@ setMethod(
     f = "initialize",
     signature = "QuantilePG",
     definition = function(.Object, freqRep, frequencies, levels) {
-      
+
       .Object@freqRep <- freqRep
       .Object@frequencies <- frequencies
       .Object@levels <- levels
-      
+
       return(.Object)
     }
 )
 
 ################################################################################
 #' Get values from a quantile periodogram.
-#' 
+#'
 #' For vectors \code{frequencies}, \code{levels.1} and \code{levels.2} the
 #' values from an \code{object} of type \code{QuantilePG} are returned.
-#' 
+#'
 #' Fetching of the periodogram values basically happens by passing
 #' \code{frequencies} and the union of \code{levels.1} and \code{levels.2} to
 #' \code{\link{getValues}}. Therefore,
@@ -79,7 +79,7 @@ setMethod(
 #' available from \code{object} a warning is issued. Note that the frequencies
 #' are transformed to \eqn{[0,\pi]}{[0,pi]} using \code{\link{frequenciesValidator}}
 #' when checking if they are available in \code{object}.
-#' 
+#'
 #' The returned array of \code{values} is of dimension \code{[J,K1,K2,B+1]},
 #' where \code{J=length(frequencies)}, \code{K1=length(levels.1)},
 #' \code{K2=length(levels.2))}, and \code{B} denotes the
@@ -90,25 +90,25 @@ setMethod(
 #' \code{frequencies}, \code{levels.1} and \code{levels.2}
 #' available in \code{object}; \code{\link{closest.pos}} is used to determine
 #' what closest to means.
-#' 
+#'
 #' @name getValues-QuantilePG
 #' @aliases getValues,QuantilePG-method
-#' 
+#'
 #' @keywords Access-functions
-#' 
+#'
 #' @param object \code{QuantilePG} of which to get the values
 #' @param frequencies a vector of frequencies for which to get the values
 #' @param levels.1 the first vector of levels for which to get the values
 #' @param levels.2 the second vector of levels for which to get the values
-#' 
+#'
 #' @return Returns data from the array \code{values} that's a slot of
-#' 				 \code{object}.
-#' 
+#'          \code{object}.
+#'
 #' @examples
 #' Y        <- rnorm(32)
-#' freq     <- 2*pi*c(0:31)/32 
+#' freq     <- 2*pi*c(0:31)/32
 #' levels   <- c(0.25,0.5,0.75)
-#' qPG		  <- quantilePG(Y, levels.1=levels)
+#' qPG      <- quantilePG(Y, levels.1=levels)
 #' V.all    <- getValues(qPG)
 #' V.coarse <- getValues(qPG, frequencies = 2*pi*c(0:15)/16)
 #' V.fine   <- getValues(qPG, frequencies = 2*pi*c(0:63)/64)
@@ -123,7 +123,7 @@ setMethod(
         frequencies=2*pi*(0:(length(object@freqRep@Y)-1))/length(object@freqRep@Y),
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2)) {
-      
+
     # workaround: default values don't seem to work for generic functions?
     if (!hasArg(frequencies)) {
       frequencies <- 2*pi*(0:(length(object@freqRep@Y)-1))/length(object@freqRep@Y)
@@ -135,24 +135,24 @@ setMethod(
       levels.2 <- object@levels[[2]]
     }
     # end: workaround
-    
+
     fR <- object@freqRep
-    
+
     N <- length(fR@Y)
     J <- length(frequencies)
     B <- fR@B
     K1 <- length(levels.1)
     K2 <- length(levels.2)
-    
+
     levels.all <- union(levels.1, levels.2)
     K <- length(levels.all)
-    
+
     P1 <- match(levels.1,levels.all)
     P2 <- match(levels.2,levels.all)
     x <- getValues(fR, frequencies, levels.all)
-    
+
     A <- apply(x, c(1,3), function(x){outer(x[P1],Conj(x[P2]),"*")})
-    
+
     values <- aperm(array(A, dim=c(K1,K2,J,B+1)), perm=c(3,1,2,4))
 
     return(1/(2*pi*N) * values)
@@ -162,21 +162,21 @@ setMethod(
 ################################################################################
 #' Get associated \code{\link{FreqRep}} from a
 #' \code{\link{QuantilePG}}.
-#' 
+#'
 #' @name getFreqRep-QuantilePG
 #' @aliases getFreqRep,QuantilePG-method
-#' 
+#'
 #' @keywords Access-association-functions
-#' 
+#'
 #' @param object \code{QuantilePG} from which to get the
-#' 							 \code{\link{FreqRep}}.
+#'                \code{\link{FreqRep}}.
 #' @return Returns the \code{\link{FreqRep}} object associated.
 ################################################################################
 setMethod(f = "getFreqRep",
-		signature = "QuantilePG",
-		definition = function(object) {
-			return(object@freqRep)
-		}
+    signature = "QuantilePG",
+    definition = function(object) {
+      return(object@freqRep)
+    }
 )
 
 ################################################################################
@@ -184,47 +184,47 @@ setMethod(f = "getFreqRep",
 #'
 #' The parameter \code{type.boot} can be set to choose a block bootstrapping
 #' procedure. If \code{"none"} is chosen, a moving blocks bootstrap with
-#' \code{l=length(Y)} and	\code{N=length(Y)} would be done. Note that in that
+#' \code{l=length(Y)} and  \code{N=length(Y)} would be done. Note that in that
 #' case one would also chose \code{B=0} which means that \code{getPositions}
 #' would never be called. If \code{B>0} then each bootstrap replication would
 #' be the undisturbed time series.
-#' 
+#'
 #' @name QuantilePG-constructor
 #' @aliases quantilePG
 #' @export
-#' 
+#'
 #' @keywords Constructors
-#' 
+#'
 #' @param Y A \code{vector} of real numbers containing the time series from
-#' 					which to determine the quantile periodogram or a \code{ts} object
-#' 					or a \code{zoo} object.
+#'           which to determine the quantile periodogram or a \code{ts} object
+#'           or a \code{zoo} object.
 #' @param isRankBased If true the time series is first transformed to pseudo
 #'                    data.
 #' @param levels.1 A vector of length \code{K1} containing the levels \code{x1}
-#' 								 at which the QuantilePG is to be determined.
+#'                  at which the QuantilePG is to be determined.
 #' @param levels.2 A vector of length \code{K2} containing the levels \code{x2}.
 #' @param frequencies A vector containing frequencies at which to determine the
-#' 										quantile periodogram.
+#'                     quantile periodogram.
 #' @param type A flag to choose the type of the estimator. Can be either
-#' 						 \code{"clipped"} or \code{"qr"}. In the first case
-#' 						 \code{\link{ClippedFT}} is used as a frequency representation, in
-#' 						 the second case \code{\link{QRegEstimator}} is used.
-#' @param B number of bootstrap replications 
+#'              \code{"clipped"} or \code{"qr"}. In the first case
+#'              \code{\link{ClippedFT}} is used as a frequency representation, in
+#'              the second case \code{\link{QRegEstimator}} is used.
+#' @param B number of bootstrap replications
 #' @param l (expected) length of blocks
 #' @param type.boot A flag to choose a method for the block bootstrap; currently
-#' 									two options are implemented: \code{"none"} and \code{"mbb"}
-#' 									which means to do a moving blocks	bootstrap with \code{B}
-#' 									and \code{l} as specified.
+#'                   two options are implemented: \code{"none"} and \code{"mbb"}
+#'                   which means to do a moving blocks  bootstrap with \code{B}
+#'                   and \code{l} as specified.
 #' @param parallel a flag to allow performing parallel computations,
-#' 								  where possible.
-#' 
+#'                   where possible.
+#'
 #' @return Returns an instance of \code{QuantilePG}.
 ################################################################################
 quantilePG <- function( Y,
                         frequencies=2*pi/length(Y) * 0:(length(Y)-1),
                         levels.1 = 0.5,
                         levels.2=levels.1,
-                        isRankBased=TRUE,                        
+                        isRankBased=TRUE,
                         type=c("clipped","qr"),
                         type.boot = c("none","mbb"),
                         B = 0,
@@ -233,42 +233,42 @@ quantilePG <- function( Y,
 
   # Verify if all parameters are valid
   Y <- timeSeriesValidator(Y)
-  
+
   if (!(is.vector(levels.1)  && is.numeric(levels.1))) {
     stop("'levels.1' needs to be specified as a vector of real numbers")
   }
-  
+
   if (!(is.vector(levels.2)  && is.numeric(levels.2))) {
     stop("'levels.2' needs to be specified as a vector of real numbers")
   }
-                      
+
   levels.all <- union(levels.1, levels.2)
   K1 <- length(levels.1)
   K2 <- length(levels.2)
-  
+
   J <- length(frequencies)
-  
-  type <- match.arg(type, type, several.ok=TRUE)[1]
+
+  type <- match.arg(type, c("clipped","qr"))[1]
   switch(type,
     "clipped" = {
       freqRep <- clippedFT(Y, frequencies, levels.all, isRankBased, B, l, type.boot)},
     "qr" = {
       freqRep <- qRegEstimator(Y, frequencies, levels.all, isRankBased, B, l, type.boot, parallel)}
   )
-  
+
   obj <- new(
       Class = "QuantilePG",
       freqRep = freqRep,
       frequencies = frequencies,
       levels = list(levels.1, levels.2)
   )
-  
+
   return(obj)
 }
 
 ################################################################################
 #' Plot the values of the \code{\link{QuantilePG}}.
-#' 
+#'
 #' Creates a \code{K} x \code{K} plot depicting a quantile periodogram.
 #' Optionally, a simulated copula spectral density can
 #' be displayed.
@@ -276,36 +276,36 @@ quantilePG <- function( Y,
 #' i. e., \eqn{\tau_1 \leq \tau_2}{tau1 <= tau2}) or the imaginary parts
 #' (above the diagonal; i. e., \eqn{\tau_1 > \tau_2}{tau1 > tau2}) of
 #' \itemize{
-#' 	\item the quantile periodogram (black line),
-#' 	\item a simulated quantile spectral density (red line),
+#'   \item the quantile periodogram (black line),
+#'   \item a simulated quantile spectral density (red line),
 #' }
 #' for the combination of levels \eqn{\tau_1}{tau1} and \eqn{\tau_2}{tau2}
-#' denoted on the left and bottom margin of the plot are displayed.   
-#' 
+#' denoted on the left and bottom margin of the plot are displayed.
+#'
 #' @name plot-QuantilePG
 #' @aliases plot,QuantilePG,ANY-method
 #' @export
-#' 
+#'
 #' @importFrom abind abind
-#' 
+#'
 #' @param x  The \code{\link{QuantilePG}} object to plot
 #' @param qsd  a \code{\link{QuantileSD}} object; will be plotted if not
-#' 						 missing.
+#'              missing.
 #' @param ratio quotient of width over height of the subplots; use this
-#' 							parameter to produce landscape or portrait shaped plots.
+#'               parameter to produce landscape or portrait shaped plots.
 #' @param type.scaling a method for scaling of the subplots; currently there
-#' 										 are three options: \code{"individual"} will scale each of the
-#' 										 \code{K^2} subplots to minimum and maximum of the values
-#' 										 in that plot, \code{"real-imaginary"} will scale each of the
-#' 										 subplots displaying real parts and each of the subplots
-#' 										 displaying imaginary parts to the minimum and maximum of
-#' 										 the values display in these subportion of plots. The
-#' 										 option \code{"all"} will scale the subplots to the minimum and
-#' 										 maximum in all of the subplots.
+#'                      are three options: \code{"individual"} will scale each of the
+#'                      \code{K^2} subplots to minimum and maximum of the values
+#'                      in that plot, \code{"real-imaginary"} will scale each of the
+#'                      subplots displaying real parts and each of the subplots
+#'                      displaying imaginary parts to the minimum and maximum of
+#'                      the values display in these subportion of plots. The
+#'                      option \code{"all"} will scale the subplots to the minimum and
+#'                      maximum in all of the subplots.
 #' @param frequencies a set of frequencies for which the values are to be
-#' 									 plotted.
+#'                    plotted.
 #' @param levels a set of levels for which the values are to be plotted.
-#' 
+#'
 #' @return Returns the plot described in the Description section.
 ################################################################################
 
@@ -316,9 +316,9 @@ setMethod(f = "plot",
         type.scaling = c("individual", "real-imaginary", "all"),
         frequencies=x@frequencies,
         levels=intersect(x@levels[[1]], x@levels[[2]])) {
-      
+
     def.par <- par(no.readonly = TRUE) # save default, for resetting...
-    
+
     # workaround: default values don't seem to work for generic functions?
     if (!hasArg(ratio)) {
       ratio <- 3/2
@@ -346,16 +346,16 @@ tryCatch({
       csd <- getValues(qsd, frequencies = freq.csd,
           levels.1=levels, levels.2=levels)
     }
- 
+
     X <- frequencies/(2*pi)
-    
+
     allVals <- array(values[,,,1], dim=c(length(X), K, K))
 
     if (hasArg(qsd)) {
       allVals <- abind(allVals, csd, along=1)
     }
-    type.scaling <- match.arg(type.scaling)[1]   
-    
+    type.scaling <- match.arg(type.scaling)[1]
+
     # TEST
     p <- K
     M1 <- cbind((p^2+1):(p^2+p),matrix(1:p^2, ncol=p))
@@ -363,7 +363,7 @@ tryCatch({
     nf <- layout(M, c(lcm(1),rep(ratio,p)), c(rep(1,p),lcm(1),lcm(1)), TRUE)
     par(mar=c(2,2,1,1))
     # END TEST
-    
+
     for (i1 in 1:K) {
       for (i2 in 1:K) {
 #        allVals <- values[,i1,i2,1]
@@ -417,7 +417,7 @@ tryCatch({
       plot.new()
       text(0.5,0.5,substitute(paste(tau[1],"=",k),list(k=levels[i])), srt=90)
     }
-    
+
     for (i in 1:p) {
       plot.new()
       text(0.5,0.5,substitute(paste(tau[2],"=",k),list(k=levels[i])))

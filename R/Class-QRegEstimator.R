@@ -11,29 +11,29 @@ NULL
 #' \eqn{L_1}{L1}-projection of a time series as described in
 #' Dette et. al (2014+). As a subclass to \code{\link{FreqRep}}
 #' it inherits slots and methods defined there.
-#' 
+#'
 #' For each frequency \eqn{\omega}{w} from \code{frequencies} and level
 #' \eqn{\tau}{tau} from \code{levels} the statistic
 #' \deqn{\hat b^{\tau}_n(\omega) := \arg\max_{a \in R, b \in C}
-#' 			\sum_{t=0}^{n-1}
-#' 			\rho_{\tau}(Y_t - a - Re(b) \cos(\omega t) - Im(b) \sin(\omega t)),}
+#'       \sum_{t=0}^{n-1}
+#'       \rho_{\tau}(Y_t - a - Re(b) \cos(\omega t) - Im(b) \sin(\omega t)),}
 #' is determined and stored to the array \code{values}.
-#' 
+#'
 #' The solution to the minimization problem is determined using the function
 #' \code{\link[quantreg]{rq}} from the \pkg{quantreg} package.
-#' 
+#'
 #' All remarks made in the documentation of the super-class
 #' \code{\link{FreqRep}} apply.
 #'
 #' @name   QRegEstimator-class
 #' @aliases QRegEstimator
 #' @exportClass QRegEstimator
-#' 
+#'
 #' @keywords S4-classes
-#' 
+#'
 #' @slot parallel a flag that signalizes that parallelization mechanisms from
-#' 							  the package \pkg{snowfall} may be used.
-#' 
+#'                 the package \pkg{snowfall} may be used.
+#'
 #' @references
 #' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
@@ -53,7 +53,7 @@ setMethod(
     f = "initialize",
     signature = "QRegEstimator",
     definition = function(.Object, Y, isRankBased, levels, frequencies, positions.boot, B, parallel) {
-      
+
       .Object@Y <- Y
       .Object@isRankBased <- isRankBased
       .Object@levels <- levels
@@ -61,30 +61,30 @@ setMethod(
       .Object@positions.boot <- positions.boot
       .Object@B <- B
       .Object@parallel <- parallel
-      
+
       # Define variables with dimensions
       T <- length(Y)
       K <- length(levels)
       J <- length(frequencies)
-      
+
       # values[,,1] contains the non-bootstrapped values
       values <- array(dim=c(J,K,B+1))
-      
+
       # Convert Y to "pseudo data", if isRankBased == TRUE
       if (isRankBased) {
         data <- rank(Y) / T
       } else {
         data <- Y
       }
-      
+
       qRegSol <- function(X,omega) {
         # Define the harmonic regressors.
         n <- length(X)
         D <- cos(omega*1:n)
         S <- sin(omega*1:n)
-        
+
         # Then perform the quantile regression.
-        
+
         suppressWarnings({ # otherwise rq from package quantreg will issue
               # warnings due to non uniqueness of the minimizer.
               if ( (omega %% (2*pi)) == 0 ) {
@@ -106,7 +106,7 @@ setMethod(
                 pos <- c(2,3)
                 iVec <- matrix(c(1, complex(real = 0, imaginary = 1)), nrow = 1)
                 if (length(levels)>1) {
-                  qregSol <- (n/2) * iVec %*% qregSol[pos,] 
+                  qregSol <- (n/2) * iVec %*% qregSol[pos,]
                 } else {
                   qregSol <- (n/2) * iVec %*% matrix(qregSol[pos],ncol=1)
                 }
@@ -114,7 +114,7 @@ setMethod(
             })
         return(qregSol)
       }
-      
+
       for (b in 0:B) {
         if (b == 0) {
           qRegSolX <- function(omega){qRegSol(data,omega)}
@@ -122,7 +122,7 @@ setMethod(
           pos.boot <- getPositions(.Object@positions.boot,B)
           qRegSolX <- function(omega){qRegSol(data[pos.boot],omega)}
         }
-        
+
         if (parallel) {
           listVals <- sfLapply(frequencies, qRegSolX)
         } else {
@@ -130,9 +130,9 @@ setMethod(
         }
         values[,,b+1] <- aperm(array(unlist(listVals),dim=c(K,J)), perm=c(2,1))
       }
-      
+
       .Object@values <- values
-      
+
       # Return object
       return(.Object)
     }
@@ -140,61 +140,61 @@ setMethod(
 
 ################################################################################
 #' Get \code{getParallel} from a \code{\link{QRegEstimator}} object
-#' 
+#'
 #' @name getParallel-QRegEstimator
 #' @aliases getParallel,QRegEstimator-method
-#' 
+#'
 #' @keywords Access-functions
-#' 
+#'
 #' @param object \code{QRegEstimator} of which to get the \code{parallel}
-#' 
+#'
 #' @return Returns the attribute \code{parallel} that's a slot of \code{object}.
 ################################################################################
 setMethod(f = "getParallel",
-		signature = signature("QRegEstimator"),
-		definition = function(object) {
-			return(object@parallel)
-		}
+    signature = signature("QRegEstimator"),
+    definition = function(object) {
+      return(object@parallel)
+    }
 )
 
 ################################################################################
 #' Create an instance of the \code{QRegEstimator} class.
-#' 
+#'
 #' The parameter \code{type.boot} can be set to choose a block bootstrapping
 #' procedure. If \code{"none"} is chosen, a moving blocks bootstrap with
-#' \code{l=length(Y)} and	\code{N=length(Y)} would be done. Note that in that
+#' \code{l=length(Y)} and  \code{N=length(Y)} would be done. Note that in that
 #' case one would also chose \code{B=0} which means that \code{getPositions}
 #' would never be called. If \code{B>0} then each bootstrap replication would
-#' be the undisturbed time series. 
+#' be the undisturbed time series.
 #'
 #' @name QRegEstimator-constructor
 #' @aliases qRegEstimator
 #' @export
 #' @importFrom snowfall sfInit sfLibrary sfExportAll sfStop
-#' 
+#'
 #' @keywords Constructors
-#' 
+#'
 #' @param Y A \code{vector} of real numbers containing the time series from
-#' 					which to determine the quantile periodogram or a \code{ts} object
-#' 					or a \code{zoo} object.
+#'           which to determine the quantile periodogram or a \code{ts} object
+#'           or a \code{zoo} object.
 #' @param isRankBased If true the time series is first transformed to pseudo
 #'                    data.
 #' @param levels A vector of length \code{K} containing the levels \code{x}
-#' 								 at which the \code{QRegEstimator} is to be determined.
+#'                  at which the \code{QRegEstimator} is to be determined.
 #' @param frequencies A vector containing frequencies at which to determine the
-#' 										\code{QRegEstimator}.
-#' @param B number of bootstrap replications 
+#'                     \code{QRegEstimator}.
+#' @param B number of bootstrap replications
 #' @param l (expected) length of blocks
 #' @param type.boot A flag to choose a method for the block bootstrap; currently
-#' 									two options are implemented: \code{"none"} and \code{"mbb"}
-#' 									which means to do a moving blocks	bootstrap with \code{B}
-#' 									and \code{l} as specified. 
+#'                   two options are implemented: \code{"none"} and \code{"mbb"}
+#'                   which means to do a moving blocks  bootstrap with \code{B}
+#'                   and \code{l} as specified.
 #' @param parallel a flag to allow performing parallel computations.
-#' 
+#'
 #' @return Returns an instance of \code{QRegEstimator}.
-#' 
+#'
 #' @example
-#' inst/examples/QRegEstimator-parallel.R 
+#' inst/examples/QRegEstimator-parallel.R
 ################################################################################
 qRegEstimator <- function( Y,
     frequencies=2*pi/length(Y) * 0:(length(Y)-1),
@@ -204,33 +204,33 @@ qRegEstimator <- function( Y,
     l = 0,
     type.boot = c("none", "mbb"),
     parallel = FALSE) {
-  
+
   # Verify if all parameters are valid
   Y <- timeSeriesValidator(Y)
-  
+
   if (!(is.vector(frequencies)  && is.numeric(frequencies))) {
     stop("'frequencies' needs to be specified as a vector of real numbers")
   }
-  
+
   if (!(is.vector(levels) && is.numeric(levels))) {
     stop("'levels' needs to be specified as a vector of real numbers")
   }
-  
+
   if (isRankBased && !(prod(levels >= 0) && prod(levels <=1))) {
     stop("'levels' need to be from [0,1] when isRankBased==TRUE")
   }
-  
+
   # Check validity of frequencies
   frequencies <- frequenciesValidator(frequencies, length(Y))
-  
-  type.boot <- match.arg(type.boot)[1]
+
+  type.boot <- match.arg(type.boot, c("none","mbb"))[1]
   switch(type.boot,
       "none" = {
         bootPos <- movingBlocks(length(Y),length(Y))},
       "mbb" = {
         bootPos <- movingBlocks(l,length(Y))}
   )
-  
+
   freqRep <- new(
       Class = "QRegEstimator",
       Y = Y,
