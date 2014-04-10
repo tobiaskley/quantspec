@@ -24,10 +24,10 @@ and estimators of it [cf. \code{\link{QuantilePG}} and
 \item{\code{values}}{The array holding the values \eqn{f(\omega; x_1, x_2)}{f(w; x1, x2)}.}
 
 \item{\code{frequencies}}{The frequencies \eqn{\omega}{w} for which the values are
-								   available.}
+                   available.}
 
 \item{\code{levels}}{A list of vectors containing the levels \eqn{x_i}{xi} serving
-							as argument for the estimator.}
+              as argument for the estimator.}
 }}
 \keyword{S4-classes}
 

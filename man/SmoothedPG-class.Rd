@@ -24,18 +24,18 @@ periodogram is implemented using
 
 \describe{
 \item{\code{env}}{An environment to allow for slots which need to be
-			accessable in a call-by-reference manner:
-			\describe{
-				\item{\code{sdNaive}}{An array used for storage of the naively
-						estimated standard deviations of the smoothed periodogram.}
-				\item{\code{sdNaive.done}}{a flag indicating whether \code{sdNaive}
-						has been set yet.}
-				\item{\code{sdBoot}}{An array used for storage of the standard
-						deviations of the smoothed periodogram, estimated via
-						bootstrap.}
-				\item{\code{sdBoot.done}}{a flag indicating whether
-						\code{sdBoot.naive} has been set yet.}
-			}}
+      accessable in a call-by-reference manner:
+      \describe{
+        \item{\code{sdNaive}}{An array used for storage of the naively
+            estimated standard deviations of the smoothed periodogram.}
+        \item{\code{sdNaive.done}}{a flag indicating whether \code{sdNaive}
+            has been set yet.}
+        \item{\code{sdBoot}}{An array used for storage of the standard
+            deviations of the smoothed periodogram, estimated via
+            bootstrap.}
+        \item{\code{sdBoot.done}}{a flag indicating whether
+            \code{sdBoot.naive} has been set yet.}
+      }}
 
 \item{\code{qPG}}{the \code{\link{QuantilePG}} to be smoothed}
 

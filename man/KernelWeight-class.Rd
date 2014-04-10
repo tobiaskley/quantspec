@@ -29,13 +29,13 @@ later usage.
 \item{\code{bw}}{bandwidth}
 
 \item{\code{env}}{An environment to allow for slots which need to be
-			accessable in a call-by-reference manner:
-			\describe{
-				\item{\code{values}}{A vector storing the weights; see the Details
-							section.}
-				\item{\code{Wnj}}{A vector storing the terms used for normalization;
-							see the Details section.}
-			}}
+      accessable in a call-by-reference manner:
+      \describe{
+        \item{\code{values}}{A vector storing the weights; see the Details
+              section.}
+        \item{\code{Wnj}}{A vector storing the terms used for normalization;
+              see the Details section.}
+      }}
 }}
 \references{
 Brillinger, D. R. (1975). \emph{Time Series: Data Analysis

@@ -31,7 +31,7 @@ All remarks made in the documentation of the super-class
 
 \describe{
 \item{\code{parallel}}{a flag that signalizes that parallelization mechanisms from
-							  the package \pkg{snowfall} may be used.}
+                the package \pkg{snowfall} may be used.}
 }}
 \references{
 Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+). Of

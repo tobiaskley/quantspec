@@ -60,7 +60,7 @@ used to determine what closest to means.
 Y        <- rnorm(32)
 freq     <- 2*pi*c(0:31)/32
 levels   <- c(0.25,0.5,0.75)
-qPG		  <- quantilePG(Y, levels.1=levels)
+qPG      <- quantilePG(Y, levels.1=levels)
 V.all    <- getValues(qPG)
 V.coarse <- getValues(qPG, frequencies = 2*pi*c(0:15)/16)
 V.fine   <- getValues(qPG, frequencies = 2*pi*c(0:63)/64)

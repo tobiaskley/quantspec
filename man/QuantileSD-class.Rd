@@ -32,39 +32,39 @@ super-class \code{\link{QSpecQuantity}} apply.
 
 \describe{
 \item{\code{N}}{a \code{numeric} specifying the number of equaly spaced
-					Fourier frequencies from
-					\eqn{[0,2\pi)}{[0,2pi)} for which the (copula) spectral density
-					will be simulated; note that due to the simulation mechanism a
-					larger number will also yield a better approximation.}
+          Fourier frequencies from
+          \eqn{[0,2\pi)}{[0,2pi)} for which the (copula) spectral density
+          will be simulated; note that due to the simulation mechanism a
+          larger number will also yield a better approximation.}
 
 \item{\code{R}}{the number of independent repetitions performed; note that due to
-				 the simulation mechanism a larger number will also yield a better
-				 approximation; can be enlarged
-				 using \code{\link{increasePrecision-QuantileSD}}.}
+         the simulation mechanism a larger number will also yield a better
+         approximation; can be enlarged
+         using \code{\link{increasePrecision-QuantileSD}}.}
 
 \item{\code{type}}{can be either \code{Laplace} or \code{copula}; indicates whether
-						the marginals are to be assumed uniform \eqn{[0,1]} distributed.}
+            the marginals are to be assumed uniform \eqn{[0,1]} distributed.}
 
 \item{\code{ts}}{a \code{function} that allows to draw independent samples
-					\eqn{Y_0, \ldots, Y_{n-1}} from the process for which the (copula)
-					spectral density kernel is to be simulated}
+          \eqn{Y_0, \ldots, Y_{n-1}} from the process for which the (copula)
+          spectral density kernel is to be simulated}
 
 \item{\code{seed.last}}{used internally to store the state of the pseudo random number
-								 generator, so the precision can be increased by generating
-								 more pseudo random numbers that are independent from the ones
-								 previously used.}
+                 generator, so the precision can be increased by generating
+                 more pseudo random numbers that are independent from the ones
+                 previously used.}
 
 \item{\code{sumPG}}{an \code{array} used to store the sum of the simulated quantile
-						 periodograms}
+             periodograms}
 
 \item{\code{sumSqPG}}{an \code{array} used to store the sum of the squared absolute
-							 values of the simulated quantile periodograms}
+               values of the simulated quantile periodograms}
 
 \item{\code{meanPG}}{an \code{array} used to store the mean of the simulated quantile
-							periodograms}
+              periodograms}
 
 \item{\code{stdError}}{an \code{array} used to store the estimated standard error of the mean
-								 of the simulated quantile periodograms}
+                 of the simulated quantile periodograms}
 }}
 \examples{
 ## This script can be used to create and store a QuantileSD object

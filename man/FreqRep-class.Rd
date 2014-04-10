@@ -46,29 +46,29 @@ bootstrapped replicate of the time series.
 \item{\code{Y}}{The time series of which the frequency representation is to be determined.}
 
 \item{\code{frequencies}}{The frequencies for which the frequency representation will
-									 be determined. On initalization
-									 \code{\link{frequenciesValidator}} is called, so that it
-									 will always be a vector of reals from \eqn{[0,\pi]}{[0,pi]}.
-									 Also, only Fourier frequencies of the form
-									 \eqn{2\pi j / n}{2 pi j / n} with integers \eqn{j} and \eqn{n}
-									 the \code{length(Y)} are allowed.}
+                  be determined. On initalization
+                  \code{\link{frequenciesValidator}} is called, so that it
+                  will always be a vector of reals from \eqn{[0,\pi]}{[0,pi]}.
+                  Also, only Fourier frequencies of the form
+                  \eqn{2\pi j / n}{2 pi j / n} with integers \eqn{j} and \eqn{n}
+                  the \code{length(Y)} are allowed.}
 
 \item{\code{levels}}{The levels for which the frequency representation will be
-						  determined. If the flag \code{isRankBased} is set to \code{FALSE},
-							then it can be any vector of reals. If \code{isRankBased} is set
-							to \code{TRUE}, then it has to be from \eqn{[0,1]}.}
+             determined. If the flag \code{isRankBased} is set to \code{FALSE},
+             then it can be any vector of reals. If \code{isRankBased} is set
+             to \code{TRUE}, then it has to be from \eqn{[0,1]}.}
 
 \item{\code{values}}{The array holding the determined frequency representation. Use a
              \code{getValues} method of the relevant subclass to access it.}
 
 \item{\code{isRankBased}}{A flag that is \code{FALSE} if the determined \code{values}
-									 are based on the original time series and \code{TRUE} if it
-									 is based on the pseudo data as described in the Details
-								   section of this topic.}
+                  are based on the original time series and \code{TRUE} if it
+                  is based on the pseudo data as described in the Details
+                  section of this topic.}
 
 \item{\code{positions.boot}}{An object of type \code{\link{BootPos}},
-											that is used to determine the block bootstrapped
-										  replicates of the time series.}
+                     that is used to determine the block bootstrapped
+                     replicates of the time series.}
 
 \item{\code{B}}{Number of bootstrap replications to perform.}
 }}
