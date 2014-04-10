@@ -108,6 +108,10 @@ setMethod(f = "getPositions",
 
 movingBlocks <- function( l, N ) {
   
+	if (!(is.wholenumber(l) && is.wholenumber(N) && 0 < l && l <= N)) {
+		stop("'l' and 'N' need to be specified as integers with 0 < l <= N")
+	}
+	
   obj <- new(
       Class = "MovingBlocks",
       l = l,

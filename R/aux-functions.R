@@ -180,3 +180,29 @@ timeSeriesValidator <- function(Y) {
   }
   return(Y)
 }
+
+################################################################################
+#' Checks whether \code{x} contains integer numbers.
+#'
+#' Borrowed from the example in \code{\link[base]{integer}}.
+#' 
+#' @name is.wholenumber
+#' 
+#' @keywords internals
+#'  
+#' @param x   a vector to be checked for integers
+#' @param tol an optional parameter specifying to which precision the check is
+#' 						to be performed.
+#' 
+#' @return Returns the time series as a numeric.
+#' 
+#' @examples
+#' \dontrun{
+#' is.wholenumber(1) # is TRUE
+#' (x <- seq(1, 5, by = 0.5) )
+#' is.wholenumber( x ) #-->  TRUE FALSE TRUE ...
+#' }
+################################################################################ 
+is.wholenumber <-	function(x, tol = .Machine$double.eps^0.5) { 
+	return(abs(x - round(x)) < tol)
+}
