@@ -103,6 +103,7 @@ setMethod(
         WW <- getValues(.Object@weight, N=N)
         Wnj <- weight@env$Wnj
 
+        II <- getValues(.Object@qPG, levels.1 = levels[[1]], levels.2 = levels[[2]])
 
         if (max(freq) > 0) {
 
@@ -113,7 +114,6 @@ setMethod(
             return((A - B) / Wnj[1:(N-1)])
           }
 
-          II <- getValues(.Object@qPG, levels.1 = levels[[1]], levels.2 = levels[[2]])
           res <- (2*pi/N) * apply(II, c(2,3,4), f)
 
           posFreq <- freq[which(freq != 0)]
@@ -941,7 +941,7 @@ setMethod(f = "plot",
     if (length(levels) == 0) {
       stop("There has to be at least one level to plot.")
     }
-		
+
 tryCatch({
 
     K <- length(levels)
