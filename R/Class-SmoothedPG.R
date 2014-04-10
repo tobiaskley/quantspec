@@ -330,6 +330,10 @@ setMethod(f = "getSdNaive",
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2)) {
 
+      if (class(getWeight(object)) != "KernelWeight") {
+        stop("getSdNaive currently only available for 'KernelWeight'.")
+      }
+
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
         frequencies <- 2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y)
@@ -509,6 +513,10 @@ setMethod(f = "getSdBoot",
         frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2)) {
+
+      if (class(getWeight(object)) != "KernelWeight") {
+        stop("getSdNaive currently only available for 'KernelWeight'.")
+      }
 
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
