@@ -334,6 +334,10 @@ setMethod(f = "plot",
     }
     # end: workaround
 
+    if (length(levels) == 0) {
+			stop("There has to be at least one level to plot.")
+    }
+
 tryCatch({
     N <- length(x@freqRep@Y)
     K <- length(levels)

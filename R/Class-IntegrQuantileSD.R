@@ -284,6 +284,12 @@ setMethod(f = "plot",
     }
     # end: workaround
 
+		if (length(levels) == 0) {
+			stop("There has to be at least one level to plot.")
+		}
+			
+tryCatch({
+
     K <- length(levels)
     values <- getValues(x, frequencies = frequencies,
                         levels.1=levels, levels.2=levels)
@@ -320,6 +326,10 @@ setMethod(f = "plot",
     plot.new()
     text(0.5,0.5,expression(omega/2*pi))
 
-    par(def.par)
+},  error = function(e) e,
+		warning = function(w) w,
+		finally = {
+			par(def.par)  #- reset to default
+		})
   }
 )

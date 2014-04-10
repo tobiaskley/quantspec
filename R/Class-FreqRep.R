@@ -406,6 +406,8 @@ setMethod(f = "show",
     }
     # end: workaround
 
+tryCatch({			
+
     TT <- length(x@Y)
     K <- length(levels)
     values <- getValues(x,
@@ -445,6 +447,10 @@ setMethod(f = "show",
     plot.new()
     text(0.5,0.5,expression(omega/2*pi))
 
-    par(def.par)  #- reset to default
+},  error = function(e) e,
+		warning = function(w) w,
+		finally = {
+			par(def.par)  #- reset to default
+		})
   }
 )

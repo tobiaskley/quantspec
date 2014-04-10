@@ -651,6 +651,12 @@ setMethod(f = "plot",
       levels <- getLevels(x,1)
     }
     # end: workaround
+			
+		if (length(levels) == 0) {
+			stop("There has to be at least one level to plot.")
+		}
+		
+tryCatch({
 
     N <- x@N
     K <- length(levels)
@@ -693,6 +699,10 @@ setMethod(f = "plot",
     plot.new()
     text(0.5,0.5,expression(omega/2*pi))
 
-    par(def.par)
+},  error = function(e) e,
+		warning = function(w) w,
+		finally = {
+			par(def.par)  #- reset to default
+		})
   }
 )
