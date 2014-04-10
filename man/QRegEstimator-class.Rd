@@ -1,0 +1,43 @@
+\docType{class}
+\name{QRegEstimator-class}
+\alias{QRegEstimator}
+\alias{QRegEstimator-class}
+\title{Class for quantile regression-based estimates in the harmonic linear model.}
+\description{
+\code{QRegEstimator} is an S4 class that implements the
+necessary calculations to determine the frequency
+representation based on the weigthed
+\eqn{L_1}{L1}-projection of a time series as described in
+Dette et. al (2014+). As a subclass to
+\code{\link{FreqRep}} it inherits slots and methods defined
+there.
+}
+\details{
+For each frequency \eqn{\omega}{w} from \code{frequencies}
+and level \eqn{\tau}{tau} from \code{levels} the statistic
+\deqn{\hat b^{\tau}_n(\omega) := \arg\max_{a \in R, b \in
+C} \sum_{t=0}^{n-1} \rho_{\tau}(Y_t - a - Re(b) \cos(\omega
+t) - Im(b) \sin(\omega t)),} is determined and stored to
+the array \code{values}.
+
+The solution to the minimization problem is determined
+using the function \code{\link[quantreg]{rq}} from the
+\pkg{quantreg} package.
+
+All remarks made in the documentation of the super-class
+\code{\link{FreqRep}} apply.
+}
+\section{Slots}{
+
+\describe{
+\item{\code{parallel}}{a flag that signalizes that parallelization mechanisms from
+							  the package \pkg{snowfall} may be used.}
+}}
+\references{
+Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+). Of
+Copulas, Quantiles, Ranks and Spectra: an
+\eqn{L_1}{L1}-approach to spectral analysis.
+\emph{Bernoulli}, \bold{forthcoming}.
+}
+\keyword{S4-classes}
+

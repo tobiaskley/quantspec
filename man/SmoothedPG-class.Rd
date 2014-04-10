@@ -1,0 +1,45 @@
+\docType{class}
+\name{SmoothedPG-class}
+\alias{SmoothedPG}
+\alias{SmoothedPG-class}
+\title{Class for a smoothed quantile periodogram.}
+\description{
+\code{SmoothedPG} is an S4 class that implements the
+necessary calculations to determine a smoothed version of
+one of the quantile periodograms defined in Dette et. al
+(2014) and Kley et. al (2014).
+}
+\details{
+For a \code{\link{QuantilePG}} \eqn{Q_n(\omega, x_1,
+x_2)}{Qn(w,x1,x2)} and a \code{\link{Weight}}
+\eqn{W_n(\cdot)}{Wn(.)} the smoothed version
+\deqn{\frac{2\pi}{n} \sum_{s=1}^{n-1} W_n(\omega-2\pi s /
+n) Q_n(2\pi s / n, x_1, x_2)} is determined.
+
+The convolution required to determine the smoothed
+periodogram is implemented using
+\code{\link[stats]{convolve}}.
+}
+\section{Slots}{
+
+\describe{
+\item{\code{env}}{An environment to allow for slots which need to be
+			accessable in a call-by-reference manner:
+			\describe{
+				\item{\code{sdNaive}}{An array used for storage of the naively
+						estimated standard deviations of the smoothed periodogram.}
+				\item{\code{sdNaive.done}}{a flag indicating whether \code{sdNaive}
+						has been set yet.}
+				\item{\code{sdBoot}}{An array used for storage of the standard
+						deviations of the smoothed periodogram, estimated via
+						bootstrap.}
+				\item{\code{sdBoot.done}}{a flag indicating whether
+						\code{sdBoot.naive} has been set yet.}
+			}}
+
+\item{\code{qPG}}{the \code{\link{QuantilePG}} to be smoothed}
+
+\item{\code{weight}}{the \code{\link{Weight}} to be used for smoothing}
+}}
+\keyword{S4-classes}
+

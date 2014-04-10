@@ -1,0 +1,26 @@
+\docType{methods}
+\name{getFrequencies-QSpecQuantity}
+\alias{getFrequencies,QSpecQuantity-method}
+\alias{getFrequencies-QSpecQuantity}
+\title{Get attribute \code{frequencies} from a \code{QSpecQuantity}.}
+\usage{
+\S4method{getFrequencies}{QSpecQuantity}(object)
+}
+\arguments{
+  \item{object}{\code{QSpecQuantity} from which to get the
+  \code{frequencies}.}
+}
+\value{
+Returns the frequencies attribute, as a vector of real
+numbers.
+}
+\description{
+Get attribute \code{frequencies} from a
+\code{QSpecQuantity}.
+}
+\examples{
+qPG  <- quantilePG(rnorm(10), levels.1=c(0.25,0.5))
+freq <- getFrequencies(qPG)
+}
+\keyword{Access-functions}
+

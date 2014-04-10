@@ -1,0 +1,21 @@
+\docType{methods}
+\name{getQuantilePG-SmoothedPG}
+\alias{getQuantilePG,SmoothedPG-method}
+\alias{getQuantilePG-SmoothedPG}
+\title{Get associated \code{\link{QuantilePG}} from a \code{\link{SmoothedPG}}.}
+\usage{
+\S4method{getQuantilePG}{SmoothedPG}(object)
+}
+\arguments{
+  \item{object}{\code{SmoothedPG} from which to get the
+  \code{\link{QuantilePG}}.}
+}
+\value{
+Returns the \code{\link{QuantilePG}} object associated.
+}
+\description{
+Get associated \code{\link{QuantilePG}} from a
+\code{\link{SmoothedPG}}.
+}
+\keyword{Access-association-functions}
+

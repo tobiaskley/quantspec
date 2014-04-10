@@ -1,0 +1,1070 @@
+#' @include generics.R
+#' @include Class-Weight.R
+NULL
+
+################################################################################
+#' Class for a smoothed quantile periodogram.
+#'
+#' \code{SmoothedPG} is an S4 class that implements the necessary
+#' calculations to determine a smoothed version of one of the quantile
+#' periodograms defined in Dette et. al (2014) and Kley et. al (2014).
+#' 
+#' For a \code{\link{QuantilePG}} \eqn{Q_n(\omega, x_1, x_2)}{Qn(w,x1,x2)} and
+#' a \code{\link{Weight}} \eqn{W_n(\cdot)}{Wn(.)} the smoothed version
+#' \deqn{\frac{2\pi}{n} \sum_{s=1}^{n-1} W_n(\omega-2\pi s / n) Q_n(2\pi s / n, x_1, x_2)}
+#' is determined.
+#' 
+#' The convolution required to determine the smoothed periodogram is implemented
+#' using \code{\link[stats]{convolve}}.
+#' 
+#' @name SmoothedPG-class
+#' @aliases SmoothedPG
+#' @exportClass SmoothedPG
+#' 
+#' @keywords S4-classes
+#' 
+#' @slot env An environment to allow for slots which need to be
+#' 			accessable in a call-by-reference manner:
+#' 			\describe{
+#' 				\item{\code{sdNaive}}{An array used for storage of the naively
+#' 						estimated standard deviations of the smoothed periodogram.}
+#' 				\item{\code{sdNaive.done}}{a flag indicating whether \code{sdNaive}
+#' 						has been set yet.}
+#' 				\item{\code{sdBoot}}{An array used for storage of the standard
+#' 						deviations of the smoothed periodogram, estimated via
+#' 						bootstrap.}
+#' 				\item{\code{sdBoot.done}}{a flag indicating whether
+#' 						\code{sdBoot.naive} has been set yet.}
+#' 			}
+#' @slot qPG the \code{\link{QuantilePG}} to be smoothed
+#' @slot weight the \code{\link{Weight}} to be used for smoothing
+#' 
+################################################################################
+setClass(
+    Class = "SmoothedPG",
+    representation=representation(
+        env = "environment",
+        qPG = "QuantilePG",
+        weight = "Weight"
+    ),
+    contains = "QSpecQuantity"
+)
+
+setMethod(
+    f = "initialize",
+    signature = "SmoothedPG",
+    definition = function(.Object, qPG, weight, frequencies, levels) {
+      #cat("~~~ SmoothedPG: initializator ~~~ \n")
+      
+      .Object@env <- new.env(parent=emptyenv())
+      .Object@env$sdNaive.done <- FALSE
+			.Object@env$sdBoot.done <- FALSE
+      
+      .Object@qPG <- qPG
+      .Object@weight <- weight
+      
+      
+      if (!(is.vector(frequencies)  && is.numeric(frequencies))) {
+        stop("'frequencies' needs to be specified as a vector of real numbers")
+      }
+      
+			N <- length(.Object@qPG@freqRep@Y)
+
+			.Object@levels <- levels
+			K1 <- length(.Object@levels[[1]])
+			K2 <- length(.Object@levels[[2]])
+			
+			# Transform all frequencies to Fourier frequencies
+			# and remove redundancies 
+			if (class(weight) == "KernelWeight") {
+				freq <- frequenciesValidator(frequencies, N, steps=1:6)
+			} else if (class(weight) == "SpecDistrWeight") {
+				freq <- frequenciesValidator(frequencies, N, steps=c(1:3,5:6))
+			} else {
+				error("Cannot handle this type of Weight object.")
+			}
+			
+			.Object@frequencies <- freq
+      
+      J <- length(freq)     
+      
+      .Object@env$sdNaive <- array()
+      .Object@env$sigSq <- 0
+      .Object@env$sdBoot <- array()
+      
+	  
+      B <- .Object@qPG@freqRep@B
+      
+			.Object@values <- array(0, dim=c(J,K1,K2,B+1))
+
+			
+			if (class(weight) == "KernelWeight") {
+				
+		  	WW <- getValues(.Object@weight, N=N)
+	      Wnj <- weight@env$Wnj
+		  
+	            
+	      if (max(freq) > 0) {
+	        
+	        # f performs convolution as defined in Brillinger (1975)
+	        f <- function(v) {
+	          A <- convolve(v[c(2:N,1)], rev(WW), type="c")[2:N]
+	          B <- WW[2:N] * v[1]
+	          return((A - B) / Wnj[1:(N-1)])
+	        }
+
+	        II <- getValues(.Object@qPG, levels.1 = levels[[1]], levels.2 = levels[[2]])
+	        res <- (2*pi/N) * apply(II, c(2,3,4), f)
+	        
+	        posFreq <- freq[which(freq != 0)]
+          pp <- round(N/(2*pi)*(posFreq %% (2*pi)))
+
+          .Object@values[which(freq != 0),,,] <- res[pp,,,]
+	      }
+	      
+	      if (min(freq) == 0) {
+	        res <- apply(II, c(2,3,4), function(v) {sum(v[2:N]*rev(WW[2:N])) / Wnj[N]})
+	        .Object@values[which(freq == 0),,,] <- (2*pi/N) * res
+	      }
+	      rm(II)
+			} else if (class(weight) == "SpecDistrWeight") {
+				if (max(freq) > 0) {
+					
+					II <- getValues(.Object@qPG, frequencies = 2*pi*(1:(N-1))/N,
+							levels.1 = levels[[1]], levels.2 = levels[[2]])
+					res <- (2*pi/N) * apply(II, c(2,3,4), cumsum)
+					
+					posFreq <- freq[which(freq != 0)]
+          pp <- round(N/(2*pi)*(posFreq %% (2*pi)))
+          
+					.Object@values[which(freq != 0),,,] <- res[pp,,,]
+				}
+			}
+      
+      return(.Object)
+    }
+)
+
+################################################################################
+#' Get values from a smoothed quantile periodogram.
+#' 
+#' The returned array of \code{values} is of dimension \code{[J,K1,K2,B+1]},
+#' where \code{J=length(frequencies)}, \code{K1=length(levels.1)},
+#' \code{K2=length(levels.2))}, and \code{B} denotes the
+#' value stored in slot \code{B} of \code{freqRep} [that is the number of
+#' boostrap repetitions performed on initialization].
+#' At position \code{(j,k1,k2,b)}
+#' the returned value is the one corresponding to \code{frequencies[j]},
+#' \code{levels.1[k1]} and \code{levels.2[k2]} that are closest to the
+#' \code{frequencies}, \code{levels.1} and \code{levels.2}
+#' available in \code{object}; \code{\link{closest.pos}} is used to determine
+#' what closest to means. \code{b==1} corresponds to the estimate without
+#' bootstrapping; \code{b>1} corresponds to the \code{b-1}st bootstrap estimate.
+#' 
+#' @name getValues-SmoothedPG
+#' @aliases getValues,SmoothedPG-method
+#' 
+#' @keywords Access-functions
+#' 
+#' @param object \code{SmoothedPG} of which to get the values
+#' @param frequencies a vector of frequencies for which to get the values
+#' @param levels.1 the first vector of levels for which to get the values
+#' @param levels.2 the second vector of levels for which to get the values
+#' 
+#' @return Returns data from the array \code{values} that's a slot of
+#' 				 \code{object}.
+#' 
+#' @seealso
+#' An example on how to use this function is analogously to the example given in
+#' \code{\link{getValues-QuantilePG}}. 
+################################################################################
+
+setMethod(f = "getValues",
+    signature = signature(
+        "SmoothedPG"),
+    definition = function(object,
+        frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
+        levels.1=getLevels(object,1),
+        levels.2=getLevels(object,2)) {
+      
+      # workaround: default values don't seem to work for generic functions?
+      if (!hasArg(frequencies)) {
+        frequencies <- 2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y)
+      }
+      if (!hasArg(levels.1)) {
+        levels.1 <- object@levels[[1]]
+      }
+      if (!hasArg(levels.2)) {
+        levels.2 <- object@levels[[2]]
+      }
+      # end: workaround
+
+      ##############################
+      ## (Similar) Code also in Class-FreqRep!!!
+      ## (Similar) Code also in Class-QuantileSD!!!
+      ##############################
+      
+      # Transform all frequencies to [0,2pi)
+      frequencies <- frequencies %% (2*pi)
+      
+      # Create an aux vector with all available frequencies
+      oF <- object@frequencies
+      f <- frequencies
+      
+      # returns TRUE if x c y
+      subsetequal.approx <- function(x,y) {
+        X <- round(x, .Machine$double.exponent-2)
+        Y <- round(y, .Machine$double.exponent-2)
+        return(setequal(X,intersect(X,Y)))
+      }
+      
+      C1 <- subsetequal.approx(f[f <= pi], oF)
+      C2 <- subsetequal.approx(f[f > pi], 2*pi - oF[which(oF != 0 & oF != pi)])
+      
+      if (!(C1 & C2)) {
+        warning("Not all 'values' for 'frequencies' requested were available. 'values' for the next available Fourier frequencies are returned.")
+      }
+      
+      # Select columns
+      c.1.pos <- closest.pos(object@levels[[1]],levels.1)
+      c.2.pos <- closest.pos(object@levels[[2]],levels.2)
+      
+      if (!subsetequal.approx(levels.1, object@levels[[1]])) {
+        warning("Not all 'values' for 'levels.1' requested were available. 'values' for the next available level are returned.")
+      }
+      
+      if (!subsetequal.approx(levels.2, object@levels[[2]])) {
+        warning("Not all 'values' for 'levels.2' requested were available. 'values' for the next available level are returned.")
+      }
+      
+
+			J <- length(frequencies)
+			K1 <- length(levels.1)
+			K2 <- length(levels.2)
+			res <- array(dim=c(J, K1, K2, object@qPG@freqRep@B+1))
+			
+
+			if (class(object@weight) == "KernelWeight") {
+				
+				# Select rows
+	      r1.pos <- closest.pos(oF, f[f <= pi])
+	      r2.pos <- closest.pos(-1*(2*pi-oF),-1*f[f > pi])
+	
+	      if (length(r1.pos) > 0) {
+	        res[which(f <= pi),,,] <- object@values[r1.pos,c.1.pos,c.2.pos,]  
+	      }
+	      if (length(r2.pos) > 0) {
+	        res[which(f > pi),,,] <- Conj(object@values[r2.pos,c.1.pos,c.2.pos,])
+	      }
+				
+			} else if (class(object@weight) == "SpecDistrWeight") {
+				# Select rows
+				r.pos <- closest.pos(oF, f)
+				res[,,,] <- object@values[r.pos,c.1.pos,c.2.pos,]
+			}
+      
+      return(res)
+    }
+)
+
+################################################################################
+#' Get estimates for the standard deviation of the smoothed quantile
+#' periodogram.
+#' 
+#' Determines and returns an array of dimension \code{[J,K1,K2]},
+#' where \code{J=length(frequencies)}, \code{K1=length(levels.1)}, and
+#' \code{K2=length(levels.2))}. Whether
+#' available or not, boostrap repetitions are ignored by this procedure.
+#' At position \code{(j,k1,k2)}
+#' the returned value is the standard deviation estimated corresponding to
+#' \code{frequencies[j]}, \code{levels.1[k1]} and \code{levels.2[k2]} that are 
+#' closest to the
+#' \code{frequencies}, \code{levels.1} and \code{levels.2}
+#' available in \code{object}; \code{\link{closest.pos}} is used to determine
+#' what closest to means.
+#' 
+#' Requires that the \code{\link{SmoothedPG}} is available at all Fourier
+#' frequencies from \eqn{(0,\pi]}{(0,pi]}. If this is not the case the missing
+#' values are imputed by taking one that is available and has a frequency
+#' that is closest to the missing Fourier frequency; \code{closest.pos} is used
+#' to determine which one this is. 
+#' 
+#' A precise definition on how the standard deviations of the smoothed quantile
+#' periodogram are estimated is given in Kley et. al (2014). The estimate
+#' returned is denoted by
+#' \eqn{\sigma(\tau_1, \tau_2; \omega)}{sigma(tau1, tau2; omega)} on p. 26 of
+#' the arXiv preprint.
+#' 
+#' 
+#' Note the ``standard deviation'' estimated here is not the square root of the
+#' complex-valued variance. It's real part is the square root of the variance
+#' of the real part of the estimator and the imaginary part is the square root
+#' of the imaginary part of the variance of the estimator.
+#' 
+#' @name getSdNaive-SmoothedPG
+#' @aliases getSdNaive,SmoothedPG-method
+#' 
+#' @keywords Access-functions
+#' 
+#' @param object \code{\link{SmoothedPG}} of which to get the estimates for the
+#' 						   standard deviation.
+#' @param frequencies a vector of frequencies for which to get the result
+#' @param levels.1 the first vector of levels for which to get the result
+#' @param levels.2 the second vector of levels for which to get the result
+#' 
+#' @return Returns the estimate described above.
+#' 
+#' @references
+#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
+#' Quantile Spectral Processes: Asymptotic Analysis and Inference.
+#' \url{http://arxiv.org/abs/1401.8104}.
+#' 
+#' @examples
+#' # Noch anpassen!!!
+################################################################################
+setMethod(f = "getSdNaive",
+    signature = signature(
+        object = "SmoothedPG"),
+    definition = function(object,
+        frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
+				levels.1=getLevels(object,1),
+				levels.2=getLevels(object,2)) {
+      
+      # workaround: default values don't seem to work for generic functions?
+      if (!hasArg(frequencies)) {
+        frequencies <- 2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y)
+      }
+      if (!hasArg(levels.1)) {
+        levels.1 <- object@levels[[1]]
+      }
+      if (!hasArg(levels.2)) {
+        levels.2 <- object@levels[[2]]
+      }
+      # end: workaround
+      
+      if (object@env$sdNaive.done == FALSE) {
+
+        weight <- object@weight
+        N <- length(object@qPG@freqRep@Y)
+        K1 <- length(object@levels[[1]])
+        K2 <- length(object@levels[[2]])
+        
+        WW <- getValues(weight, N=N)[c(2:N,1)] # WW[j] corresponds to W_n(2 pi j/n) 
+        WW3 <- rep(WW,4)
+        
+        V <- getValues(object, frequencies = 2*pi*(1:(N-1))/N)[,,,1]
+        
+        res <- array(0,dim=c(N,K1,K2))
+
+        M1 <- matrix(0, ncol=N-1, nrow=N)
+        M2 <- matrix(0, ncol=N-1, nrow=N)
+        M3 <- matrix(0, ncol=N-1, nrow=N)
+        M4 <- matrix(0, ncol=N-1, nrow=N)
+        for (j in 1:N) {
+          M1[j,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j-(1:(N-1))]
+          M2[j,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j+(1:(N-1))]
+          M3[j,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j-(1:(N-1))]
+          M4[j,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j+(1:(N-1))]
+        }
+
+        for (k1 in 1:K1) {
+          for (k2 in 1:K2) {
+            if (k1 <= k2) {
+              V1 <- matrix(Re(V[,k1,k1]) * Re(V[,k2,k2]), ncol=1)
+              V2 <- matrix(abs(V[,k1,k2])^2, ncol=1)
+  
+              A1 <- rowSums(M1 %*% V1)
+              B1 <- rowSums(M2 %*% V2)
+  
+              Sr1 <- A1+B1
+  
+              if (k1 == k2) {
+                S <- Sr1
+              } else {
+                A2 <- rowSums(M3 %*% V1)
+                B2 <- rowSums(M4 %*% V2)
+                Sr2 <- A2+B2
+                Si <- A1+B1-A2-B2
+                S <- (1/2) * complex(real = Sr1+Sr2, imaginary = Si)            
+              }
+              res[,k1,k2] <- (2*pi/N)^2 * S / weight@env$Wnj^2
+            } else {
+              res[,k1,k2] <- res[,k2,k1]
+            }
+          }
+        }
+        
+        sqrt.cw <- function(z) {
+          return(complex(real=sqrt(max(Re(z),0)), imaginary=sqrt(max(Im(z),0))))
+        }
+        res <- array(apply(res,c(1,2,3),sqrt.cw),dim=c(N,K1,K2))
+        
+        object@env$sdNaive.done <- TRUE
+        object@env$sdNaive <- res[1:(floor(N/2)+1),,]
+      }
+      
+      ##############################
+      ## (Similar) Code also in Class-FreqRep!!!
+      ##############################
+      
+      # Transform all frequencies to [0,2pi)
+      frequencies <- frequencies %% (2*pi)
+      
+      # Create an aux vector with all available frequencies
+      oF <- object@frequencies
+      f <- frequencies
+      
+      # returns TRUE if x c y
+      subsetequal.approx <- function(x,y) {
+        X <- round(x, .Machine$double.exponent-2)
+        Y <- round(y, .Machine$double.exponent-2)
+        return(setequal(X,intersect(X,Y)))
+      }
+      
+      C1 <- subsetequal.approx(f[f <= pi], oF)
+      C2 <- subsetequal.approx(f[f > pi], 2*pi - oF[which(oF != 0 & oF != pi)])
+      
+      # Ist dann der Fall wenn die frequencies nicht geeignete FF sind!!
+      if (!(C1 & C2)) {
+        warning("Not all 'values' for 'frequencies' requested were available. 'values' for the next available Fourier frequencies are returned.")
+      }
+      
+      # Select columns
+      c.1.pos <- closest.pos(object@levels[[1]],levels.1)
+      c.2.pos <- closest.pos(object@levels[[2]],levels.2)
+      
+      # Select rows
+      r1.pos <- closest.pos(object@frequencies,frequencies[frequencies <= pi])
+      r2.pos <- closest.pos(-1*(2*pi-object@frequencies),-1*frequencies[frequencies > pi])
+      
+      J <- length(frequencies)
+      K1 <- length(levels.1)
+      K2 <- length(levels.2)
+      res <- array(dim=c(J, K1, K2))
+      
+      if (length(r1.pos) > 0) {
+        res[1:length(r1.pos),,] <- object@env$sdNaive[r1.pos,c.1.pos,c.2.pos]    
+      }
+      if (length(r2.pos) > 0) {
+        res[(length(r1.pos)+1):J,,] <- Conj(object@env$sdNaive[r2.pos,c.1.pos,c.2.pos])
+      }
+      
+      return(res)    
+    }
+)
+
+################################################################################
+#' Get bootstrap estimates for the standard deviation of the smoothed quantile
+#' periodogram.
+#' 
+#' Determines and returns an array of dimension \code{[J,K1,K2]},
+#' where \code{J=length(frequencies)}, \code{K1=length(levels.1)}, and
+#' \code{K2=length(levels.2))}.
+#' At position \code{(j,k1,k2)} the real part of the returned value is the
+#' standard deviation estimated from the real parts of the bootstrap
+#' replications and the imaginary part of the returned value is the standard
+#' deviation estimated from the imaginary part of the bootstrap replications.
+#' The estimate is determined from those bootstrap replicates of the estimator
+#' that have
+#' \code{frequencies[j]}, \code{levels.1[k1]} and \code{levels.2[k2]} closest
+#' to the \code{frequencies}, \code{levels.1} and \code{levels.2}
+#' available in \code{object}; \code{\link{closest.pos}} is used to determine
+#' what closest to means.
+#' 
+#' Requires that the \code{\link{SmoothedPG}} is available at all Fourier
+#' frequencies from \eqn{(0,\pi]}{(0,pi]}. If this is not the case the missing
+#' values are imputed by taking one that is available and has a frequency
+#' that is closest to the missing Fourier frequency; \code{closest.pos} is used
+#' to determine which one this is. 
+#' 
+#' If there are no bootstrap replicates available (i. e., \code{B == 0}) an
+#' error is returned.
+#' 
+#' Note the ``standard deviation'' estimated here is not the square root of the
+#' complex-valued variance. It's real part is the square root of the variance
+#' of the real part of the estimator and the imaginary part is the square root
+#' of the imaginary part of the variance of the estimator.
+#' 
+#' @name getSdBoot-SmoothedPG
+#' @aliases getSdBoot,SmoothedPG-method
+#' 
+#' @keywords Access-functions
+#' 
+#' @param object \code{\link{SmoothedPG}} of which to get the bootstrap estimates for the
+#' 						   standard deviation.
+#' @param frequencies a vector of frequencies for which to get the result
+#' @param levels.1 the first vector of levels for which to get the result
+#' @param levels.2 the second vector of levels for which to get the result
+#' 
+#' @return Returns the estimate described above.
+#' 
+#' @examples
+#' # Noch anpassen!!!
+################################################################################
+
+setMethod(f = "getSdBoot",
+    signature = signature(
+        object = "SmoothedPG"),
+    definition = function(object,
+        frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
+				levels.1=getLevels(object,1),
+				levels.2=getLevels(object,2)) {
+      
+      # workaround: default values don't seem to work for generic functions?
+      if (!hasArg(frequencies)) {
+        frequencies <- 2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y)
+      }
+      if (!hasArg(levels.1)) {
+        levels.1 <- object@levels[[1]]
+      }
+      if (!hasArg(levels.2)) {
+        levels.2 <- object@levels[[2]]
+      }
+      # end: workaround
+      
+      if (dim(object@env$sdBoot) == 1) {
+        
+        complex.var <- function(x) {
+          return(complex(real = sd(Re(x)), imaginary = sd(Im(x))))
+        }
+        
+        #N <- length(object@qPG@freqRep@Y)
+        #K1 <- length(object@levels[[1]])
+        #K2 <- length(object@levels[[2]])
+        B <- object@qPG@freqRep@B
+        
+        v <- getValues(object, frequencies = frequencies,
+            levels.1 = levels.1, levels.2 = levels.2)[,,,2:(B+1)]
+        object@env$sdBoot <- apply(v, c(1,2,3), complex.var)
+      }
+      return(object@env$sdBoot)
+    }
+)
+
+################################################################################
+#' Get pointwise confidence intervals for the quantile spectral density kernel
+#'
+#' Returns a list of two arrays \code{lowerCIs} and \code{upperCIs} that contain
+#' the upper and lower limits for a level \code{1-alpha} confidence interval of
+#' the copula spectral density kernel. Each array is of dimension \code{[J,K1,K2]},
+#' where \code{J=length(frequencies)}, \code{K1=length(levels.1)}, and
+#' \code{K2=length(levels.2))}.
+#' At position \code{(j,k1,k2)} the real (imaginary) part of the returned values
+#' are the bounds of the confidence interval for the the real (imaginary) part
+#' of the quantile spectrum, which corresponds to
+#' \code{frequencies[j]}, \code{levels.1[k1]} and \code{levels.2[k2]} closest
+#' to the Fourier frequencies, \code{levels.1} and \code{levels.2}
+#' available in \code{object}; \code{\link{closest.pos}} is used to determine
+#' what closest to means.
+#' 
+#' Currently, three different \code{type}s of confidence intervals are
+#' available:
+#' \itemize{
+#' 	\item \code{"naive.sd"}: confidence intervals based on the asymptotic
+#' 					normality of the smoothed quantile periodogram; standard deviations
+#' 					are estimated using \code{\link{getSdNaive}}.
+#' 	\item \code{"boot.sd"}: confidence intervals based on the asymptotic
+#' 					normality of the smoothed quantile periodogram; standard deviations
+#' 					are estimated using \code{\link{getSdBoot}}.
+#' 	\item \code{"boot.full"}: confidence intervals determined by estimating the
+#' 					quantiles of he distribution of the smoothed quantile periodogram,
+#' 					by the empirical quantiles of the sample of bootstrapped
+#' 					replications.
+#' }
+#' 
+#' @name getPointwiseCIs-SmoothedPG
+#' @aliases getPointwiseCIs,SmoothedPG-method
+#' 
+#' @keywords Access-functions
+#' 
+#' @param object \code{SmoothedPG} of which to get the confidence intervals
+#' @param frequencies a vector of frequencies for which to get the result
+#' @param levels.1 the first vector of levels for which to get the result
+#' @param levels.2 the second vector of levels for which to get the result
+#' @param alpha the level of the confidence interval; must be from \eqn{(0,1)}
+#' @param type a flag indicating which type of confidence interval should be
+#' 				returned; can take one of the three values discussed above.
+#' 
+#' @return Returns a named list of two arrays \code{lowerCIS} and \code{upperCIs}
+#' 				 containing the lower and upper bounds for the confidence intervals.
+#' 
+#' @examples
+#' # Noch anpassen!!!
+################################################################################
+setMethod(f = "getPointwiseCIs",
+    signature = signature(
+        object = "SmoothedPG"),
+    definition = function(object,
+        frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
+        levels.1=getLevels(object,1),
+        levels.2=getLevels(object,2),
+        alpha=.1, type=c("naive.sd", "boot.sd", "boot.full")) {
+      
+      # workaround: default values don't seem to work for generic functions?
+      if (!hasArg(frequencies)) {
+        frequencies <- 2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y)
+      }
+      if (!hasArg(levels.1)) {
+        levels.1 <- object@levels[[1]]
+      }
+      if (!hasArg(levels.2)) {
+        levels.2 <- object@levels[[2]]
+      }
+      if (!hasArg(alpha)) {
+        alpha <- 0.1
+      }
+      if (!hasArg(type)) {
+        type <- "naive.sd"
+      }
+      # end: workaround
+      
+      type <- match.arg(type)[1]
+      switch(type,
+          "naive.sd" = {
+            sdEstim <- getSdNaive(object,
+                frequencies = frequencies,
+                levels.1 = levels.1,
+                levels.2 = levels.2)},
+          "boot.sd" = {
+            sdEstim <- getSdBoot(object,
+                frequencies = frequencies,
+                levels.1 = levels.1,
+                levels.2 = levels.2)}
+      )
+      
+      J <- length(frequencies)
+      K1 <- length(levels.1)
+      K2 <- length(levels.2)
+
+      
+      if (type == "naive.sd" || type == "boot.sd") {
+        v <- getValues(object,
+            frequencies = frequencies,
+            levels.1 = levels.1,
+            levels.2 = levels.2)[,,,1]
+        upperCIs <- array(v + sdEstim * qnorm(1-alpha/2), dim = c(J, K1, K2))
+        lowerCIs <- array(v + sdEstim * qnorm(alpha/2), dim = c(J, K1, K2))
+      } else if (type == "boot.full") {
+        # TODO: Error Msg ausgeben falls B == 0
+        B <- object@qPG@freqRep@B
+        v <- getValues(object,
+            frequencies = frequencies,
+            levels.1 = levels.1,
+            levels.2 = levels.2)[,,,2:(B+1)]
+        uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
+              imaginary = quantile(Im(x),1-alpha/2))}
+        lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
+              imaginary = quantile(Im(x),alpha/2))}
+        
+        upperCIs <- apply(v, c(1,2,3), uQuantile)
+        lowerCIs <- apply(v, c(1,2,3), lQuantile)
+      }
+      
+      res <- list(lowerCIs = lowerCIs, upperCIs = upperCIs)
+      return(res)
+    }
+)
+
+################################################################################
+#' Get associated \code{\link{Weight}} from a \code{\link{SmoothedPG}}.
+#' 
+#' @name getWeight-SmoothedPG
+#' @aliases getWeight,SmoothedPG-method
+#' 
+#' @keywords Access-association-functions
+#' 
+#' @param object \code{SmoothedPG} from which to get the \code{Weight}.
+#' @return Returns the \code{\link{Weight}} object associated.
+################################################################################
+setMethod(f = "getWeight",
+		signature = "SmoothedPG",
+		definition = function(object) {
+			return(object@weight)
+		}
+)
+
+################################################################################
+#' Get associated \code{\link{QuantilePG}} from a \code{\link{SmoothedPG}}.
+#' 
+#' @name getQuantilePG-SmoothedPG
+#' @aliases getQuantilePG,SmoothedPG-method
+#' 
+#' @keywords Access-association-functions
+#' 
+#' @param object \code{SmoothedPG} from which to get the \code{\link{QuantilePG}}.
+#' @return Returns the \code{\link{QuantilePG}} object associated.
+################################################################################
+setMethod(f = "getQuantilePG",
+		signature = "SmoothedPG",
+		definition = function(object) {
+			return(object@qPG)
+		}
+)
+
+################################################################################
+#' Create an instance of the \code{SmoothedPG} class.
+#' 
+#' A \code{SmoothedPG} object can be created from either
+#' \itemize{
+#'  \item a \code{numeric}, a \code{ts}, or a \code{zoo} object
+#' 	\item a \code{QuantilePG} object.
+#' }
+#' If a \code{QuantilePG} object is used for smoothing, only the \code{weight},
+#' \code{frequencies} and \code{levels.1} and \code{levels.2} parameters are
+#' used; all others are ignored. In this case the default values for the levels
+#' are the levels of the \code{QuantilePG} used for smoothing. Any subset of the
+#' levels available there can be chosen.   
+#' 
+#' The parameter \code{type.boot} can be set to choose a block bootstrapping
+#' procedure. If \code{"none"} is chosen, a moving blocks bootstrap with
+#' \code{l=length(Y)} and	\code{N=length(Y)} would be done. Note that in that
+#' case one would also chose \code{B=0} which means that \code{getPositions}
+#' would never be called. If \code{B>0} then each bootstrap replication would
+#' be the undisturbed time series.
+#'
+#' @name SmoothedPG-constructors
+#' @aliases smoothedPG
+#' @export
+#' 
+#' @keywords Constructors
+#' 
+#' @param object a time series (\code{numeric}, \code{ts}, or \code{zoo} object)
+#' 							 from which to determine the smoothed periodogram; alternatively
+#' 							 a \code{\link{QuantilePG}} object can be supplied.
+#' @param isRankBased If true the time series is first transformed to pseudo
+#'                    data.
+#' @param levels.1 A vector of length \code{K1} containing the levels \code{x1}
+#' 								 at which the SmoothedPG is to be determined.
+#' @param levels.2 A vector of length \code{K2} containing the levels \code{x2}.
+#' @param frequencies A vector containing frequencies at which to determine the
+#' 										smoothed periodogram.
+#' @param type A flag to choose the type of the estimator. Can be either
+#' 						 \code{"clipped"} or \code{"qr"}. In the first case
+#' 						 \code{\link{ClippedFT}} is used as a frequency representation, in
+#' 						 the second case \code{\link{QRegEstimator}} is used.
+#' @param B number of bootstrap replications 
+#' @param l (expected) length of blocks
+#' @param type.boot A flag to choose a method for the block bootstrap; currently
+#' 									two options are implemented: \code{"none"} and \code{"mbb"}
+#' 									which means to do a moving blocks	bootstrap with \code{B}
+#' 									and \code{l} as specified. 
+#' @param parallel a flag to allow performing parallel computations,
+#' 								  where possible.
+#' @param weight Object of type \code{\link{Weight}} to be used for smoothing.
+#' 
+#' @return Returns an instance of \code{SmoothedPG}.
+#' 
+#' @examples
+#' Y <- rnorm(16)
+#' levels.1 <- c(0.25,0.5,0.75)
+#' weight <- kernelWeight(W=W0)
+#' 
+#' # Version 1a of the constructor -- for numerics:
+#' sPG.ft <- smoothedPG(Y, levels.1 = levels.1, weight = weight, type="clipped")
+#' sPG.qr <- smoothedPG(Y, levels.1 = levels.1, weight = weight, type="qr")
+#'
+#' # Version 1b of the constructor -- for ts objects:
+#' sPG.ft <- smoothedPG(wheatprices, levels.1 = c(0.05,0.5,0.95), weight = weight)
+#'  
+#' # Version 1c of the constructor -- for zoo objects:
+#' sPG.ft <- smoothedPG(sp500, levels.1 = c(0.05,0.5,0.95), weight = weight)
+#' 
+#' # Version 2 of the constructor:
+#' qPG.ft <- quantilePG(Y, levels.1 = levels.1, type="clipped")
+#' sPG.ft <- smoothedPG(qPG.ft, weight = weight)
+#' qPG.qr <- quantilePG(Y, levels.1 = levels.1, type="qr")
+#' sPG.qr <- smoothedPG(qPG.qr, weight = weight)
+################################################################################
+smoothedPG <- function(
+    object,
+    frequencies=2*pi/length(object) * 0:(length(object)-1),
+    levels.1 = 0.5,
+    levels.2=levels.1,
+    isRankBased=TRUE,
+    type=c("clipped","qr"),
+    type.boot=c("none","mbb"),
+    parallel=FALSE,
+    B = 0,
+    l = 1,
+    weight = kernelWeight()) {
+  
+  if (class(object) == "numeric") {
+    versConstr <- 1
+    Y <- object
+  } else if (class(object) == "ts") {
+    versConstr <- 1
+    Y <- object[1:length(object)]
+  } else if (class(object) == "zoo") {
+    versConstr <- 1
+    Y <- coredata(object)
+  } else if (class(object) == "QuantilePG") {
+    versConstr <- 2
+
+
+    
+    if (!hasArg(frequencies)) {
+      Y <- object@freqRep@Y
+      frequencies <- 2*pi/length(Y) * 0:(length(Y)-1)
+    }
+
+    if (!hasArg(levels.1)) {
+      levels.1 <- getLevels(object,1)
+    }
+    if (!hasArg(levels.2)) {
+      levels.2 <- getLevels(object,2)
+    }
+    
+  } else {
+    stop("object is neither 'numeric', 'ts', 'zoo', nor 'QuantilePG'.")
+  }
+  
+  if (versConstr == 1) {
+    
+    levels.all <- union(levels.1, levels.2)
+    K1 <- length(levels.1)
+    K2 <- length(levels.2)
+    
+    J <- length(frequencies)
+    
+    qPG <- quantilePG(Y, frequencies = 2*pi/length(Y) * 0:(length(Y)-1),
+        levels.1 = levels.1,
+        levels.2 = levels.2,
+        isRankBased = isRankBased,
+        type=type, type.boot = type.boot, B=B, l=l)
+  } else if (versConstr == 2) {
+    qPG <- object
+  }
+  
+  obj <- new(
+      Class = "SmoothedPG",
+      qPG = qPG,
+      weight = weight,
+      frequencies = frequencies,
+      levels = list(levels.1, levels.2)
+  )
+  
+  return(obj)
+  
+}
+  
+
+################################################################################
+#' Plot the values of a \code{\link{SmoothedPG}}.
+#' 
+#' Creates a \code{K} x \code{K} plot depicting a smoothed quantile periodogram.
+#' Optionally, the quantile periodogram on which the smoothing was performed,
+#' a simulated quantile spectral density, and pointwise confidence intervals can
+#' be displayed.
+#' In each of the subplots either the real part (on and below the diagonal;
+#' i. e., \eqn{\tau_1 \leq \tau_2}{tau1 <= tau2}) or the imaginary parts
+#' (above the diagonal; i. e., \eqn{\tau_1 > \tau_2}{tau1 > tau2}) of
+#' \itemize{
+#' 	\item the smoothed quantile periodogram (blue line),
+#' 	\item the quanitle peridogram that was used for smoothing (gray line),
+#' 	\item a simulated quantile spectral density (red line),
+#' 	\item pointwise (asymptotic) confidence intervals (light gray area),
+#' }
+#' for the combination of levels \eqn{\tau_1}{tau1} and \eqn{\tau_2}{tau2}
+#' denoted on the left and bottom margin of the plot are displayed.   
+#' 
+#' @name plot-SmoothedPG
+#' @aliases plot,SmoothedPG,ANY-method
+#' @export
+#' 
+#' @importFrom abind abind
+#' 
+#' @param x  The \code{\link{SmoothedPG}} object to plot
+#' @param plotPG a flag indicating weater the \code{QuantilePG} object
+#' 						   associated with the \code{\link{SmoothedPG}} \code{x}
+#' 							 is also to be plotted.
+#' @param qsd  a \code{\link{QuantileSD}} object; will be plotted if not
+#' 						 missing.
+#' @param ptw.CIs the confidence level for the confidence intervals to be 
+#' 							  displayed; must be a number from [0,1]; if null, then no
+#' 								confidence intervals will be plotted.
+#' @param type.CIs indicates the method to be used for determining the
+#' 								 confidence intervals; the methods available are those provided by
+#' 								 \code{\link{getPointwiseCIs-SmoothedPG}}.
+#' @param ratio quotient of width over height of the subplots; use this
+#' 							parameter to produce landscape or portrait shaped plots.
+#' @param type.scaling a method for scaling of the subplots; currently there
+#' 										 are three options: \code{"individual"} will scale each of the
+#' 										 \code{K^2} subplots to minimum and maximum of the values
+#' 										 in that plot, \code{"real-imaginary"} will scale each of the
+#' 										 subplots displaying real parts and each of the subplots
+#' 										 displaying imaginary parts to the minimum and maximum of
+#' 										 the values display in these subportion of plots. The
+#' 										 option \code{"all"} will scale the subplots to the minimum and
+#' 										 maximum in all of the subplots.
+#' @param frequencies a set of frequencies for which the values are to be
+#' 									 plotted.
+#' @param levels a set of levels for which the values are to be plotted.
+#' 
+#' @return Returns the plot described in the Description section.
+################################################################################
+
+setMethod(f = "plot",
+    signature = signature("SmoothedPG"),
+    definition = function(x, plotPG=FALSE, qsd,
+        ptw.CIs = 0.1, type.CIs = c("naive.sd", "boot.sd", "boot.full"),
+        ratio = 3/2,
+        type.scaling = c("individual", "real-imaginary", "all"),
+        frequencies=x@frequencies,
+        levels=intersect(x@levels[[1]], x@levels[[2]])) {
+      
+    def.par <- par(no.readonly = TRUE) # save default, for resetting...
+
+		# workaround: default values don't seem to work for generic functions?
+    if (!hasArg(frequencies)) {
+      frequencies <- x@frequencies
+    }
+    if (!hasArg(levels)) {
+      levels <- intersect(x@levels[[1]], x@levels[[2]])
+    }
+    if (!hasArg(plotPG)) {
+      plotPG <- FALSE
+    }
+    if (!hasArg(ptw.CIs)) {
+      ptw.CIs <- 0.1
+    }
+    if (!hasArg(type.CIs)) {
+      type.CIs <- "naive.sd"
+    }
+    if (!hasArg(ratio)) {
+      ratio <- 3/2
+    }
+    if (!hasArg(type.scaling)) {
+      type.scaling <- c("individual", "real-imaginary", "all")
+    }
+    # end: workaround
+      
+tryCatch({
+    
+    K <- length(levels)
+    values <- getValues(x, frequencies = frequencies,
+        levels.1=levels, levels.2=levels)
+    if (plotPG) {
+      PG <- getValues(x@qPG, frequencies = frequencies,
+          levels.1=levels, levels.2=levels)
+    }
+    if (hasArg(qsd)) {
+      j.min <- round(min(frequencies*2^8/(2*pi)))
+      j.max <- round(max(frequencies*2^8/(2*pi)))
+      freq.csd <- 2*pi*(j.min:j.max)/2^8
+      csd <- getValues(qsd, frequencies = freq.csd,
+          levels.1=levels, levels.2=levels)
+    }
+    
+    text.headline <- x@weight@descr
+    if (ptw.CIs > 0) {
+      CI <- getPointwiseCIs(x, frequencies = frequencies,
+          alpha=ptw.CIs, type=type.CIs,
+          levels.1=levels, levels.2=levels)
+      lowerCIs  <- CI$lowerCIs
+      upperCIs  <- CI$upperCIs
+      text.headline <- (paste(text.headline, ", includes ",1-ptw.CIs,"-CI (ptw. of type '",type.CIs,"')",sep=""))
+    }
+
+    X <- frequencies/(2*pi)
+
+    allVals <- array(values[,,,1], dim=c(length(X), K, K))
+    if (plotPG)  {
+      allVals <- abind(allVals, array(PG[,,,1], dim=c(length(X), K, K)), along=1)
+    }
+    if (hasArg(qsd)) {
+      allVals <- abind(allVals, csd, along=1)
+    }
+    if (ptw.CIs > 0) {
+      allVals <- abind(allVals, lowerCIs, upperCIs, along=1)
+    }
+    type.scaling <- match.arg(type.scaling)[1]
+    
+    # TEST
+    p <- K
+    M1 <- cbind((p^2+1):(p^2+p),matrix(1:p^2, ncol=p))
+    M <- rbind(M1,c(0,(p^2+p+1):(p^2+2*p)),c(0,rep(p^2+2*p+1,p)))
+    nf <- layout(M, c(lcm(1),rep(ratio,p)), c(rep(1,p),lcm(1),lcm(1)), TRUE)
+    par(mar=c(2,2,1,1))
+    # END TEST
+    
+    for (i1 in 1:K) {
+      for (i2 in 1:K) {
+        if (i2 >= i1) {
+          switch(type.scaling,
+              "individual" = {
+                y.min <- min(Re(allVals[,i1,i2]))
+                y.max <- max(Re(allVals[,i1,i2]))},
+              "real-imaginary" = {
+                y.min <- min(Re(allVals))
+                y.max <- max(Re(allVals))},
+              "all" = {
+                y.min <- min(Re(allVals),Im(allVals))
+                y.max <- max(Re(allVals),Im(allVals))}
+          )
+          
+          plot(x=0,y=0, type="n", xlab="", ylab="", #xlab=xl, ylab=yl,
+              xlim=c(min(X), max(X)), ylim=c(y.min, y.max))
+          if (ptw.CIs > 0) {
+            polygon(x=c(X,rev(X)), y=c(Re(lowerCIs[,i1,i2]),rev(Re(upperCIs[,i1,i2]))),
+                    col="lightgray", border=NA)
+          }
+          if (plotPG) {
+            lines(x=X, y=Re(PG[,i1,i2,1]), col=gray(0.5))
+          }
+          if (hasArg(qsd)) {
+            lines(x=freq.csd/(2*pi), y=Re(csd[,i1,i2]), col="red")
+          }
+          lines(x=X, y=Re(values[,i1,i2,1]),
+              ylim=c(min(Re(allVals)), max(Re(allVals))),
+              type="l", col="blue")
+        } else {
+          switch(type.scaling,
+              "individual" = {
+                y.min <- min(Im(allVals[,i1,i2]))
+                y.max <- max(Im(allVals[,i1,i2]))},
+              "real-imaginary" = {
+                y.min <- min(Im(allVals))
+                y.max <- max(Im(allVals))},
+              "all" = {
+                y.min <- min(Re(allVals),Im(allVals))
+                y.max <- max(Re(allVals),Im(allVals))}
+          )
+          plot(x=0,y=0, type="n", xlab="", ylab="", #xlab=xl, ylab=yl,
+              xlim=c(min(X), max(X)), ylim=c(y.min, y.max))
+          if (ptw.CIs > 0) {
+            polygon(x=c(X,rev(X)), y=c(Im(lowerCIs[,i1,i2]),rev(Im(upperCIs[,i1,i2]))),
+                    col="lightgray", border=NA)
+          }
+          if (plotPG) {
+            lines(x=X, y=Im(PG[,i1,i2,1]), col=gray(0.5))
+          }
+          if (hasArg(qsd)) {
+            lines(x=freq.csd/(2*pi), y=Im(csd[,i1,i2]), col="red")
+          }
+          lines(x=X, y=Im(values[,i1,i2,1]),
+              ylim=c(min(Im(allVals)), max(Im(allVals))),
+              type="l", col="blue")
+        }
+      }
+    }
+    
+    par(mar=c(0,0,0,0))
+    for (i in 1:p) {
+      plot.new()
+      text(0.5,0.5,substitute(paste(tau[1],"=",k),list(k=levels[i])), srt=90)
+    }
+    
+    for (i in 1:p) {
+      plot.new()
+      text(0.5,0.5,substitute(paste(tau[2],"=",k),list(k=levels[i])))
+    }
+    plot.new()
+    text(0.5,0.5,expression(omega/2*pi))
+    
+    },  error = function(e) e,
+    warning = function(w) w,
+    finally = {
+      par(def.par)  #- reset to default
+    })
+  }
+)

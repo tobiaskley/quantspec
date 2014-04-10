@@ -1,0 +1,55 @@
+\docType{methods}
+\name{plot-QuantilePG}
+\alias{plot,QuantilePG,ANY-method}
+\alias{plot-QuantilePG}
+\title{Plot the values of the \code{\link{QuantilePG}}.}
+\usage{
+\S4method{plot}{QuantilePG,ANY}(x, qsd, ratio = 3/2,
+  type.scaling = c("individual", "real-imaginary", "all"),
+  frequencies = x@frequencies, levels = intersect(x@levels[[1]],
+  x@levels[[2]]))
+}
+\arguments{
+  \item{x}{The \code{\link{QuantilePG}} object to plot}
+
+  \item{qsd}{a \code{\link{QuantileSD}} object; will be
+  plotted if not missing.}
+
+  \item{ratio}{quotient of width over height of the
+  subplots; use this parameter to produce landscape or
+  portrait shaped plots.}
+
+  \item{type.scaling}{a method for scaling of the subplots;
+  currently there are three options: \code{"individual"}
+  will scale each of the \code{K^2} subplots to minimum and
+  maximum of the values in that plot,
+  \code{"real-imaginary"} will scale each of the subplots
+  displaying real parts and each of the subplots displaying
+  imaginary parts to the minimum and maximum of the values
+  display in these subportion of plots. The option
+  \code{"all"} will scale the subplots to the minimum and
+  maximum in all of the subplots.}
+
+  \item{frequencies}{a set of frequencies for which the
+  values are to be plotted.}
+
+  \item{levels}{a set of levels for which the values are to
+  be plotted.}
+}
+\value{
+Returns the plot described in the Description section.
+}
+\description{
+Creates a \code{K} x \code{K} plot depicting a quantile
+periodogram. Optionally, a simulated copula spectral
+density can be displayed. In each of the subplots either
+the real part (on and below the diagonal; i. e.,
+\eqn{\tau_1 \leq \tau_2}{tau1 <= tau2}) or the imaginary
+parts (above the diagonal; i. e., \eqn{\tau_1 >
+\tau_2}{tau1 > tau2}) of \itemize{ \item the quantile
+periodogram (black line), \item a simulated quantile
+spectral density (red line), } for the combination of
+levels \eqn{\tau_1}{tau1} and \eqn{\tau_2}{tau2} denoted on
+the left and bottom margin of the plot are displayed.
+}
+

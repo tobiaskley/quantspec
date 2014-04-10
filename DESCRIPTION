@@ -1,0 +1,44 @@
+Package: quantspec
+Version: 1.0-0
+Date: 2014-04-15
+Title: Quantile-based Spectral Analysis of Time Series
+Authors@R: person("Tobias", "Kley", role=c("aut","cre"),
+    email = "tobias.kley@ruhr-uni-bochum.de")
+Depends:
+    R (>= 3.0.2),
+    stats4,
+    methods,
+    graphics
+Imports:
+    quantreg,
+    testthat,
+    abind,
+    zoo,
+    rje,
+    tcltk,
+    snowfall
+Description: Methods to determine, smooth and plot quantile (i. e., Laplace or
+    copula) periodograms for univariate time series.
+License: GPL (>= 2)
+LazyData: TRUE
+Collate:
+    'Class-BootPos.R'
+    'generics.R'
+    'aux-functions.R'
+    'Class-QSpecQuantity.R'
+    'Class-FreqRep.R'
+    'Class-ClippedFT.R'
+    'Class-QuantileSD.R'
+    'Class-IntegrQuantileSD.R'
+    'Class-Weight.R'
+    'Class-KernelWeight.R'
+    'Class-MovingBlocks.R'
+    'Class-QRegEstimator.R'
+    'Class-QuantilePG.R'
+    'Class-SmoothedPG.R'
+    'Class-SpecDistrWeight.R'
+    'data.R'
+    'depreciated.R'
+    'kernels.R'
+    'models.R'
+    'quantspec-package.R'

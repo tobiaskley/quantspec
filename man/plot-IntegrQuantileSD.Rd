@@ -1,0 +1,39 @@
+\docType{methods}
+\name{plot-IntegrQuantileSD}
+\alias{plot,IntegrQuantileSD,ANY-method}
+\alias{plot-IntegrQuantileSD}
+\title{Plot the values of the \code{\link{IntegrQuantileSD}}.}
+\usage{
+\S4method{plot}{IntegrQuantileSD,ANY}(x, ratio = 3/2, frequencies = 2 * pi *
+  (1:(floor(getN(getQuantileSD(x))/2)))/getN(getQuantileSD(x)),
+  levels = getLevels(x, 1))
+}
+\arguments{
+  \item{x}{The \code{\link{IntegrQuantileSD}} to plot}
+
+  \item{ratio}{quotient of width over height of the
+  subplots; use this parameter to produce landscape or
+  portrait shaped plots.}
+
+  \item{frequencies}{a set of frequencies for which the
+  values are to be plotted.}
+
+  \item{levels}{a set of levels for which the values are to
+  be plotted.}
+}
+\value{
+Plots the simulated integrated quantile spectral density
+for all \code{frequencies} and \code{levels} specified.
+}
+\description{
+Creates a \code{K} x \code{K} plot depicting an integrated
+quantile spectral density. In each of the subplots either
+the real part (on and below the diagonal; i. e.,
+\eqn{\tau_1 \leq \tau_2}{tau1 <= tau2}) or the imaginary
+part (above the diagonal; i. e., \eqn{\tau_1 > \tau_2}{tau1
+> tau2}) of \itemize{ \item the integrated quantile
+spectral density (black line), } for the combination of
+levels \eqn{\tau_1}{tau1} and \eqn{\tau_2}{tau2} denoted on
+the left and bottom margin of the plot are displayed.
+}
+
