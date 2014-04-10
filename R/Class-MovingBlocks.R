@@ -77,7 +77,7 @@ setMethod(f = "getPositions",
     
     for (b in 1:B) {
       blocks <- matrix(ncol=nBlocks, nrow=l)
-      blocks[1,] <- ceiling(runif(n=nBlocks, min=0,max=N-l))
+			blocks[1,] <- floor(runif(n=nBlocks, min=1,max=N-l+1))
       if (l > 1) {
 				for (i in 2:l) {
 					blocks[i,] <- blocks[1,]+i-1
