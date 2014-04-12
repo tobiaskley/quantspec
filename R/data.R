@@ -1,12 +1,12 @@
 ################################################################################
-#' S&P 500: Standard and Poor's 500 stock index, 2004--2006
+#' S&P 500: Standard and Poor's 500 stock index, 2007--2010
 #'
-#' Contains the returns of the S&P 500 stock index for the years 2004--2006.
+#' Contains the returns of the S&P 500 stock index for the years 2007--2010.
 #' The returns were computed as \code{(Adjusted.Close-Open)/Open}.
 #'
 #' The data was downloaded from the Yahoo! Finance Website.
 #'
-#' @format A univariate time series with 755 observations; a \code{zoo} object
+#' @format A univariate time series with 1008 observations; a \code{zoo} object
 #'
 #' @name data-sp500
 #' @aliases sp500
