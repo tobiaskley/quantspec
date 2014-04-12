@@ -303,7 +303,8 @@ quantilePG <- function( Y,
 #'                      option \code{"all"} will scale the subplots to the minimum and
 #'                      maximum in all of the subplots.
 #' @param frequencies a set of frequencies for which the values are to be
-#'                    plotted.
+#'                    plotted; default is all available frequencies but 0; if 0 is the
+#'                     only available frequency, then only 0 will be used.
 #' @param levels a set of levels for which the values are to be plotted.
 #'
 #' @return Returns the plot described in the Description section.
@@ -314,7 +315,7 @@ setMethod(f = "plot",
     definition = function(x, qsd,
         ratio = 3/2,
         type.scaling = c("individual", "real-imaginary", "all"),
-        frequencies=x@frequencies,
+        frequencies=x@frequencies[-which(x@frequencies == 0)],
         levels=intersect(x@levels[[1]], x@levels[[2]])) {
 
     def.par <- par(no.readonly = TRUE) # save default, for resetting...
@@ -327,7 +328,11 @@ setMethod(f = "plot",
       type.scaling <- c("individual", "real-imaginary", "all")
     }
     if (!hasArg(frequencies)) {
-      frequencies <- x@frequencies
+      if (length(x@frequencies[-which(x@frequencies == 0)]) > 0) {
+        frequencies <- x@frequencies[-which(x@frequencies == 0)]
+      } else {
+        frequencies <- x@frequencies
+      }
     }
     if (!hasArg(levels)) {
       levels <- intersect(x@levels[[1]], x@levels[[2]])

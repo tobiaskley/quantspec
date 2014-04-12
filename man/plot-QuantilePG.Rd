@@ -6,8 +6,8 @@
 \usage{
 \S4method{plot}{QuantilePG,ANY}(x, qsd, ratio = 3/2,
   type.scaling = c("individual", "real-imaginary", "all"),
-  frequencies = x@frequencies, levels = intersect(x@levels[[1]],
-  x@levels[[2]]))
+  frequencies = x@frequencies[-which(x@frequencies == 0)],
+  levels = intersect(x@levels[[1]], x@levels[[2]]))
 }
 \arguments{
   \item{x}{The \code{\link{QuantilePG}} object to plot}
@@ -31,7 +31,9 @@
   maximum in all of the subplots.}
 
   \item{frequencies}{a set of frequencies for which the
-  values are to be plotted.}
+  values are to be plotted; default is all available
+  frequencies but 0; if 0 is the only available frequency,
+  then only 0 will be used.}
 
   \item{levels}{a set of levels for which the values are to
   be plotted.}
