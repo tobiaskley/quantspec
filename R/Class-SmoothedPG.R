@@ -356,7 +356,7 @@ setMethod(f = "getSdNaive",
         WW <- getValues(weight, N=N)[c(2:N,1)] # WW[j] corresponds to W_n(2 pi j/n)
         WW3 <- rep(WW,4)
 
-        V <- getValues(object, frequencies = 2*pi*(1:(N-1))/N)[,,,1]
+        V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N)[,,,1], dim=c(N-1,K1,K2))
 
         res <- array(0,dim=c(N,K1,K2))
 
@@ -404,7 +404,7 @@ setMethod(f = "getSdNaive",
         res <- array(apply(res,c(1,2,3),sqrt.cw),dim=c(N,K1,K2))
 
         object@env$sdNaive.done <- TRUE
-        object@env$sdNaive <- res[1:(floor(N/2)+1),,]
+        object@env$sdNaive <- res[1:(floor(N/2)+1),,, drop=F]
       }
 
       ##############################
@@ -542,7 +542,7 @@ setMethod(f = "getSdBoot",
         B <- object@qPG@freqRep@B
 
         v <- getValues(object, frequencies = frequencies,
-            levels.1 = levels.1, levels.2 = levels.2)[,,,2:(B+1)]
+            levels.1 = levels.1, levels.2 = levels.2)[,,,2:(B+1), drop=F]
         object@env$sdBoot <- apply(v, c(1,2,3), complex.var)
       }
       return(object@env$sdBoot)
@@ -658,7 +658,7 @@ setMethod(f = "getPointwiseCIs",
         v <- getValues(object,
             frequencies = frequencies,
             levels.1 = levels.1,
-            levels.2 = levels.2)[,,,2:(B+1)]
+            levels.2 = levels.2)[,,,2:(B+1), drop=F]
         uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
               imaginary = quantile(Im(x),1-alpha/2))}
         lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
