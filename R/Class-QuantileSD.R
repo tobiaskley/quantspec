@@ -192,7 +192,7 @@ setMethod(f = "increasePrecision",
       }
 
       object@R <- object@R + R
-      object@stdError <- Re(1/(object@R-1) * (sumSqPG - 1/(object@R)*abs(sumPG)^2))
+      object@stdError <- Re(1/(object@R-1) * (sumSqPG - 1/(object@R)*abs(sumPG)^2)) / sqrt(object@R)
 
       object@sumPG <- sumPG
       object@sumSqPG <- sumSqPG
@@ -651,11 +651,11 @@ setMethod(f = "plot",
       levels <- getLevels(x,1)
     }
     # end: workaround
-			
-		if (length(levels) == 0) {
-			stop("There has to be at least one level to plot.")
-		}
-		
+
+    if (length(levels) == 0) {
+      stop("There has to be at least one level to plot.")
+    }
+
 tryCatch({
 
     N <- x@N
@@ -700,9 +700,9 @@ tryCatch({
     text(0.5,0.5,expression(omega/2*pi))
 
 },  error = function(e) e,
-		warning = function(w) w,
-		finally = {
-			par(def.par)  #- reset to default
-		})
+    warning = function(w) w,
+    finally = {
+      par(def.par)  #- reset to default
+    })
   }
 )
