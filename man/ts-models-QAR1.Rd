@@ -25,7 +25,7 @@ Returns an QAR(1) time series with specified parameters.
 \description{
 Returns a simulated time series \eqn{(Y_t)} that fulfills
 the following equation: \deqn{Y_t = \theta_1(U_t) Y_{t-1} +
-theta_0(U_t),} where \eqn{\theta_1} and \eqn{\theta_0} are
+\theta_0(U_t),} where \eqn{\theta_1} and \eqn{\theta_0} are
 parameters and \eqn{U_t} is independent white noise with
 uniform \eqn{[0,1]} marginal distributions.
 }

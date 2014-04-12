@@ -21,7 +21,7 @@ clippedFT(Y, frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
   representation is to be determined.}
 
   \item{isRankBased}{If true the time series is first
-  transformed to pseudo data.}
+  transformed to pseudo data [cf. \code{\link{FreqRep}}].}
 
   \item{B}{number of bootstrap replications}
 

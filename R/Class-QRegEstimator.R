@@ -178,7 +178,7 @@ setMethod(f = "getParallel",
 #'           which to determine the quantile periodogram or a \code{ts} object
 #'           or a \code{zoo} object.
 #' @param isRankBased If true the time series is first transformed to pseudo
-#'                    data.
+#'                    data [cf. \code{\link{FreqRep}}].
 #' @param levels A vector of length \code{K} containing the levels \code{x}
 #'                  at which the \code{QRegEstimator} is to be determined.
 #' @param frequencies A vector containing frequencies at which to determine the

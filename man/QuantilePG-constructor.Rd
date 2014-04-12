@@ -15,7 +15,7 @@ quantilePG(Y, frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
   object.}
 
   \item{isRankBased}{If true the time series is first
-  transformed to pseudo data.}
+  transformed to pseudo data [cf. \code{\link{FreqRep}}].}
 
   \item{levels.1}{A vector of length \code{K1} containing
   the levels \code{x1} at which the QuantilePG is to be

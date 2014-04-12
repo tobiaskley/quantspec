@@ -740,7 +740,7 @@ setMethod(f = "getQuantilePG",
 #'                from which to determine the smoothed periodogram; alternatively
 #'                a \code{\link{QuantilePG}} object can be supplied.
 #' @param isRankBased If true the time series is first transformed to pseudo
-#'                    data.
+#'                    data [cf. \code{\link{FreqRep}}].
 #' @param levels.1 A vector of length \code{K1} containing the levels \code{x1}
 #'                  at which the SmoothedPG is to be determined.
 #' @param levels.2 A vector of length \code{K2} containing the levels \code{x2}.
@@ -763,7 +763,7 @@ setMethod(f = "getQuantilePG",
 #' @return Returns an instance of \code{SmoothedPG}.
 #'
 #' @examples
-#' Y <- rnorm(16)
+#' Y <- rnorm(64)
 #' levels.1 <- c(0.25,0.5,0.75)
 #' weight <- kernelWeight(W=W0)
 #'

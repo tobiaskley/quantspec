@@ -122,12 +122,12 @@ setMethod(
 #'               \code{\link{ClippedFT}} frequency representation is to be
 #'               determined.
 #' @param isRankBased If true the time series is first transformed to pseudo
-#'                    data.
+#'                    data [cf. \code{\link{FreqRep}}].
 #' @param B number of bootstrap replications
 #' @param l (expected) length of blocks
 #' @param type.boot A flag to choose a method for the block bootstrap; currently
 #'                  two options are implemented: \code{"none"} and \code{"mbb"}
-#'                  which means to do a moving blocks	bootstrap with \code{B}
+#'                  which means to do a moving blocks  bootstrap with \code{B}
 #'                  and \code{l} as specified.
 #'
 #' @return Returns an instance of \code{ClippedFT}.

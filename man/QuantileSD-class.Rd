@@ -73,7 +73,7 @@ super-class \code{\link{QSpecQuantity}} apply.
 R <- 50                      # number of independent repetitions;
                              # R should be much larger than this in practice!
 N <- 2^8                     # number of Fourier frequencies in [0,2pi)
-ts <- ts3                    # time series model
+ts <- ts1                    # time series model
 levels <- seq(0.1,0.9,0.1)   # quantile levels
 type <- "copula"             # copula, not Laplace, spectral density kernel
 seed.init <- 2581            # seed for the pseudo random numbers
@@ -86,14 +86,14 @@ qsd <- quantileSD(N=N, seed.init = 2581, type = type,
 V1 <- getValues(qsd)
 
 ## It is also possible to fetch the result for only a few levels
-levels.few <- c(0.25,0.5,0.75)
+levels.few <- c(0.2,0.5,0.7)
 V2 <- getValues(qsd, levels.1=levels.few, levels.2=levels.few)
 
 ## If desired additional repetitions can be performed to yield a more precise
 ## simulation result by calling; here the number of independent runs is doubled.
 sCSD <- increasePrecision(qsd,R)
 
-## Often the result will be stored for later usage.  
+## Often the result will be stored for later usage.
 save(qsd, file="QAR1.rdata")
 
 ## Take a brief look at the result of the simulation

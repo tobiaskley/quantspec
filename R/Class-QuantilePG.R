@@ -199,7 +199,7 @@ setMethod(f = "getFreqRep",
 #'           which to determine the quantile periodogram or a \code{ts} object
 #'           or a \code{zoo} object.
 #' @param isRankBased If true the time series is first transformed to pseudo
-#'                    data.
+#'                    data [cf. \code{\link{FreqRep}}].
 #' @param levels.1 A vector of length \code{K1} containing the levels \code{x1}
 #'                  at which the QuantilePG is to be determined.
 #' @param levels.2 A vector of length \code{K2} containing the levels \code{x2}.
@@ -335,7 +335,7 @@ setMethod(f = "plot",
     # end: workaround
 
     if (length(levels) == 0) {
-			stop("There has to be at least one level to plot.")
+      stop("There has to be at least one level to plot.")
     }
 
 tryCatch({

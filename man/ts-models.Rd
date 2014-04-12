@@ -1,15 +1,15 @@
 \name{ts-models}
 \alias{ts-models}
+\alias{ts1}
+\alias{ts2}
 \alias{ts3}
-\alias{ts5}
-\alias{ts8}
 \title{Functions to simulate from the time series models in Kley et. al (2014).}
 \usage{
+ts1(n)
+
+ts2(n)
+
 ts3(n)
-
-ts5(n)
-
-ts8(n)
 }
 \arguments{
   \item{n}{length of the time series to be returned}
@@ -19,17 +19,17 @@ Functions to simulate from the time series models in Kley
 et. al (2014).
 }
 \details{
-\code{ts3} QAR(1) model from Dette et. al (2014+).
+\code{ts1} QAR(1) model from Dette et. al (2014+).
 
-\code{ts5} AR(2) model from Li (2012):
+\code{ts2} AR(2) model from Li (2012):
 
-\code{ts8} ARCH(1) model from Lee and Subba Rao (2012):
+\code{ts3} ARCH(1) model from Lee and Subba Rao (2012):
 }
 \examples{
 # Plot sample paths:
+plot(ts1(100), type="l")
+plot(ts2(100), type="l")
 plot(ts3(100), type="l")
-plot(ts5(100), type="l")
-plot(ts8(100), type="l")
 }
 \references{
 Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+). Of

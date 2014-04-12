@@ -2,7 +2,7 @@
 #' Simulation of an QAR(1) time series.
 #'
 #' Returns a simulated time series \eqn{(Y_t)} that fulfills the following equation:
-#' \deqn{Y_t = \theta_1(U_t) Y_{t-1} + theta_0(U_t),}
+#' \deqn{Y_t = \theta_1(U_t) Y_{t-1} + \theta_0(U_t),}
 #' where \eqn{\theta_1} and \eqn{\theta_0} are parameters and \eqn{U_t} is
 #' independent white noise with uniform \eqn{[0,1]} marginal distributions.
 #'
@@ -105,7 +105,7 @@ AR2 <- function(n,a1,a2,overhead=500,innov=rnorm) {
 #' Simulation of an ARCH(1) time series.
 #'
 #' Returns a simulated time series \eqn{(Y_t)} that fulfills the following equation:
-#' \deqn{Y_t = Z_t \sigma_t, \sigma_t^2 = a_0 + a_1 Y_{t-1} + \epsilon_t}
+#' \deqn{Y_t = Z_t \sigma_t, \quad \sigma_t^2 = a_0 + a_1 Y_{t-1}^2 + \epsilon_t}
 #' where \eqn{a_0} and \eqn{a_1} are parameters and \eqn{\epsilon_t} is
 #' independent white noise with marginal distribution specified by the
 #' parameter \code{innov}.
@@ -144,10 +144,10 @@ ARCH1 <- function(n,a0,a1,overhead=500,innov = rnorm) {
 #' Functions to simulate from the time series models in Kley et. al (2014).
 #'
 #' @details
-#' \code{ts3} QAR(1) model from Dette et. al (2014+).
+#' \code{ts1} QAR(1) model from Dette et. al (2014+).
 #'
 #' @name ts-models
-#' @aliases ts3
+#' @aliases ts1
 #'
 #' @export
 #'
@@ -160,18 +160,18 @@ ARCH1 <- function(n,a0,a1,overhead=500,innov = rnorm) {
 #'
 #' @examples
 #' # Plot sample paths:
-#' plot(ts3(100), type="l")
+#' plot(ts1(100), type="l")
 ################################################################################
 
 
-ts3 <- function(n){QAR1(n,th0=function(x){0.1*qnorm(x)})}
+ts1 <- function(n){QAR1(n,th0=function(x){0.1*qnorm(x)})}
 
 ################################################################################
 #' @details
-#' \code{ts5} AR(2) model from Li (2012):
+#' \code{ts2} AR(2) model from Li (2012):
 #'
 #' @name ts-models
-#' @aliases ts5
+#' @aliases ts2
 #' @export
 #'
 #' @references
@@ -179,9 +179,9 @@ ts3 <- function(n){QAR1(n,th0=function(x){0.1*qnorm(x)})}
 #' \emph{Journal of the American Statistical Association}, \bold{107}, 765--776.
 #'
 #' @examples
-#' plot(ts5(100), type="l")
+#' plot(ts2(100), type="l")
 ################################################################################
-ts5 <- function(n){
+ts2 <- function(n){
   #  r <- 0.6
   #  wc <- 2*pi*0.25
   #  a1 <- 2*r*cos(wc)
@@ -194,10 +194,10 @@ ts5 <- function(n){
 
 ################################################################################
 #' @details
-#' \code{ts8} ARCH(1) model from Lee and Subba Rao (2012):
+#' \code{ts3} ARCH(1) model from Lee and Subba Rao (2012):
 #'
 #' @name ts-models
-#' @aliases ts8
+#' @aliases ts3
 #' @export
 #'
 #' @references
@@ -206,8 +206,8 @@ ts5 <- function(n){
 #' Series. \url{http://arxiv.org/abs/1112.2759}.
 #'
 #' @examples
-#' plot(ts8(100), type="l")
+#' plot(ts3(100), type="l")
 ################################################################################
 
 # Example from Subba Rao's paper
-ts8 <- function(n){ARCH1(n,1/1.9,0.9,innov=function(n){rnorm(n)})}
+ts3 <- function(n){ARCH1(n,1/1.9,0.9,innov=function(n){rnorm(n)})}

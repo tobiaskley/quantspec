@@ -25,8 +25,8 @@ Return an ARCH(1) time series with specified parameters.
 }
 \description{
 Returns a simulated time series \eqn{(Y_t)} that fulfills
-the following equation: \deqn{Y_t = Z_t \sigma_t,
-\sigma_t^2 = a_0 + a_1 Y_{t-1} + \epsilon_t} where
+the following equation: \deqn{Y_t = Z_t \sigma_t, \quad
+\sigma_t^2 = a_0 + a_1 Y_{t-1}^2 + \epsilon_t} where
 \eqn{a_0} and \eqn{a_1} are parameters and \eqn{\epsilon_t}
 is independent white noise with marginal distribution
 specified by the parameter \code{innov}.

@@ -3,7 +3,7 @@
 
 ## Simulate a time series Y1,...,Y128 from the QAR(1) process discussed in
 ## Dette et. al (2014).
-Y <- ts3(64)
+Y <- ts1(64)
 
 ## For a defined set of quantile levels 
 levels <- c(0.25,0.5,0.75)
@@ -39,7 +39,7 @@ plot(qPG.cl, frequencies=2*pi*(1:32)/64, levels=c(0.25))
 ## We can also plot the same plot together with a (simulated) quantile spectral
 ## density kernel
 csd <- quantileSD(N=2^8, seed.init = 2581, type = "copula",
-    ts = ts3, levels.1=c(0.25), R = 100)
+    ts = ts1, levels.1=c(0.25), R = 100)
 plot(qPG.cl, qsd = csd, frequencies=2*pi*(1:32)/64, levels=c(0.25))
 
 ## Calling the getValues method allows for comparing the two quantile

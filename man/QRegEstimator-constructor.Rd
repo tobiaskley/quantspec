@@ -14,7 +14,7 @@ qRegEstimator(Y, frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
   object.}
 
   \item{isRankBased}{If true the time series is first
-  transformed to pseudo data.}
+  transformed to pseudo data [cf. \code{\link{FreqRep}}].}
 
   \item{levels}{A vector of length \code{K} containing the
   levels \code{x} at which the \code{QRegEstimator} is to

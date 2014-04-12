@@ -15,7 +15,7 @@ smoothedPG(object, frequencies = 2 * pi/length(object) * 0:(length(object) -
   \code{\link{QuantilePG}} object can be supplied.}
 
   \item{isRankBased}{If true the time series is first
-  transformed to pseudo data.}
+  transformed to pseudo data [cf. \code{\link{FreqRep}}].}
 
   \item{levels.1}{A vector of length \code{K1} containing
   the levels \code{x1} at which the SmoothedPG is to be
@@ -74,7 +74,7 @@ then each bootstrap replication would be the undisturbed
 time series.
 }
 \examples{
-Y <- rnorm(16)
+Y <- rnorm(64)
 levels.1 <- c(0.25,0.5,0.75)
 weight <- kernelWeight(W=W0)
 

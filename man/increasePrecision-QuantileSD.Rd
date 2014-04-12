@@ -27,7 +27,7 @@ the previous ones) and then including them in the average.
 }
 \examples{
 # First simulate a copula spectral density from R=20 independent runs.
-csd <- quantileSD(N=2^9, ts=ts3, levels.1=c(0.25,0.5), type="copula", R=20)
+csd <- quantileSD(N=2^9, ts=ts1, levels.1=c(0.25,0.5), type="copula", R=20)
 
 # Check out the result:
 getR(csd)
