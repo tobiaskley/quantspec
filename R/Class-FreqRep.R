@@ -333,7 +333,7 @@ setMethod(f = "show",
       K <- length(object@levels)
       B <- dim(values)[3]
 
-      cat(paste("\n",class(object)," (J=",J,", K=",K,", B=",B,")\n", sep=""))
+      cat(paste("\n",class(object)," (J=",J,", K=",K,", B+1=",B,")\n", sep=""))
 
       if (J <= 7) {
         cat("Frequencies: ", round(object@frequencies,4),"\n")
@@ -406,7 +406,7 @@ setMethod(f = "show",
     }
     # end: workaround
 
-tryCatch({			
+tryCatch({
 
     TT <- length(x@Y)
     K <- length(levels)
@@ -448,9 +448,9 @@ tryCatch({
     text(0.5,0.5,expression(omega/2*pi))
 
 },  error = function(e) e,
-		warning = function(w) w,
-		finally = {
-			par(def.par)  #- reset to default
-		})
+    warning = function(w) w,
+    finally = {
+      par(def.par)  #- reset to default
+    })
   }
 )

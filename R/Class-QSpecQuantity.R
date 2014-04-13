@@ -109,7 +109,7 @@ setMethod(f = "show",
     K2 <- length(object@levels[[2]])
     B <- dim(values)[4]
 
-    cat(paste("\n",class(object)," (J=",J,", K1=",K1,", K2=",K2,", B=",B,")\n", sep=""))
+    cat(paste("\n",class(object)," (J=",J,", K1=",K1,", K2=",K2,", B+1=",B,")\n", sep=""))
 
     if (J <= 7) {
       cat("Frequencies: ", object@frequencies,"\n")
