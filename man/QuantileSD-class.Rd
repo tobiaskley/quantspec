@@ -93,7 +93,7 @@ V2 <- getValues(qsd, levels.1=levels.few, levels.2=levels.few)
 ## simulation result by calling; here the number of independent runs is doubled.
 sCSD <- increasePrecision(qsd,R)
 
-## Often the result will be stored for later usage.
+## Often the result will be stored for later usage.  
 save(qsd, file="QAR1.rdata")
 
 ## Take a brief look at the result of the simulation

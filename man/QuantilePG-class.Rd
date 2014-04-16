@@ -32,7 +32,7 @@ All remarks made in the documentation of the super-class
 ## Dette et. al (2014).
 Y <- ts1(64)
 
-## For a defined set of quantile levels
+## For a defined set of quantile levels 
 levels <- c(0.25,0.5,0.75)
 
 ## the various quantile periodograms can be calculated calling quantilePG:
@@ -50,7 +50,7 @@ system.time(
         type.boot="mbb", B=250, l=2^5))
 
 ## The two previous calls also illustrate that computation of the CR-periodogram
-## is much more efficient than the quantile-regression based copula periodogram.
+## is much more efficient than the quantile-regression based copula periodogram.  
 
 ## Either periodogram can be plotted using the plot command
 plot(qPG.cl)
