@@ -626,6 +626,14 @@ quantileSD <- function(N=2^8,
 #' @param x  The \code{\link{QuantileSD}} to plot
 #' @param ratio quotient of width over height of the subplots; use this
 #'               parameter to produce landscape or portrait shaped plots.
+#' @param widthlab width for the labels (left and bottom); default is
+#' 							   \code{lcm(1)}, cf. \code{\link[graphics]{layout}}.
+#' @param xlab label that will be shown on the bottom of the plots; can be
+#' 						 an expression (for formulas), characters or \code{NULL} to
+#' 						 force omission (to save space).
+#' @param ylab label that will be shown on the left side of the plots;
+#' 						 can be an expression (for formulas), characters or
+#' 						 \code{NULL} to force omission (to save space).
 #' @param frequencies a set of frequencies for which the values are to be
 #'                    plotted.
 #' @param levels a set of levels for which the values are to be plotted.
@@ -637,7 +645,7 @@ quantileSD <- function(N=2^8,
 setMethod(f = "plot",
     signature = signature(x = "QuantileSD"),
     definition = function(x,
-        ratio = 3/2,
+        ratio = 3/2, widthlab = lcm(1), xlab = expression(omega/2*pi), ylab = NULL,
         frequencies=2*pi*(1:(floor(x@N/2)))/x@N,
         levels=getLevels(x,1)) {
 
@@ -665,11 +673,32 @@ tryCatch({
     meanPG <- getMeanPG(x, frequencies = frequencies,
         levels.1=levels, levels.2=levels)
 
-    # TEST
     p <- K
-    M1 <- cbind((p^2+1):(p^2+p),matrix(1:p^2, ncol=p))
-    M <- rbind(M1,c(0,(p^2+p+1):(p^2+2*p)),c(0,rep(p^2+2*p+1,p)))
-    nf <- layout(M, c(lcm(1),rep(ratio,p)), c(rep(1,p),lcm(1),lcm(1)), TRUE)
+    M <- matrix(1:p^2, ncol=p)
+    M.heights <- rep(1,p)
+    M.widths  <- rep(ratio,p)
+
+    # Add places for tau labels
+    M <- cbind((p^2+1):(p^2+p),M)
+    M.widths <- c(widthlab,M.widths)
+    M <- rbind(M,c(0,(p^2+p+1):(p^2+2*p)))
+    M.heights <- c(M.heights, widthlab)
+
+    i <- (p^2+2*p+1)
+    # Add places for labels
+    if (length(xlab)>0) {
+      M.heights <- c(M.heights, widthlab)
+      M <- rbind(M,c(rep(0,length(M.widths)-p),rep(i,p)))
+      i <- i + 1
+    }
+
+    if (length(ylab)>0) {
+      M <- cbind(c(rep(i,p),rep(0,length(M.heights)-p)),M)
+      M.widths <- c(widthlab,M.widths)
+    }
+
+    nf <- layout(M, M.widths, M.heights, TRUE)
+
     par(mar=c(2,2,1,1))
     # END TEST
 
@@ -696,8 +725,14 @@ tryCatch({
       plot.new()
       text(0.5,0.5,substitute(paste(tau[2],"=",k),list(k=levels[i])))
     }
-    plot.new()
-    text(0.5,0.5,expression(omega/2*pi))
+    if (length(xlab)>0) {
+      plot.new()
+      text(0.5, 0.5, xlab)
+    }
+    if (length(ylab)>0) {
+      plot.new()
+      text(0.5, 0.5, ylab, srt=90)
+    }
 
 },  error = function(e) e,
     warning = function(w) w,

@@ -4,7 +4,8 @@
 \alias{plot-QuantilePG}
 \title{Plot the values of the \code{\link{QuantilePG}}.}
 \usage{
-\S4method{plot}{QuantilePG,ANY}(x, qsd, ratio = 3/2,
+\S4method{plot}{QuantilePG,ANY}(x, qsd, ratio = 3/2, widthlab = lcm(1),
+  xlab = expression(omega/2 * pi), ylab = NULL,
   type.scaling = c("individual", "real-imaginary", "all"),
   frequencies = x@frequencies[-which(x@frequencies == 0)],
   levels = intersect(x@levels[[1]], x@levels[[2]]))
@@ -18,6 +19,19 @@
   \item{ratio}{quotient of width over height of the
   subplots; use this parameter to produce landscape or
   portrait shaped plots.}
+
+  \item{widthlab}{width for the labels (left and bottom);
+  default is \code{lcm(1)}, cf.
+  \code{\link[graphics]{layout}}.}
+
+  \item{xlab}{label that will be shown on the bottom of the
+  plots; can be an expression (for formulas), characters or
+  \code{NULL} to force omission (to save space).}
+
+  \item{ylab}{label that will be shown on the left side of
+  the plots; can be an expression (for formulas),
+  characters or \code{NULL} to force omission (to save
+  space).}
 
   \item{type.scaling}{a method for scaling of the subplots;
   currently there are three options: \code{"individual"}

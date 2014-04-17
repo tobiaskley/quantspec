@@ -4,7 +4,8 @@
 \alias{plot-IntegrQuantileSD}
 \title{Plot the values of the \code{\link{IntegrQuantileSD}}.}
 \usage{
-\S4method{plot}{IntegrQuantileSD,ANY}(x, ratio = 3/2, frequencies = 2 * pi *
+\S4method{plot}{IntegrQuantileSD,ANY}(x, ratio = 3/2, widthlab = lcm(1),
+  xlab = expression(omega/2 * pi), ylab = NULL, frequencies = 2 * pi *
   (1:(floor(getN(getQuantileSD(x))/2)))/getN(getQuantileSD(x)),
   levels = getLevels(x, 1))
 }
@@ -14,6 +15,19 @@
   \item{ratio}{quotient of width over height of the
   subplots; use this parameter to produce landscape or
   portrait shaped plots.}
+
+  \item{widthlab}{width for the labels (left and bottom);
+  default is \code{lcm(1)}, cf.
+  \code{\link[graphics]{layout}}.}
+
+  \item{xlab}{label that will be shown on the bottom of the
+  plots; can be an expression (for formulas), characters or
+  \code{NULL} to force omission (to save space).}
+
+  \item{ylab}{label that will be shown on the left side of
+  the plots; can be an expression (for formulas),
+  characters or \code{NULL} to force omission (to save
+  space).}
 
   \item{frequencies}{a set of frequencies for which the
   values are to be plotted.}
