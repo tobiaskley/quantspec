@@ -9,7 +9,7 @@ Laplace or copula) periodograms for univariate time series.
 }
 \details{
 \tabular{ll}{ \cr Package: \tab quantspec \cr Type: \tab
-Package \cr Version: \tab 1.0-0 \cr Date: \tab 2014-04-10
+Package \cr Version: \tab 1.0-0 \cr Date: \tab 2014-04-18
 \cr License: \tab GPL (>= 2) }
 }
 \section{Contents}{
