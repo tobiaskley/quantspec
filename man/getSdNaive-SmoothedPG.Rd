@@ -59,9 +59,6 @@ is the square root of the variance of the real part of the
 estimator and the imaginary part is the square root of the
 imaginary part of the variance of the estimator.
 }
-\examples{
-# Noch anpassen!!!
-}
 \references{
 Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
 Quantile Spectral Processes: Asymptotic Analysis and

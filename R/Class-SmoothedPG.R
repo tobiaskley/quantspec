@@ -318,9 +318,6 @@ setMethod(f = "getValues",
 #' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
 #' \url{http://arxiv.org/abs/1401.8104}.
-#'
-#' @examples
-#' # Noch anpassen!!!
 ################################################################################
 setMethod(f = "getSdNaive",
     signature = signature(
@@ -501,9 +498,6 @@ setMethod(f = "getSdNaive",
 #' @param levels.2 the second vector of levels for which to get the result
 #'
 #' @return Returns the estimate described above.
-#'
-#' @examples
-#' # Noch anpassen!!!
 ################################################################################
 
 setMethod(f = "getSdBoot",
@@ -597,7 +591,15 @@ setMethod(f = "getSdBoot",
 #'          containing the lower and upper bounds for the confidence intervals.
 #'
 #' @examples
-#' # Noch anpassen!!!
+#' sPG <- smoothedPG(rnorm(2^10), levels.1=0.5)
+#' CI.upper <- Re(getPointwiseCIs(sPG)$upperCIs[,1,1])
+#' CI.lower <- Re(getPointwiseCIs(sPG)$lowerCIs[,1,1])
+#' freq = 2*pi*(0:1023)/1024
+#' plot(x = freq, y = rep(0.25/(2*pi),1024),
+#'    ylim=c(min(CI.lower), max(CI.upper)),
+#'    type="l", col="red") # true spectrum
+#' lines(x = freq, y = CI.upper)
+#' lines(x = freq, y = CI.lower)
 ################################################################################
 setMethod(f = "getPointwiseCIs",
     signature = signature(
