@@ -1,0 +1,50 @@
+\docType{methods}
+\name{getValues-SmoothedPG}
+\alias{getValues,SmoothedPG-method}
+\alias{getValues-SmoothedPG}
+\title{Get values from a smoothed quantile periodogram.}
+\usage{
+\S4method{getValues}{SmoothedPG}(object, frequencies = 2 * pi *
+  (0:(length(object@qPG@freqRep@Y) - 1))/length(object@qPG@freqRep@Y),
+  levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2))
+}
+\arguments{
+  \item{object}{\code{SmoothedPG} of which to get the
+  values}
+
+  \item{frequencies}{a vector of frequencies for which to
+  get the values}
+
+  \item{levels.1}{the first vector of levels for which to
+  get the values}
+
+  \item{levels.2}{the second vector of levels for which to
+  get the values}
+}
+\value{
+Returns data from the array \code{values} that's a slot of
+\code{object}.
+}
+\description{
+The returned array of \code{values} is of dimension
+\code{[J,K1,K2,B+1]}, where \code{J=length(frequencies)},
+\code{K1=length(levels.1)}, \code{K2=length(levels.2))},
+and \code{B} denotes the value stored in slot \code{B} of
+\code{freqRep} [that is the number of boostrap repetitions
+performed on initialization]. At position
+\code{(j,k1,k2,b)} the returned value is the one
+corresponding to \code{frequencies[j]}, \code{levels.1[k1]}
+and \code{levels.2[k2]} that are closest to the
+\code{frequencies}, \code{levels.1} and \code{levels.2}
+available in \code{object}; \code{\link{closest.pos}} is
+used to determine what closest to means. \code{b==1}
+corresponds to the estimate without bootstrapping;
+\code{b>1} corresponds to the \code{b-1}st bootstrap
+estimate.
+}
+\seealso{
+An example on how to use this function is analogously to
+the example given in \code{\link{getValues-QuantilePG}}.
+}
+\keyword{Access-functions}
+

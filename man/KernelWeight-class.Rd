@@ -1,0 +1,50 @@
+\docType{class}
+\name{KernelWeight-class}
+\alias{KernelWeight}
+\alias{KernelWeight-class}
+\title{Class for Brillinger-type Kernel weights.}
+\description{
+\code{KernelWeight} is an S4 class that implements a
+weighting function by specification of a kernel function
+\code{W} and a scale parameter \code{bw}.
+}
+\details{
+It extends the class \code{\link{Weight}} and writes
+\deqn{W_N(2\pi (k-1)/N) := \sum_{j \in Z} bw^{-1} W(2\pi
+bw^{-1} [(k-1)/N + j])} to \code{values[k]} [nested inside
+\code{env}] for \code{k=1,\ldots,N}. The number
+\code{length(values)} of Fourier frequencies for which
+\eqn{W_N} will be evaluated may be set on construction or
+updated when evoking the method \code{getValues}. To
+standardize the weights used in the convolution to unity
+\deqn{W_N^j := \sum_{j \neq s = 0}^{N-1} W_n(2\pi s / N)}
+is stored to \code{Wnj[s]} for \code{s=1,\ldots,N}, for
+later usage.
+}
+\section{Slots}{
+
+\describe{
+\item{\code{W}}{a kernel function}
+
+\item{\code{bw}}{bandwidth}
+
+\item{\code{env}}{An environment to allow for slots which need to be
+      accessable in a call-by-reference manner:
+      \describe{
+        \item{\code{values}}{A vector storing the weights; see the Details
+              section.}
+        \item{\code{Wnj}}{A vector storing the terms used for normalization;
+              see the Details section.}
+      }}
+}}
+\references{
+Brillinger, D. R. (1975). \emph{Time Series: Data Analysis
+and Theory}. Holt, Rinehart and Winston, Inc., New York.
+[cf. p. 146 f.]
+}
+\seealso{
+Examples for implementations of kernels \code{W} can be
+found at: \code{\link{kernels}}.
+}
+\keyword{S4-classes}
+

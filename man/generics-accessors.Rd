@@ -1,0 +1,82 @@
+\name{generics-accessors}
+\alias{generics-accessors}
+\alias{getB}
+\alias{getBw}
+\alias{getDescr}
+\alias{getFrequencies}
+\alias{getIsRankBased}
+\alias{getLevels}
+\alias{getMeanPG}
+\alias{getN}
+\alias{getParallel}
+\alias{getPointwiseCIs}
+\alias{getR}
+\alias{getSdBoot}
+\alias{getSdNaive}
+\alias{getStdError}
+\alias{getTs}
+\alias{getType}
+\alias{getValues}
+\alias{getW}
+\alias{getWnj}
+\alias{getY}
+\title{Generic functions for accessing attributes of objects}
+\usage{
+getY(object, ...)
+
+getValues(object, ...)
+
+getIsRankBased(object, ...)
+
+getB(object, ...)
+
+getParallel(object, ...)
+
+getFrequencies(object, ...)
+
+getLevels(object, ...)
+
+getMeanPG(object, ...)
+
+getStdError(object, ...)
+
+getN(object, ...)
+
+getR(object, ...)
+
+getType(object, ...)
+
+getTs(object, ...)
+
+getSdNaive(object, ...)
+
+getSdBoot(object, ...)
+
+getPointwiseCIs(object, ...)
+
+getDescr(object, ...)
+
+getW(object, ...)
+
+getBw(object, ...)
+
+getWnj(object, ...)
+}
+\arguments{
+  \item{object}{object from which to get the value}
+
+  \item{...}{optional parameters; for documentation see the
+  documentation of the methods to each of the generic.}
+}
+\description{
+These generic functions are needed to access the objects'
+attributes. Note that the naming convention
+\code{getAttribute} was applied, where \code{attribute} is
+the name of the attribute/slot of the class of the object.
+}
+\seealso{
+For an overview on the classes of the framework, and all of
+their attributes, see the class diagrams in the package
+description [cf. \code{\link{quantspec-package}}].
+}
+

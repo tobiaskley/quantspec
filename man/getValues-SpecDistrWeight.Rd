@@ -1,0 +1,29 @@
+\docType{methods}
+\name{getValues-SpecDistrWeight}
+\alias{getValues,SpecDistrWeight-method}
+\alias{getValues-SpecDistrWeight}
+\title{Get values from a weight object of type \code{\link{SpecDistrWeight}}}
+\usage{
+\S4method{getValues}{SpecDistrWeight}(object, N = length(object@env$values))
+}
+\arguments{
+  \item{object}{\code{SpecDistrWeight} of which to get the
+  values}
+
+  \item{N}{a \code{numeric} specifying the number of equaly
+  spaced Fourier frequencies from \eqn{[0,2\pi)}{[0,2pi)}
+  for which the weight will be computed; by default the
+  number \code{N} specified on construction.}
+}
+\value{
+Returns a vector of size \code{N} as described in the
+Description section.
+}
+\description{
+For an \code{object} of type \code{SpecDistrWeight} and an
+optional integer \code{N} the weights \eqn{W_n}{Wn} are
+returned as a vector that has
+\eqn{W_n(2\pi(k-1)/n)}{Wn(2pi(k-1)/n)} at position
+\code{k}.
+}
+

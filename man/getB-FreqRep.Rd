@@ -1,0 +1,21 @@
+\docType{methods}
+\name{getB-FreqRep}
+\alias{getB,FreqRep-method}
+\alias{getB-FreqRep}
+\title{Get \code{B} from a \code{\link{FreqRep}} object.}
+\usage{
+\S4method{getB}{FreqRep}(object)
+}
+\arguments{
+  \item{object}{\code{FreqRep} of which to get the
+  \code{B}}
+}
+\value{
+Returns the attribute \code{B} that's a slot of
+\code{object}.
+}
+\description{
+Get \code{B} from a \code{\link{FreqRep}} object.
+}
+\keyword{Access-functions}
+

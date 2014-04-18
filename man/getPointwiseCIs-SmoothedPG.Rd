@@ -1,0 +1,81 @@
+\docType{methods}
+\name{getPointwiseCIs-SmoothedPG}
+\alias{getPointwiseCIs,SmoothedPG-method}
+\alias{getPointwiseCIs-SmoothedPG}
+\title{Get pointwise confidence intervals for the quantile spectral density kernel}
+\usage{
+\S4method{getPointwiseCIs}{SmoothedPG}(object, frequencies = 2 * pi *
+  (0:(length(object@qPG@freqRep@Y) - 1))/length(object@qPG@freqRep@Y),
+  levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2),
+  alpha = 0.1, type = c("naive.sd", "boot.sd", "boot.full"))
+}
+\arguments{
+  \item{object}{\code{SmoothedPG} of which to get the
+  confidence intervals}
+
+  \item{frequencies}{a vector of frequencies for which to
+  get the result}
+
+  \item{levels.1}{the first vector of levels for which to
+  get the result}
+
+  \item{levels.2}{the second vector of levels for which to
+  get the result}
+
+  \item{alpha}{the level of the confidence interval; must
+  be from \eqn{(0,1)}}
+
+  \item{type}{a flag indicating which type of confidence
+  interval should be returned; can take one of the three
+  values discussed above.}
+}
+\value{
+Returns a named list of two arrays \code{lowerCIS} and
+\code{upperCIs} containing the lower and upper bounds for
+the confidence intervals.
+}
+\description{
+Returns a list of two arrays \code{lowerCIs} and
+\code{upperCIs} that contain the upper and lower limits for
+a level \code{1-alpha} confidence interval of the copula
+spectral density kernel. Each array is of dimension
+\code{[J,K1,K2]}, where \code{J=length(frequencies)},
+\code{K1=length(levels.1)}, and
+\code{K2=length(levels.2))}. At position \code{(j,k1,k2)}
+the real (imaginary) part of the returned values are the
+bounds of the confidence interval for the the real
+(imaginary) part of the quantile spectrum, which
+corresponds to \code{frequencies[j]}, \code{levels.1[k1]}
+and \code{levels.2[k2]} closest to the Fourier frequencies,
+\code{levels.1} and \code{levels.2} available in
+\code{object}; \code{\link{closest.pos}} is used to
+determine what closest to means.
+}
+\details{
+Currently, three different \code{type}s of confidence
+intervals are available: \itemize{ \item \code{"naive.sd"}:
+confidence intervals based on the asymptotic normality of
+the smoothed quantile periodogram; standard deviations are
+estimated using \code{\link{getSdNaive}}.  \item
+\code{"boot.sd"}: confidence intervals based on the
+asymptotic normality of the smoothed quantile periodogram;
+standard deviations are estimated using
+\code{\link{getSdBoot}}.  \item \code{"boot.full"}:
+confidence intervals determined by estimating the quantiles
+of he distribution of the smoothed quantile periodogram, by
+the empirical quantiles of the sample of bootstrapped
+replications. }
+}
+\examples{
+sPG <- smoothedPG(rnorm(2^10), levels.1=0.5)
+CI.upper <- Re(getPointwiseCIs(sPG)$upperCIs[,1,1])
+CI.lower <- Re(getPointwiseCIs(sPG)$lowerCIs[,1,1])
+freq = 2*pi*(0:1023)/1024
+plot(x = freq, y = rep(0.25/(2*pi),1024),
+   ylim=c(min(CI.lower), max(CI.upper)),
+   type="l", col="red") # true spectrum
+lines(x = freq, y = CI.upper)
+lines(x = freq, y = CI.lower)
+}
+\keyword{Access-functions}
+

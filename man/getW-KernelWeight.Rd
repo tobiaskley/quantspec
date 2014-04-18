@@ -1,0 +1,21 @@
+\docType{methods}
+\name{getW-KernelWeight}
+\alias{getW,KernelWeight-method}
+\alias{getW-KernelWeight}
+\title{Get attribute \code{W} (kernel used for smoothing) from a \code{KernelWeight}.}
+\usage{
+\S4method{getW}{KernelWeight}(object)
+}
+\arguments{
+  \item{object}{\code{KernelWeight} from which to get the
+  kernel \code{W}.}
+}
+\value{
+Returns the \code{W} attribute.
+}
+\description{
+Get attribute \code{W} (kernel used for smoothing) from a
+\code{KernelWeight}.
+}
+\keyword{Access-functions}
+

@@ -1,0 +1,21 @@
+\docType{methods}
+\name{getLevels-FreqRep}
+\alias{getLevels,FreqRep-method}
+\alias{getLevels-FreqRep}
+\title{Get attribute \code{levels} from a \code{\link{FreqRep}}.}
+\usage{
+\S4method{getLevels}{FreqRep}(object)
+}
+\arguments{
+  \item{object}{\code{FreqRep} from which to get the
+  \code{levels}.}
+}
+\value{
+Returns the \code{levels} attribute, as a vector of real
+numbers.
+}
+\description{
+Get attribute \code{levels} from a \code{\link{FreqRep}}.
+}
+\keyword{Access-functions}
+

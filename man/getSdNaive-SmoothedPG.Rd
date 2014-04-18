@@ -1,0 +1,68 @@
+\docType{methods}
+\name{getSdNaive-SmoothedPG}
+\alias{getSdNaive,SmoothedPG-method}
+\alias{getSdNaive-SmoothedPG}
+\title{Get estimates for the standard deviation of the smoothed quantile
+periodogram.}
+\usage{
+\S4method{getSdNaive}{SmoothedPG}(object, frequencies = 2 * pi *
+  (0:(length(object@qPG@freqRep@Y) - 1))/length(object@qPG@freqRep@Y),
+  levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2))
+}
+\arguments{
+  \item{object}{\code{\link{SmoothedPG}} of which to get
+  the estimates for the standard deviation.}
+
+  \item{frequencies}{a vector of frequencies for which to
+  get the result}
+
+  \item{levels.1}{the first vector of levels for which to
+  get the result}
+
+  \item{levels.2}{the second vector of levels for which to
+  get the result}
+}
+\value{
+Returns the estimate described above.
+}
+\description{
+Determines and returns an array of dimension
+\code{[J,K1,K2]}, where \code{J=length(frequencies)},
+\code{K1=length(levels.1)}, and
+\code{K2=length(levels.2))}. Whether available or not,
+boostrap repetitions are ignored by this procedure. At
+position \code{(j,k1,k2)} the returned value is the
+standard deviation estimated corresponding to
+\code{frequencies[j]}, \code{levels.1[k1]} and
+\code{levels.2[k2]} that are closest to the
+\code{frequencies}, \code{levels.1} and \code{levels.2}
+available in \code{object}; \code{\link{closest.pos}} is
+used to determine what closest to means.
+}
+\details{
+Requires that the \code{\link{SmoothedPG}} is available at
+all Fourier frequencies from \eqn{(0,\pi]}{(0,pi]}. If this
+is not the case the missing values are imputed by taking
+one that is available and has a frequency that is closest
+to the missing Fourier frequency; \code{closest.pos} is
+used to determine which one this is.
+
+A precise definition on how the standard deviations of the
+smoothed quantile periodogram are estimated is given in
+Kley et. al (2014). The estimate returned is denoted by
+\eqn{\sigma(\tau_1, \tau_2; \omega)}{sigma(tau1, tau2;
+omega)} on p. 26 of the arXiv preprint.
+
+Note the ``standard deviation'' estimated here is not the
+square root of the complex-valued variance. It's real part
+is the square root of the variance of the real part of the
+estimator and the imaginary part is the square root of the
+imaginary part of the variance of the estimator.
+}
+\references{
+Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
+Quantile Spectral Processes: Asymptotic Analysis and
+Inference. \url{http://arxiv.org/abs/1401.8104}.
+}
+\keyword{Access-functions}
+

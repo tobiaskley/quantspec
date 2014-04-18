@@ -1,0 +1,22 @@
+\docType{methods}
+\name{getFreqRep-QuantilePG}
+\alias{getFreqRep,QuantilePG-method}
+\alias{getFreqRep-QuantilePG}
+\title{Get associated \code{\link{FreqRep}} from a
+\code{\link{QuantilePG}}.}
+\usage{
+\S4method{getFreqRep}{QuantilePG}(object)
+}
+\arguments{
+  \item{object}{\code{QuantilePG} from which to get the
+  \code{\link{FreqRep}}.}
+}
+\value{
+Returns the \code{\link{FreqRep}} object associated.
+}
+\description{
+Get associated \code{\link{FreqRep}} from a
+\code{\link{QuantilePG}}.
+}
+\keyword{Access-association-functions}
+
