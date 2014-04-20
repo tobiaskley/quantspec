@@ -9,7 +9,7 @@ NULL
 #' calculations to determine the Fourier transform of the clipped time
 #' series. As a subclass to \code{\link{FreqRep}} it inherits
 #' slots and methods defined there; it servers as a frequency representation of
-#' a time series as described in Kley et. al (2014+).
+#' a time series as described in Kley et. al (2014).
 #'
 #' For each frequency \eqn{\omega} from \code{frequencies} and level \code{q}
 #' from \code{levels} the statistic

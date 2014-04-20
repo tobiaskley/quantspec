@@ -9,7 +9,7 @@ Laplace or copula) periodograms for univariate time series.
 }
 \details{
 \tabular{ll}{ \cr Package: \tab quantspec \cr Type: \tab
-Package \cr Version: \tab 1.0-0 \cr Date: \tab 2014-04-18
+Package \cr Version: \tab 1.0-0 \cr Date: \tab 2014-04-21
 \cr License: \tab GPL (>= 2) }
 }
 \section{Contents}{
@@ -96,7 +96,8 @@ Ruhr University Bochum.
 
 Kley, T. (2014b). An Object-oriented Framework for
 Quantile-based Spectral Analysis and a Reference
-Implementation in R: The quantspec Package. in preparation.
+Implementation in R: The quantspec Package. Vignette to
+this R package.
 
 Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+). Of
 Copulas, Quantiles, Ranks and Spectra: an
