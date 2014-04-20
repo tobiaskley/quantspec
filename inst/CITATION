@@ -14,32 +14,3 @@ citEntry(entry="Manual",
                year,
                "). quantspec: Quantile-based Spectral Analysis Functions. ",
                vers, ".", sep=""))
-
-citEntry(entry="Article",
-         title = "Of Copulas, Quantiles, Ranks and Spectra: an $L_1$-approach to spectral analysis",
-         author = personList(as.person("Holger Dette"),
-                             as.person("Marc Hallin"),
-                             as.person("Tobias Kley"),
-                             as.person("Stanislav Volgushev")),
-         journal = "Bernoulli",
-         year     = "forthcoming",
-         url      = "http://arxiv.org/abs/1111.7205",
-         textVersion =
-         paste("Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014).",
-  	       "Of Copulas, Quantiles, Ranks and Spectra: an $L_1$-approach to spectral analysis.",
-           "Bernoulli, forthcoming."))
-
-               
-citEntry(entry="Article",
-         title = "Quantile Spectral Processes: Asymptotic Analysis and Inference",
-         author = personList(as.person("Tobias Kley"),
-                             as.person("Stanislav Volgushev"),
-         					 as.person("Holger Dette"),
-                             as.person("Marc Hallin")),
-         journal = "arXiv",
-         year     = "2014",
-         url      = "http://arxiv.org/abs/",
-         textVersion =
-         paste("Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).",
-  	       	   "Quantile Spectral Processes: Asymptotic Analysis and Inference.",
-               "http://arxiv.org/abs/1401.8104"))
