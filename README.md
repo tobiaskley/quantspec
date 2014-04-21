@@ -3,7 +3,7 @@ quantspec: Quantile-Based Spectral Analysis with R
 
 The aim of the `quantspec` package is to make methods for quantile-based spectral analysis of time series available to data analysts and researchers in statistics.
 
-You can track (and contribute to) the development of `quantspec` at https://github.com/tobiaskley/quantspec. If you encounter unexpected behavior while using `quantspec`, please write an [email](tobias.kley@ruhr-uni-bochum.de) or file an [issue](http://github.com/tobiaskley/quantspec/issues).
+You can track (and contribute to) the development of `quantspec` at https://github.com/tobiaskley/quantspec. If you encounter unexpected behavior while using `quantspec`, please write an [email](mailto:tobias.kley@ruhr-uni-bochum.de) or file an [issue](http://github.com/tobiaskley/quantspec/issues).
 
 ## Getting started with ``quantspec``
 
