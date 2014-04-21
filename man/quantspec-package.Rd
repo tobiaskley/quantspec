@@ -90,9 +90,9 @@ Package \cr Version: \tab 1.0-0 \cr Date: \tab 2014-04-21
 Tobias Kley
 }
 \references{
-Kley, T. (2014a). Quantile-Based Spectral Analysis of
-Stationary Time-Series. unpublished Ph.D. Dissertation,
-Ruhr University Bochum.
+Kley, T. (2014a). Quantile-Based Spectral Analysis:
+Asymptotic Theory and Computation. unpublished Ph.D.
+Dissertation, Ruhr University Bochum.
 
 Kley, T. (2014b). An Object-oriented Framework for
 Quantile-based Spectral Analysis and a Reference
