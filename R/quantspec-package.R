@@ -84,6 +84,7 @@ NULL
 #' @docType package
 #' @author Tobias Kley
 #'
+#' @import graphics
 #' @import methods
 #' @import stats4
 #' @import testthat
