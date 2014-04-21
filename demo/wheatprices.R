@@ -24,11 +24,14 @@ plot(LPG, frequencies = f[which(f > 0 & f <= pi)], levels = c(0.25, 0.5, 0.75))
 # Now determine the smoothed rank-based Laplace periodogram kernel
 # (from the unsmoothed one), using a weight determined by an
 # Epanechnikov kernel and b=0.05
-sLPG <- smoothedPG(LPG, weight=kernelWeight(W=W1, bw=0.05))  
+sLPG <- smoothedPG(LPG, weight=kernelWeight(W=W1, bw=0.05))
 
 # Then, plot the estimate, with a full bootstrap pointwise confidence band
 plot(sLPG, levels=c(0.25,0.5,0.75), ptw.CIs=0)
 
+# Note the many peaks between 0.06 and 0.07, which correspond to the
+# well known cycle of 15.3 years in the data.
+# (the peak is at the reciprocal of 15.3!
 
 # Determine the CR periodogram kernel
 # for the quantile orders taus.
@@ -38,9 +41,9 @@ CR <- quantilePG(wheatprices, levels.1 = taus, type="clipped")
 f <- getFrequencies(CR)
 plot(CR, frequencies = f[which(f > 0 & f <= pi)], levels = c(0.25, 0.5, 0.75))
 
-# Now determine the smoothed CR periodogram kernel (from the unsmoothed one), 
+# Now determine the smoothed CR periodogram kernel (from the unsmoothed one),
 # using a weight determined by an Epanechnikov kernel and b=0.05
-sPG <- smoothedPG(CR, weight=kernelWeight(W=W1, bw=0.05))  
+sPG <- smoothedPG(CR, weight=kernelWeight(W=W1, bw=0.05))
 
 # plot for omega in [0,pi],
 #  - for tau_1, tau_2 = 0.25, 0.5, 0.75
@@ -58,8 +61,8 @@ plot(sPG, levels=c(0.25,0.5,0.75), type.scaling="individual",
 #  - for tau_1, tau_2 in taus,
 #  - also determine 250 bootstrap replicates
 #    (use moving blocks and blocklength 32),
-sPG <- smoothedPG(Y, levels.1 = taus, weight=kernelWeight(W=W1, bw=0.05),
-    type = "clipped", type.boot="mbb", B=500, l=32)
+sPG <- smoothedPG(wheatprices, levels.1 = taus, weight=kernelWeight(W=W1, bw=0.05),
+    type = "clipped", type.boot="mbb", B=250, l=32)
 
 # Plot (for the values 0.25, 0.5 and 0.75),
 # with homogeneous range in real and imaginary parts

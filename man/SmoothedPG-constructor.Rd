@@ -1,5 +1,5 @@
-\name{SmoothedPG-constructors}
-\alias{SmoothedPG-constructors}
+\name{SmoothedPG-constructor}
+\alias{SmoothedPG-constructor}
 \alias{smoothedPG}
 \title{Create an instance of the \code{SmoothedPG} class.}
 \usage{

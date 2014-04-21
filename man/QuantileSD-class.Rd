@@ -91,7 +91,7 @@ V2 <- getValues(qsd, levels.1=levels.few, levels.2=levels.few)
 
 ## If desired additional repetitions can be performed to yield a more precise
 ## simulation result by calling; here the number of independent runs is doubled.
-sCSD <- increasePrecision(qsd,R)
+qsd <- increasePrecision(qsd,R)
 
 ## Often the result will be stored for later usage.  
 save(qsd, file="QAR1.rdata")

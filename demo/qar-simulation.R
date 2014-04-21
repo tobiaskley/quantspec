@@ -51,13 +51,13 @@ for (i in 1:R) {
 }
 
 trueV <- getValues(csd, frequencies=freq)
-
-Sqdeviation <- apply(sims, c(1,2), function(x) {abs(x-trueV)^2})
-rimse <- sqrt(apply(Sqdeviation, c(1,3,4), mean) / R)
+SqDev <- array(apply(sims, c(1,2),
+        function(x) {abs(x-trueV)^2}), dim=c(J,K,K,4,R))
+rimse <- sqrt(apply(SqDev, c(2,3,4), mean))
 
 # Inspect the rimse, but note that to have reliable approximations of
 # the true rimse the simulations should run much longer.
-for (i in 1:4) {rimse[i,,]}
+rimse
 
 # Finally take a look a the last simulated periodograms and see that
 # time series of length 64 are not quiet long enought to yield

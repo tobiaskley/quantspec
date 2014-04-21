@@ -1,25 +1,41 @@
 
-Changes in Version 1.0.0
+Changes in quantspec 1.0-0
+==========================
 
-	o The quantspec package was conceptually remodeled. It is now based on an
-		object-oriented design. The implementation uses the S4 system.
-	o The functionality was largely extended and now includes:
-		-	efficient computation of frequency representations based on
-			(1) the clipped time series,
-			(2) the quantile regression estimator in the harmonic linear model.
-		- computation of the periodograms based on (1) and (2)
-		- computation of smoothed periodograms; using different types of weights
-			will yield estimatiors for
-			(1) the Laplace or copula spectral density
-			(2) the integrated Laplace or copula spectral density
-		- simulation of
-			(1) Laplace and copula spectral densities,
-			(2) integrated Laplace and copula spectral densities,
-		- a mechanism to generate block bootstrap replicates in the time domain and
-			compute all the estimators from them.
+OBJECT-ORIENTED DESIGN
+
+ o The quantspec package was conceptually remodeled. It is now based on an
+   object-oriented design. The implementation uses the S4 system.
+
+FUNCTIONALITY LARGELY EXTENDED; NOW INCLUDES
+
+ o efficient computation of frequency representations based on
+   (1) the clipped time series,
+   (2) the quantile regression estimator in the harmonic linear model.
+
+ o computation of the periodograms based on (1) and (2)
+
+ o computation of smoothed periodograms; using different types of weights
+   will yield estimatiors for
+   (1) the Laplace or copula spectral density
+   (2) the integrated Laplace or copula spectral density
+
+ o simulation of
+   (1) Laplace and copula spectral densities,
+   (2) integrated Laplace and copula spectral densities,
+
+ o a mechanism to generate block bootstrap replicates in the time domain and
+   compute all the estimators from them.
+
+VIGNETTE
+
+ o A vignette was added to the package. It contains a brief introduction to
+   quantile-based spectral analysis, a description of the framework,
+   a tutorial and two worked examples.
 
 
-Version 0.1 and 0.2
+quantspec 0.1 and 0.2
+=====================
 
-	o Three functions to compute, smooth and plot the (quantile regression-based)
-		Laplace periodograms and rank-based Laplace periodograms.
+ o Three functions to compute, smooth and plot the (quantile regression-based)
+   Laplace periodograms and rank-based Laplace periodograms.

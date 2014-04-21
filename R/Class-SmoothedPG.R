@@ -732,7 +732,7 @@ setMethod(f = "getQuantilePG",
 #' would never be called. If \code{B>0} then each bootstrap replication would
 #' be the undisturbed time series.
 #'
-#' @name SmoothedPG-constructors
+#' @name SmoothedPG-constructor
 #' @aliases smoothedPG
 #' @export
 #'
@@ -894,18 +894,18 @@ smoothedPG <- function(
 #'                 confidence intervals will be plotted.
 #' @param type.CIs indicates the method to be used for determining the
 #'                 confidence intervals; the methods available are those
-#' 								 provided by
+#'                  provided by
 #'                 \code{\link{getPointwiseCIs-SmoothedPG}}.
 #' @param ratio quotient of width over height of the subplots; use this
 #'               parameter to produce landscape or portrait shaped plots.
 #' @param widthlab width for the labels (left and bottom); default is
-#' 							   \code{lcm(1)}, cf. \code{\link[graphics]{layout}}.
+#'                  \code{lcm(1)}, cf. \code{\link[graphics]{layout}}.
 #' @param xlab label that will be shown on the bottom of the plots; can be
-#' 						 an expression (for formulas), characters or \code{NULL} to
-#' 						 force omission (to save space).
+#'              an expression (for formulas), characters or \code{NULL} to
+#'              force omission (to save space).
 #' @param ylab label that will be shown on the left side of the plots;
-#' 						 can be an expression (for formulas), characters or
-#' 						 \code{NULL} to force omission (to save space).
+#'              can be an expression (for formulas), characters or
+#'              \code{NULL} to force omission (to save space).
 #' @param type.scaling a method for scaling of the subplots; currently there
 #'                      are three options: \code{"individual"} will scale each of the
 #'                      \code{K^2} subplots to minimum and maximum of the values
