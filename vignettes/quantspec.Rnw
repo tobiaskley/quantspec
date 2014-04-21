@@ -139,10 +139,11 @@ Further,
 0\} + \tau   \vert x\vert I\{ x > 0\},\]
 denotes the so-called \emph{check function} [cf.~\citet{Koenker2005}].
 
-\begin{defi}[Quantile-regression based peridograms]
+\begin{defi}[Quantile-regression based periodograms]
   \label{def:qregPG} ~\\
   For $\omega \in \IR$ and $\tau_1, \tau_2 \in (0,1)$ the
-  \emph{Laplace peridogram} $\hat L_{n}^{\tau_1, \tau_2}(\omega)$, and the \emph{rank-based Laplace periodogram} $\hat L_{n,R}^{\tau_1,\tau_2}(\omega)$ are defined as
+  \emph{Laplace periodogram} $\hat L_{n}^{\tau_1, \tau_2}(\omega)$, and the
+  \emph{rank-based Laplace periodogram} $\hat L_{n,R}^{\tau_1,\tau_2}(\omega)$ are defined as
   \begin{equation*}
     \hat L_{n}^{\tau_1, \tau_2}(\omega) := (2\pi n)^{-1} \hat b_{n}^{q_1}(\omega) \hat b_{n}^{q_2}(-\omega), \quad
     \hat L_{n,R}^{\tau_1,\tau_2}(\omega) := (2\pi n)^{-1} \hat b_{n,R}^{\tau_1}(\omega) \hat b_{n,R}^{\tau_2}(-\omega),
@@ -169,10 +170,10 @@ later extended the approach to arbitrary quantiles \cite{Li2012}.
 \cite{DetteEtAl2013} introduced the estimator with distinct quantile levels $\tau_1$ and $\tau_2$ (not necessarily equal),
 and based it on the ranks.
 
-\begin{defi}[Peridograms based on clipped time series]
+\begin{defi}[Periodograms based on clipped time series]
   \label{def:clippedPG} ~\\
   For $\omega \in \IR$ and $q_1, q_2 \in \IR$, the
-  \emph{clipped time-series peridogram} is defined as
+  \emph{clipped time-series periodogram} is defined as
   \begin{equation*}
     I_{n}^{q_1, q_2}(\omega) := (2\pi n)^{-1} d_{n}^{q_1}(\omega) d_{n}^{q_2}(-\omega), \quad
     d_{n}^{q}(\omega) := \sum_{t=0}^{n-1} I\{X_t \leq q\} {\rm e}^{-{\rm i} \omega t}.
@@ -202,8 +203,11 @@ As in the traditional case the new periodograms are not consistent estimators [c
 
 The smoothed periodograms are defined as follows:
 
-\begin{defi}[Smoothed quantile-regression based peridograms]\label{def:SmqregPG} ~\\
-  For $\omega \in \IR$ and $\tau_1, \tau_2 \in (0,1)$ the \emph{smoothed Laplace peridogram} $\hat{\mathfrak{f}}_{n}(\tau_1, \tau_2; \omega)$ and \emph{smoothed rank-based laplace peridogram} $\hat{\mathfrak{f}}_{n,R}(\tau_1, \tau_2; \omega)$ are defined as
+\begin{defi}[Smoothed quantile-regression based
+periodograms]\label{def:SmqregPG} ~\\
+  For $\omega \in \IR$ and $\tau_1, \tau_2 \in (0,1)$ the \emph{smoothed Laplace
+  periodogram} $\hat{\mathfrak{f}}_{n}(\tau_1, \tau_2; \omega)$ and
+  \emph{smoothed rank-based laplace periodogram} $\hat{\mathfrak{f}}_{n,R}(\tau_1, \tau_2; \omega)$ are defined as
   \begin{equation*}
   \begin{split}
     \hat{\mathfrak{f}}_{n}(\tau_1, \tau_2; \omega) & := \frac{2\pi}{n} \sum_{s=1}^{n-1} W_n\big( \omega - 2\pi s / n \big) \hat L_{n}^{\tau_1, \tau_2}(2 \pi s / n), \\
@@ -212,12 +216,15 @@ The smoothed periodograms are defined as follows:
   \end{equation*}
 \end{defi}
 
-\begin{defi}[Smoothed peridograms based on clipped time series]\label{def:SmclippedPG} ~\\
-  For $\omega \in \IR$ and $q_1, q_2 \in \IR$ the \emph{smoothed clipped time series peridogram} is defined as
+\begin{defi}[Smoothed periodograms based on clipped time
+series]\label{def:SmclippedPG} ~\\
+  For $\omega \in \IR$ and $q_1, q_2 \in \IR$ the \emph{smoothed clipped time
+  series periodogram} is defined as
   \begin{equation*}
     \hat G_{n}(q_1, q_2; \omega) := \frac{2\pi}{n} \sum_{s=1}^{n-1} W_n\big( \omega - 2\pi s / n \big) I_{n}^{q_1, q_2}(2 \pi s / n).
   \end{equation*}
-  For $\omega \in \IR$ and $\tau_1, \tau_2 \in [0,1]$ the \emph{smoothed copula rank peridogram} is defined as
+  For $\omega \in \IR$ and $\tau_1, \tau_2 \in [0,1]$ the \emph{smoothed copula
+  rank periodogram} is defined as
   \begin{equation*}
     \hat G_{n,R}(\tau_1, \tau_2; \omega) := \frac{2\pi}{n} \sum_{s=1}^{n-1} W_n\big( \omega - 2\pi s / n \big) I_{n,R}^{\tau_1, \tau_2}(2 \pi s / n).
   \end{equation*}
@@ -239,7 +246,7 @@ Before going into the programming-specific details of the project, a conceptual 
 
 Aiming for a software system that is most flexible in the ways in which it can be used, that can easily be extended in functionality and also for the ease of it's maintenance an object-oriented design was chosen. This type of design also contributes to a structure of the system that can be better understood, both by users and developers. The general structure of the system for performing quantile-based spectral analysis is described using class diagrams of the unified modeling language (UML). In these diagrams, all necessary components and their interrelations are described in a formal manner.
 
-To understand the specification of the framework, recall that in an object-oriented design the components of the system are objects encapsulating both data and behavior of a specific ``real-world'' entity. The structure of each object can thus be described by a meaningful name (the \emph{class name}), a collection of data fields (in \proglang{R} these are called \emph{slots}) and implementations of the behavior (in \proglang{R} these implementations are called \emph{methods}). In a class diagram each class (i.\,e., the composite of class name, data files and implemented behavior) is represented as a rectangle subdivided into three blocks. The name of the class is given in the top block, the data fields in the middle block and the methods in the bottom block. Note that in the unified modelling language the data fields and methods are specified in a standardized format. In this format the first symbol is an abbreviation used to specify the visibility of the class member. Here ``+'' for public and ``--'' for private members are used, meaning that the member is intended to be seen (and used) from outside the object or from inside the object only, respectively. For a data field the name is then followed by a colon and the type of the field. For a method the parameters are given in parenthesis; optional parameters are denoted by two dots. In the class diagram, relationships between classes are marked as lines connecting them. Currently two different types of relationships are modeled. A line with a triangular shaped tip at one end is used to declare a \emph{generalization} relationship (sometimes also coined inheritance or ``is a'' relationship). The class at the end of the line with the triangle is called the \emph{superclass} or the parent, while the class on the other side is called the \emph{subclass} or the child. In particular this type of relationship implies that an object that is an instance to the subclass and therefore provides all the subclasses' data fields and methods will also provide the data fields and methods of the superclass (and the superclasses' superclass it there are such, etc.). The second type of relationships used in this framework is that of an \emph{aggregation} (sometimes called ``has a'' relationship). A line with a hollow diamond at one end is used to denote this kind of relationship, where objects to the class at the end of the line with the diamond are the ones having objects of the class at the other end of the line as a part of them. At each end of the line the so-called cardinalities are denoted in the form of two numbers with dots in between them. The left number is the minimum number of objects of that type in the relationship that need to exist, the right number is the maximum number. A star is used to denote an unknown positive integer. If min and max cardinality coincide it is displayed without the dots.
+To understand the specification of the framework, recall that in an object-oriented design the components of the system are objects encapsulating both data and behavior of a specific ``real-world'' entity. The structure of each object can thus be described by a meaningful name (the \emph{class name}), a collection of data fields (in \proglang{R} these are called \emph{slots}) and implementations of the behavior (in \proglang{R} these implementations are called \emph{methods}). In a class diagram each class (i.\,e., the composite of class name, data files and implemented behavior) is represented as a rectangle subdivided into three blocks. The name of the class is given in the top block, the data fields in the middle block and the methods in the bottom block. Note that in the unified modeling language the data fields and methods are specified in a standardized format. In this format the first symbol is an abbreviation used to specify the visibility of the class member. Here ``+'' for public and ``--'' for private members are used, meaning that the member is intended to be seen (and used) from outside the object or from inside the object only, respectively. For a data field the name is then followed by a colon and the type of the field. For a method the parameters are given in parenthesis; optional parameters are denoted by two dots. In the class diagram, relationships between classes are marked as lines connecting them. Currently two different types of relationships are modeled. A line with a triangular shaped tip at one end is used to declare a \emph{generalization} relationship (sometimes also coined inheritance or ``is a'' relationship). The class at the end of the line with the triangle is called the \emph{superclass} or the parent, while the class on the other side is called the \emph{subclass} or the child. In particular this type of relationship implies that an object that is an instance to the subclass and therefore provides all the subclasses' data fields and methods will also provide the data fields and methods of the superclass (and the superclasses' superclass it there are such, etc.). The second type of relationships used in this framework is that of an \emph{aggregation} (sometimes called ``has a'' relationship). A line with a hollow diamond at one end is used to denote this kind of relationship, where objects to the class at the end of the line with the diamond are the ones having objects of the class at the other end of the line as a part of them. At each end of the line the so-called cardinalities are denoted in the form of two numbers with dots in between them. The left number is the minimum number of objects of that type in the relationship that need to exist, the right number is the maximum number. A star is used to denote an unknown positive integer. If min and max cardinality coincide it is displayed without the dots.
 
 For the class diagrams in this manuscript the classes are arranged in a way such that (whenever possible) generalization relationships are displayed with the superclass on top and the subclasses in the bottom. Aggregations are shown with aggregated classes to the left and/or the right of the class representing ``the whole''.
 
@@ -310,7 +317,7 @@ respectively. In the framework this fact is incorporated by introduction of the 
   \item the result of the computation, which is stored in an array \code{values}.
 \end{itemize}
 Further more, a flag \code{isRankBased} indicates whether, prior to the main computations, the observations $(Y_t)$ were transformed to pseudo-observations $(\hat F_n(Y_t))$. Performing this extra step will yield $\hat b_{n,R}^{\tau}(\omega)$ instead of $\hat b_{n}^{\tau}(\omega)$ or $d_{n,R}^{\tau}(\omega)$ instead of $d_{n}^{\tau}(\omega)$, respectively.
-The class \code{BootPos} allows for performing a block bootstrap procedure by ``shuffeling'' the observations and repeatedly doing the computations on these bootstrapped observations. Currently only one method, the \code{MovingBlocks} bootstrap, is implemented.
+The class \code{BootPos} allows for performing a block bootstrap procedure by ``shuffling'' the observations and repeatedly doing the computations on these bootstrapped observations. Currently only one method, the \code{MovingBlocks} bootstrap, is implemented.
 
 Now, turning attention to the class \code{SmoothedPG}, recall that the various smoothed periodograms are all defined similarly, in the sense that computing the smoothed periodogram for $\omega_j := 2\pi j /n$, $j=1, \ldots, n-1$ basically means to do a discrete convolution of the sequence of quantile periodograms computed at $\omega_s$ with a sequence of appropriately chosen weight functions $W_n(\omega_s)$. Hence, everything needed for the smoothed periodogram is these two ingredients, which is reflected in the framework by two aggregation relationships involving the class \code{SmoothedPG}. The first such relationship links \code{SmoothedPG} to the \code{QuantilePG}s to be smoothed. The second such relationship links \code{SmoothedPG} to a class \code{Weight}, which provides a common interface to different weight functions. Currently two implementations are included. Employing weights of type \code{KernelWeight}, defined by a kernel \code{W} and a scale parameter~\code{bw} (bandwidth), will yield an estimator for the quantile (i.\,e, Laplace or copula) spectral density. An alternative is to use weights of type \code{SpecDistrWeight}, which should yield estimators for the integrated quantile (i.\,e, Laplace or copula) spectral density.
 
@@ -469,7 +476,7 @@ getParallel(bn)
 
 To invoke a method \code{f} with parameters \code{p1,...,pk} of an
 object \code{obj} the call is \code{f(obj,p1,...,pk)}. An
-example is to invoke the accessor function \code{getValues}, which is equiped
+example is to invoke the accessor function \code{getValues}, which is equipped
 with parameters to get the values associated with certain \code{frequencies} or
 \code{levels}. An exemplary call looks like this:
 
@@ -493,7 +500,7 @@ method and that the attribute \code{values} is part of the abstract class
 A graphical representation of the data can easily be created by applying the
 \code{plot} command. For example, to compute and plot the frequency
 representations $d_{32,R}^{\tau}(\omega)$, from 32 simulated, standard
-normally distributed random variales execute the following lines on the
+normally distributed random variables execute the following lines on the
 \proglang{R} shell:
 
 <<plotbn,eval=FALSE>>=
@@ -713,7 +720,7 @@ plot(sPG, levels = c(0.05,0.5,0.95), type.scaling = "individual",
     ylab = expression(hat(G)[list(n,R)](list(tau[1],tau[2],omega))))
 @
 
-Of course, the second line initiates plotting the smoothed CR peridogram, which
+Of course, the second line initiates plotting the smoothed CR periodogram, which
 is on display in Figure~\ref{fig:SPsmoothedPG}. Note that the option
 \code{type.scaling} can be set to yield a plot with certain subplots possessing
 the same scale. In Figure~\ref{fig:SPsmoothedPG} pointwise confidence intervals
@@ -787,7 +794,7 @@ finite stretches of is available can be studied. On the other hand, the finite
 sample performance of the new spectral methods are to be evaluated. Note that
 the example discussed in this section and the functions to simulate QAR(1)
 processes are available inside the package, by calling
-\code{demo("qar-simulation")} and by refering to the function \code{ts1}, which
+\code{demo("qar-simulation")} and by referring to the function \code{ts1}, which
 implements the QAR(1) process that was discussed in \cite{DetteEtAl2013} and
 \cite{KleyEtAl2014}. Recall that a QAR(1) process is a sequence $(X_t)$ of
 random variables that fulfills
@@ -917,7 +924,7 @@ sims  <- array(0, dim=c(4,R,J,K,K))
 weight <- kernelWeight(W=W1, bw=0.3)
 @
 
-Setting the seed in the very beginning allows for reproducable results.
+Setting the seed in the very beginning allows for reproducible results.
 Recall that \code{ts1} is a function to simulate from the QAR(1) model to be
 studied. \code{N} is the length of the time series and also the number of
 Fourier frequencies for which the quantile periodograms will be computed. By the
@@ -970,7 +977,7 @@ for (i in 1:R) {
 Note that the flexible accessor method \code{getValues} is used to access the
 relevant subset of values for the frequencies specified (i.\,e., \code{freq}).
 Once the array \code{sims} is available, many interesting properties of
-the estimator can be analysed. Examples include the bias,
+the estimator can be analyzed. Examples include the bias,
 variance, etc. Here, using the function \code{getValues} again, the true copula
 spectral density is copied to an array \code{trueV}. Using the
 arrays \code{sims} and \code{trueV} the root integrated mean squared errors are
@@ -1052,7 +1059,7 @@ welcome.
 
 \section*{Acknowledgments}
 This work has been supported by the Sonderforschungsbereich ``Statistical
-modelling of nonlinear dynamic processes'' (SFB 823) of the Deutsche
+modeling of nonlinear dynamic processes'' (SFB 823) of the Deutsche
 Forschungsgemeinschaft and by a PhD Grant of the Ruhr-Universit\"{a}at Bochum
 and by the Ruhr- Universit\"{a}t Research School funded by Germany's Excellence Initiative [DFG
 GSC 98/1].
