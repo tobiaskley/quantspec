@@ -15,7 +15,6 @@ Imports:
     abind,
     zoo,
     rje,
-    tcltk,
     snowfall
 Description: Methods to determine, smooth and plot quantile (i. e., Laplace or
     copula) periodograms for univariate time series.
@@ -39,7 +38,7 @@ Collate:
     'Class-SmoothedPG.R'
     'Class-SpecDistrWeight.R'
     'data.R'
-    'depreciated.R'
+    'deprecated.R'
     'kernels.R'
     'models.R'
     'quantspec-package.R'

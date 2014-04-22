@@ -48,7 +48,6 @@ ct <- function (i1, i2, n) {
 ################################################################################
 
 #' @name quantspec-deprecated
-#' @importFrom tcltk tkProgressBar getTkProgressBar setTkProgressBar
 LaplacePeriodogram <-
     function (X, taus, omegas=1:(ceiling(length(X)/2)-1), fromRanks=TRUE, showProgressBar=FALSE) {
 
@@ -91,7 +90,7 @@ LaplacePeriodogram <-
   # Initialize Progress Bar
   if (showProgressBar) {
     maxPb <- length(omegas)+1
-    pb <- tkProgressBar(title = "Calculate Laplace Periodogram", min=0, max=maxPb, width = 400)
+    #pb <- tkProgressBar(title = "Calculate Laplace Periodogram", min=0, max=maxPb, width = 400)
   }
 
   # Define and initiate auxiliary variables.
@@ -104,8 +103,8 @@ LaplacePeriodogram <-
   # Then calculate the Laplace Periodogram at all frequencies in omegas.
   for (i in omegas) {
     if (showProgressBar) {
-      iPb <- getTkProgressBar(pb)+1
-      setTkProgressBar(pb, iPb, label=paste(round(100*iPb/maxPb,0),"% done"))
+      #iPb <- getTkProgressBar(pb)+1
+      #setTkProgressBar(pb, iPb, label=paste(round(100*iPb/maxPb,0),"% done"))
     }
     # Define the harmonic regressors.
     omega <- (2 * pi * i) / n
@@ -132,7 +131,7 @@ LaplacePeriodogram <-
   }
 
   if (showProgressBar) {
-    close(pb)
+    #close(pb)
   }
 
   # At last prepare the row and column labels
