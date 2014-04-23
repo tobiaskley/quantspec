@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/craigcitro/r-travis.svg?branch=develop,osx)](https://travis-ci.org/craigcitro/r-travis)
+[![Build Status](https://travis-ci.org/tobiaskley/quantspec.svg?branch=develop)](https://travis-ci.org/tobiaskley/quantspec)
 
 
 quantspec: Quantile-Based Spectral Analysis with R
