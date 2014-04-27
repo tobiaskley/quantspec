@@ -215,6 +215,9 @@ setMethod(f = "getFreqRep",
 #'                   two options are implemented: \code{"none"} and \code{"mbb"}
 #'                   which means to do a moving blocks  bootstrap with \code{B}
 #'                   and \code{l} as specified.
+#' @param method  method used for computing the quantile regression estimates.
+#'                 The choice is passed to \code{qr}; see the
+#'                 documentation of \code{quantreg} for details.
 #' @param parallel a flag to allow performing parallel computations,
 #'                   where possible.
 #'
@@ -229,6 +232,7 @@ quantilePG <- function( Y,
                         type.boot = c("none","mbb"),
                         B = 0,
                         l = 0,
+                        method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
                         parallel=FALSE) {
 
   # Verify if all parameters are valid
@@ -253,7 +257,7 @@ quantilePG <- function( Y,
     "clipped" = {
       freqRep <- clippedFT(Y, frequencies, levels.all, isRankBased, B, l, type.boot)},
     "qr" = {
-      freqRep <- qRegEstimator(Y, frequencies, levels.all, isRankBased, B, l, type.boot, parallel)}
+      freqRep <- qRegEstimator(Y, frequencies, levels.all, isRankBased, B, l, type.boot, method, parallel)}
   )
 
   obj <- new(
@@ -294,13 +298,13 @@ quantilePG <- function( Y,
 #' @param ratio quotient of width over height of the subplots; use this
 #'               parameter to produce landscape or portrait shaped plots.
 #' @param widthlab width for the labels (left and bottom); default is
-#' 							   \code{lcm(1)}, cf. \code{\link[graphics]{layout}}.
+#'                  \code{lcm(1)}, cf. \code{\link[graphics]{layout}}.
 #' @param xlab label that will be shown on the bottom of the plots; can be
-#' 						 an expression (for formulas), characters or \code{NULL} to
-#' 						 force omission (to save space).
+#'              an expression (for formulas), characters or \code{NULL} to
+#'              force omission (to save space).
 #' @param ylab label that will be shown on the left side of the plots;
-#' 						 can be an expression (for formulas), characters or
-#' 						 \code{NULL} to force omission (to save space).
+#'              can be an expression (for formulas), characters or
+#'              \code{NULL} to force omission (to save space).
 #' @param type.scaling a method for scaling of the subplots; currently there
 #'                      are three options: \code{"individual"} will scale each of the
 #'                      \code{K^2} subplots to minimum and maximum of the values

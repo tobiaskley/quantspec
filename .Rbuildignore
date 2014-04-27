@@ -4,3 +4,4 @@
 .project
 diagrams
 README.md
+.travis.yml

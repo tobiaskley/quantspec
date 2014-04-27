@@ -6,7 +6,7 @@
 quantilePG(Y, frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
   levels.1 = 0.5, levels.2 = levels.1, isRankBased = TRUE,
   type = c("clipped", "qr"), type.boot = c("none", "mbb"), B = 0, l = 0,
-  parallel = FALSE)
+  method = c("br", "fn", "pfn", "fnc", "lasso", "scad"), parallel = FALSE)
 }
 \arguments{
   \item{Y}{A \code{vector} of real numbers containing the
@@ -42,6 +42,10 @@ quantilePG(Y, frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
   \code{"none"} and \code{"mbb"} which means to do a moving
   blocks bootstrap with \code{B} and \code{l} as
   specified.}
+
+  \item{method}{method used for computing the quantile
+  regression estimates.  The choice is passed to \code{qr};
+  see the documentation of \code{quantreg} for details.}
 
   \item{parallel}{a flag to allow performing parallel
   computations, where possible.}

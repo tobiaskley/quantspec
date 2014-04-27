@@ -5,7 +5,8 @@
 \usage{
 qRegEstimator(Y, frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
   levels = 0.5, isRankBased = TRUE, B = 0, l = 0,
-  type.boot = c("none", "mbb"), parallel = FALSE)
+  type.boot = c("none", "mbb"), method = c("br", "fn", "pfn", "fnc",
+  "lasso", "scad"), parallel = FALSE)
 }
 \arguments{
   \item{Y}{A \code{vector} of real numbers containing the
@@ -33,6 +34,10 @@ qRegEstimator(Y, frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
   blocks bootstrap with \code{B} and \code{l} as
   specified.}
 
+  \item{method}{method used for computing the quantile
+  regression estimates.  The choice is passed to \code{qr};
+  see the documentation of \code{quantreg} for details.}
+
   \item{parallel}{a flag to allow performing parallel
   computations.}
 }
@@ -56,7 +61,7 @@ Y <- rnorm(100) # Try 2000 and parallel computation will in fact be faster.
 
 # Compute without using snowfall capabilities
 system.time(
-	qRegEst1 <- qRegEstimator(Y, levels=seq(0.25,0.75,0.25), parallel=FALSE)
+  qRegEst1 <- qRegEstimator(Y, levels=seq(0.25,0.75,0.25), parallel=FALSE)
 )
 
 # Set up snowfall
@@ -66,7 +71,7 @@ sfExportAll()
 
 # Compare how much faster the computation is when done in parallel
 system.time(
-	qRegEst2 <- qRegEstimator(Y, levels=seq(0.25,0.75,0.25), parallel=TRUE)
+  qRegEst2 <- qRegEstimator(Y, levels=seq(0.25,0.75,0.25), parallel=TRUE)
 )
 
 sfStop()

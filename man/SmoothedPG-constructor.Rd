@@ -6,7 +6,8 @@
 smoothedPG(object, frequencies = 2 * pi/length(object) * 0:(length(object) -
   1), levels.1 = 0.5, levels.2 = levels.1, isRankBased = TRUE,
   type = c("clipped", "qr"), type.boot = c("none", "mbb"),
-  parallel = FALSE, B = 0, l = 1, weight = kernelWeight())
+  method = c("br", "fn", "pfn", "fnc", "lasso", "scad"), parallel = FALSE,
+  B = 0, l = 1, weight = kernelWeight())
 }
 \arguments{
   \item{object}{a time series (\code{numeric}, \code{ts},
@@ -42,6 +43,10 @@ smoothedPG(object, frequencies = 2 * pi/length(object) * 0:(length(object) -
   \code{"none"} and \code{"mbb"} which means to do a moving
   blocks bootstrap with \code{B} and \code{l} as
   specified.}
+
+  \item{method}{method used for computing the quantile
+  regression estimates.  The choice is passed to \code{qr};
+  see the documentation of \code{quantreg} for details.}
 
   \item{parallel}{a flag to allow performing parallel
   computations, where possible.}

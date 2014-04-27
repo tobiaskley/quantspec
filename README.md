@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/tobiaskley/quantspec.svg?branch=develop)](https://travis-ci.org/tobiaskley/quantspec)
+
+
 quantspec: Quantile-Based Spectral Analysis with R
 ==================================================
 

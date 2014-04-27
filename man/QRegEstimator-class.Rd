@@ -30,6 +30,10 @@ All remarks made in the documentation of the super-class
 \section{Slots}{
 
 \describe{
+\item{\code{method}}{method used for computing the quantile regression estimates.
+                The choice is passed to \code{qr}; see the
+                documentation of \code{quantreg} for details.}
+
 \item{\code{parallel}}{a flag that signalizes that parallelization mechanisms from
                 the package \pkg{snowfall} may be used.}
 }}

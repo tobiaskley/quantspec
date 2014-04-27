@@ -758,6 +758,9 @@ setMethod(f = "getQuantilePG",
 #'                   two options are implemented: \code{"none"} and \code{"mbb"}
 #'                   which means to do a moving blocks  bootstrap with \code{B}
 #'                   and \code{l} as specified.
+#' @param method  method used for computing the quantile regression estimates.
+#'                 The choice is passed to \code{qr}; see the
+#'                 documentation of \code{quantreg} for details.
 #' @param parallel a flag to allow performing parallel computations,
 #'                   where possible.
 #' @param weight Object of type \code{\link{Weight}} to be used for smoothing.
@@ -793,6 +796,7 @@ smoothedPG <- function(
     isRankBased=TRUE,
     type=c("clipped","qr"),
     type.boot=c("none","mbb"),
+    method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
     parallel=FALSE,
     B = 0,
     l = 1,
