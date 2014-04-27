@@ -31,6 +31,9 @@ NULL
 #'
 #' @keywords S4-classes
 #'
+#' @slot method   method used for computing the quantile regression estimates.
+#'                 The choice is passed to \code{qr}; see the
+#'                 documentation of \code{quantreg} for details.
 #' @slot parallel a flag that signalizes that parallelization mechanisms from
 #'                 the package \pkg{snowfall} may be used.
 #'
@@ -43,6 +46,7 @@ NULL
 setClass(
     Class = "QRegEstimator",
     representation=representation(
+        method = "character",
         parallel = "logical"
     ),
     contains = "FreqRep"
@@ -52,7 +56,7 @@ setClass(
 setMethod(
     f = "initialize",
     signature = "QRegEstimator",
-    definition = function(.Object, Y, isRankBased, levels, frequencies, positions.boot, B, parallel) {
+    definition = function(.Object, Y, isRankBased, levels, frequencies, positions.boot, B, method, parallel) {
 
       .Object@Y <- Y
       .Object@isRankBased <- isRankBased
@@ -60,6 +64,7 @@ setMethod(
       .Object@frequencies <- frequencies
       .Object@positions.boot <- positions.boot
       .Object@B <- B
+      .Object@method <- method
       .Object@parallel <- parallel
 
       # Define variables with dimensions
@@ -87,22 +92,22 @@ setMethod(
 
         suppressWarnings({ # otherwise rq from package quantreg will issue
               # warnings due to non uniqueness of the minimizer.
-              if ( (omega %% (2*pi)) == 0 ) {
-                qregSol <- coef(rq(X ~ 1, levels))
+              if ( abs(omega %% (2*pi)) < .Machine$double.eps^0.5 ) {
+                qregSol <- coef(rq(X ~ 1, levels, method=method))
                 if (length(levels) > 1) {
                   qregSol <- n * qregSol[1,]
                 } else {
                   qregSol <- n * matrix(qregSol[1],ncol=1)
                 }
-              } else if ( (omega %% pi) == 0 ) {
-                qregSol <- coef(rq(X ~ 1 + D, levels))
+              } else if ( abs((omega-pi) %% (2*pi)) < .Machine$double.eps^0.5 ) {
+                qregSol <- coef(rq(X ~ 1 + D, levels, method=method))
                 if (length(levels) > 1) {
                   qregSol <- n * qregSol[2,]
                 } else {
                   qregSol <- n * matrix(qregSol[2],ncol=1)
                 }
               } else {
-                qregSol <- coef(rq(X ~ 1 + D + S, levels))
+                qregSol <- coef(rq(X ~ 1 + D + S, levels, method=method))
                 pos <- c(2,3)
                 iVec <- matrix(c(1, complex(real = 0, imaginary = 1)), nrow = 1)
                 if (length(levels)>1) {
@@ -189,6 +194,9 @@ setMethod(f = "getParallel",
 #'                   two options are implemented: \code{"none"} and \code{"mbb"}
 #'                   which means to do a moving blocks  bootstrap with \code{B}
 #'                   and \code{l} as specified.
+#' @param method  method used for computing the quantile regression estimates.
+#'                 The choice is passed to \code{qr}; see the
+#'                 documentation of \code{quantreg} for details.
 #' @param parallel a flag to allow performing parallel computations.
 #'
 #' @return Returns an instance of \code{QRegEstimator}.
@@ -203,6 +211,7 @@ qRegEstimator <- function( Y,
     B = 0,
     l = 0,
     type.boot = c("none", "mbb"),
+    method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
     parallel = FALSE) {
 
   # Verify if all parameters are valid
@@ -231,6 +240,8 @@ qRegEstimator <- function( Y,
         bootPos <- movingBlocks(l,length(Y))}
   )
 
+  method <- match.arg(method, c("br", "fn", "pfn", "fnc", "lasso", "scad"))[1]
+
   freqRep <- new(
       Class = "QRegEstimator",
       Y = Y,
@@ -239,6 +250,7 @@ qRegEstimator <- function( Y,
       B = B,
       positions.boot = bootPos,
       frequencies = frequencies,
+      method = method,
       parallel = parallel
   )
 

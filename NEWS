@@ -1,6 +1,6 @@
 
-Changes in quantspec 1.0-0
-==========================
+quantspec 1.0-0
+===============
 
 OBJECT-ORIENTED DESIGN
 
@@ -34,8 +34,9 @@ VIGNETTE
    a tutorial and two worked examples.
 
 
-quantspec 0.1 and 0.2
-=====================
+quantspec 0.2
+quantspec 0.1
+=============
 
  o Three functions to compute, smooth and plot the (quantile regression-based)
    Laplace periodograms and rank-based Laplace periodograms.
