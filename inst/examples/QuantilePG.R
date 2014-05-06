@@ -5,7 +5,7 @@
 ## Dette et. al (2014).
 Y <- ts1(64)
 
-## For a defined set of quantile levels 
+## For a defined set of quantile levels
 levels <- c(0.25,0.5,0.75)
 
 ## the various quantile periodograms can be calculated calling quantilePG:
@@ -23,7 +23,7 @@ system.time(
         type.boot="mbb", B=250, l=2^5))
 
 ## The two previous calls also illustrate that computation of the CR-periodogram
-## is much more efficient than the quantile-regression based copula periodogram.  
+## is much more efficient than the quantile-regression based copula periodogram.
 
 ## Either periodogram can be plotted using the plot command
 plot(qPG.cl)
@@ -48,5 +48,14 @@ freq <- 2*pi*(1:31)/32
 V.cl <- getValues(qPG.cl, frequencies = freq, levels.1=c(0.25))
 V.qr <- getValues(qPG.qr, frequencies = freq, levels.1=c(0.25))
 plot(x = freq/(2*pi), Re(V.cl[,1,1,1]), type="l",
-        ylab="quantile PGs", xlab=expression(omega/2*pi))
+        ylab="real part -- quantile PGs", xlab=expression(omega/2*pi))
 lines(x = freq/(2*pi), Re(V.qr[,1,1,1]), col="red")
+
+## Now plot the imaginary parts of the quantile spectra for tau1 = 0.25
+## and tau2 = 0.5
+freq <- 2*pi*(1:31)/32
+V.cl <- getValues(qPG.cl, frequencies = freq, levels.1=c(0.25, 0.5))
+V.qr <- getValues(qPG.qr, frequencies = freq, levels.1=c(0.25, 0.5))
+plot(x = freq/(2*pi), Im(V.cl[,1,2,1]), type="l",
+    ylab="imaginary part -- quantile PGs", xlab=expression(omega/2*pi))
+lines(x = freq/(2*pi), Im(V.qr[,1,2,1]), col="red")

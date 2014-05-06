@@ -86,7 +86,7 @@ setMethod(
         # Define the harmonic regressors.
         n <- length(X)
         D <- cos(omega*1:n)
-        S <- sin(omega*1:n)
+        S <- -1*sin(omega*1:n)
 
         # Then perform the quantile regression.
 
