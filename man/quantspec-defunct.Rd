@@ -1,0 +1,64 @@
+\name{quantspec-defunct}
+\alias{LaplacePeriodogram}
+\alias{ct}
+\alias{plotLaplacePeriodogram}
+\alias{quantspec-defunct}
+\alias{smoothedLaplacePeriodogram}
+\title{Defunct functions in package quantspec}
+\usage{
+ct(i1, i2, n)
+
+LaplacePeriodogram(X, taus, omegas = 1:(ceiling(length(X)/2) - 1),
+  fromRanks = TRUE, showProgressBar = FALSE)
+
+plotLaplacePeriodogram(LPG, taus, F = 1:length(LPG[, 1]),
+  CL = 1:length(taus), hRange = FALSE, hOffset = FALSE,
+  ylabel = expression({     {         hat(f)     }[n]^{         list(tau[1],
+  tau[2])     } }(omega)), oma = c(2.5, 2.5, 2.5, 2.5), mar = c(4.5, 4.5, 1,
+  0) + 0.1, cex.lab = 1.5)
+
+smoothedLaplacePeriodogram(LPG, taus, W)
+}
+\arguments{
+  \item{i1}{Parameter of DEFUNCT function.}
+
+  \item{i2}{Parameter of DEFUNCT function.}
+
+  \item{n}{Parameter of DEFUNCT function.}
+
+  \item{X}{Parameter of DEFUNCT function.}
+
+  \item{taus}{Parameter of DEFUNCT function.}
+
+  \item{omegas}{Parameter of DEFUNCT function.}
+
+  \item{fromRanks}{Parameter of DEFUNCT function.}
+
+  \item{showProgressBar}{Parameter of DEFUNCT function.}
+
+  \item{LPG}{Parameter of DEFUNCT function.}
+
+  \item{F}{Parameter of DEFUNCT function.}
+
+  \item{CL}{Parameter of DEFUNCT function.}
+
+  \item{hRange}{Parameter of DEFUNCT function.}
+
+  \item{hOffset}{Parameter of DEFUNCT function.}
+
+  \item{ylabel}{Parameter of DEFUNCT function.}
+
+  \item{oma}{Parameter of DEFUNCT function.}
+
+  \item{mar}{Parameter of DEFUNCT function.}
+
+  \item{cex.lab}{Parameter of DEFUNCT function.}
+
+  \item{W}{Parameter of DEFUNCT function.}
+}
+\description{
+These functions have been declared defunct since Version
+1.0-1.
+}
+\keyword{Defunct}
+

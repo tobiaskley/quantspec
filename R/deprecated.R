@@ -1,6 +1,6 @@
 ################################################################################
-# This code is from version 0.2; don't these functions any more!
-# Version 1.0 was completely redesigned and offers the same functionality.
+# This code is from version 0.2; don't use these functions any more!
+# Version 1.0-0 was completely redesigned and offers the same functionality.
 #
 # The old codes is soley kept for compatability reasons and to warn users about
 # its depreciation. It will be removed in the near future.
@@ -10,35 +10,35 @@
 # This code used to be in ct.R
 ################################################################################
 
-#' Deprecated functions in package quantspec
+#' Defunct functions in package quantspec
 #'
-#' These functions have been deprecated since Version 1.0.
-#' They will be defunct in the near future!
+#' These functions have been declared defunct since Version 1.0-1.
 #'
-#' @name quantspec-deprecated
-#' @keywords Deprecated
+#' @name quantspec-defunct
+#' @aliases ct
+#' @keywords Defunct
 #'
-#' @param i1 Parameter of DEPRECATED function.
-#' @param i2 Parameter of DEPRECATED function.
-#' @param n   Parameter of DEPRECATED function.
-#' @param X Parameter of DEPRECATED function.
-#' @param taus Parameter of DEPRECATED function.
-#' @param omegas Parameter of DEPRECATED function.
-#' @param fromRanks Parameter of DEPRECATED function.
-#' @param showProgressBar Parameter of DEPRECATED function.
-#' @param LPG Parameter of DEPRECATED function.
-#' @param F Parameter of DEPRECATED function.
-#' @param CL Parameter of DEPRECATED function.
-#' @param hRange Parameter of DEPRECATED function.
-#' @param hOffset Parameter of DEPRECATED function.
-#' @param ylabel Parameter of DEPRECATED function.
-#' @param oma Parameter of DEPRECATED function.
-#' @param mar Parameter of DEPRECATED function.
-#' @param cex.lab Parameter of DEPRECATED function.
-#' @param W Parameter of DEPRECATED function.
+#' @param i1 Parameter of DEFUNCT function.
+#' @param i2 Parameter of DEFUNCT function.
+#' @param n   Parameter of DEFUNCT function.
+#' @param X Parameter of DEFUNCT function.
+#' @param taus Parameter of DEFUNCT function.
+#' @param omegas Parameter of DEFUNCT function.
+#' @param fromRanks Parameter of DEFUNCT function.
+#' @param showProgressBar Parameter of DEFUNCT function.
+#' @param LPG Parameter of DEFUNCT function.
+#' @param F Parameter of DEFUNCT function.
+#' @param CL Parameter of DEFUNCT function.
+#' @param hRange Parameter of DEFUNCT function.
+#' @param hOffset Parameter of DEFUNCT function.
+#' @param ylabel Parameter of DEFUNCT function.
+#' @param oma Parameter of DEFUNCT function.
+#' @param mar Parameter of DEFUNCT function.
+#' @param cex.lab Parameter of DEFUNCT function.
+#' @param W Parameter of DEFUNCT function.
 
 ct <- function (i1, i2, n) {
-  .Deprecated("getValues")
+  .Defunct("getValues")
 
   i1*(n+0.5)-n+i2-0.5*i1^2
 }
@@ -47,11 +47,12 @@ ct <- function (i1, i2, n) {
 # This code used to be in LaplacePeriodogram.R
 ################################################################################
 
-#' @name quantspec-deprecated
+#' @name quantspec-defunct
+#' @aliases LaplacePeriodogram
 LaplacePeriodogram <-
     function (X, taus, omegas=1:(ceiling(length(X)/2)-1), fromRanks=TRUE, showProgressBar=FALSE) {
 
-  .Deprecated("quantilePG")
+  .Defunct("quantilePG")
 
 
   # Verify if all parameters are valid
@@ -152,7 +153,8 @@ LaplacePeriodogram <-
 # This code used to be in plotLaplacePeriodogram.R
 ################################################################################
 
-#' @name quantspec-deprecated
+#' @name quantspec-defunct
+#' @aliases plotLaplacePeriodogram
 #' @importFrom rje is.subset
 plotLaplacePeriodogram <-
     function(LPG, taus, F=1:length(LPG[,1]), CL=1:length(taus),
@@ -162,7 +164,7 @@ plotLaplacePeriodogram <-
         mar=c(4.5,4.5,1,0)+0.1,
         cex.lab=1.5) {
 
-  .Deprecated("plot")
+  .Defunct("plot")
   warning("This function has been depreciated since Version 1.0\n",
       "It will be removed in the near future!")
 
@@ -255,11 +257,12 @@ plotLaplacePeriodogram <-
 # This code used to be in smoothedLaplacePeriodogram.R
 ################################################################################
 
-#' @name quantspec-deprecated
+#' @name quantspec-defunct
+#' @aliases smoothedLaplacePeriodogram
 smoothedLaplacePeriodogram <-
     function(LPG, taus, W) {
 
-  .Deprecated("smoothedPG")
+  .Defunct("smoothedPG")
 
   # Verify if all parameters are valid
 
