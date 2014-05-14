@@ -1,8 +1,8 @@
-% This file was created with JabRef 2.6.
+% This file was created with JabRef 2.9.2.
 % Encoding: UTF8
 
 @BOOK{Brillinger1975,
-  title = {Time series: data analysis and theory},
+  title = {Time Series: Data Analysis and Theory},
   publisher = {Holt, Rinehart and Winston, Inc.},
   year = {1975},
   author = {D. R. Brillinger},
@@ -15,7 +15,7 @@
   title = {Of Copulas, Quantiles, Ranks and Spectra: An $L_1$-Approach to Spectral
 	Analysis},
   journal = {Bernoulli},
-  year = {2013},
+  year = {2014+},
   volume = {forthcoming},
   owner = {kley},
   timestamp = {2012.10.07}
@@ -31,13 +31,137 @@
   url = {http://arxiv.org/abs/1111.1965}
 }
 
+@UNPUBLISHED{HillMcCloskey2013,
+  author = {Hill, Jonathan B and McCloskey, Adam},
+  title = {Heavy Tail Robust Frequency Domain Estimation},
+  year = {2013},
+  owner = {kley},
+  timestamp = {2014.01.24}
+}
+
+@ARTICLE{Hong1999,
+  author = {Y. Hong},
+  title = {Hypothesis Testing in Time Series via the Empirical Characteristic
+	Function: A Generalized Spectral Density Approach},
+  journal = {Journal of the American Statistical Association},
+  year = {1999},
+  volume = {94},
+  pages = {1201--1220},
+  number = {448},
+  abstract = {The standardized spectral density completely describes serial dependence
+	of a Gaussian process. For non-Gaussian processes, however, it may
+	become an inappropriate analytic tool, because it misses the nonlinear
+	processes with zero autocorrelation. By generalizing the concept
+	of the standardized spectral density, I propose a new spectral tool
+	suitable for both linear and nonlinear time series analysis. The
+	generalized spectral density is indexed by frequency and a pair of
+	auxiliary parameters. It is well defined for both continuous and
+	discrete random variables, and requires no moment condition. Introduction
+	of the auxiliary parameters renders the spectrum able to capture
+	all pairwise dependencies, including those with zero autocorrelation.
+	The standardized spectral density can be derived by properly differentiating
+	the generalized spectral density with respect to the auxiliary parameters
+	at the origin. The consistency of a class of Parzen's kernel-type
+	estimators for the generalized spectral density is established, and
+	their optimal convergence rates are derived using the integrated
+	mean squared error criterion. A data-dependent asymptotically optimal
+	bandwidth (or lag order) is introduced. The kernel estimators and
+	their derivatives are applied to construct a class of asymptotically
+	one-sided N(0, 1) tests for generic serial dependence and hypotheses
+	on various specific aspects of serial dependence. The latter include
+	serial uncorrelatedness, martingale, conditional homoscedasticity,
+	conditional symmetry, and conditional homokurtosis. All of the proposed
+	tests, which include Hong's spectral density test for serial correlation,
+	can be derived from a unified framework. An empirical application
+	to Deutschemark exchange rates highlights the approach.},
+  copyright = {Copyright ï¿½ 1999 American Statistical Association},
+  jstor_articletype = {research-article},
+  jstor_formatteddate = {Dec., 1999},
+  language = {English},
+  owner = {tobias.kley},
+  publisher = {American Statistical Association},
+  timestamp = {2011.11.26}
+}
+
+@ARTICLE{Katkovnik1998,
+  author = {V. Katkovnik},
+  title = {Robust {M}-Periodogram},
+  journal = {IEEE Transactions on Signal Processing},
+  year = {1998},
+  volume = {46},
+  pages = {3104--3109},
+  number = {11},
+  owner = {tobias.kley},
+  timestamp = {2011.11.26}
+}
+
+@BOOK{Kedem1980,
+  title = {Binary Time Series},
+  publisher = {Dekker},
+  year = {1980},
+  author = {B. Kedem},
+  address = {New York},
+  owner = {tobias.kley},
+  timestamp = {2010.08.10}
+}
+
+@ARTICLE{KluppelbergMikosch1994,
+  author = {Kl{\"u}ppelberg, Claudia and Mikosch, Thomas},
+  title = {Some Limit Theory for the Self-Normalised Periodogram of Stable Processes},
+  journal = {Scandinavian Journal of Statistics},
+  year = {1994},
+  pages = {485--491},
+  owner = {kley},
+  publisher = {JSTOR},
+  timestamp = {2014.01.24}
+}
+
+@ARTICLE{KleinerEtAl1979,
+  author = {B. Kleiner and R. D. Martin and D. J. Thomson},
+  title = {Robust Estimation of Power Spectra},
+  journal = {Journal of the Royal Statistical Society. Series B (Methodological)},
+  year = {1979},
+  volume = {41},
+  pages = {313--351},
+  number = {3},
+  abstract = {Outliers in time series can play havoc with conventional power spectrum
+	density estimation techniques when the spectrum features of interest
+	consist of one or more peaks of relatively low amplitude. Furthermore,
+	the outliers need not be large relative to the scale of the process
+	in order to have considerable impact on the estimate; they only need
+	to be large relative to the scale of the innovations process. Following
+	a tutorial review of the central notions of robustness and the principles
+	guiding conventional spectrum estimation, methods are presented for
+	computing robust spectral densities. These are quite insensitive
+	to such outliers and produce reliable estimates reflecting the structure
+	of the core portion of the data. Two distinct methods are described.
+	Both are based on robust prewhitening and on weighting the resulting
+	residuals. They differ only in the way prewhitening is done: the
+	first method computes the prewhitened values iteratively through
+	a filtering operation; the second fits a robust autoregressive representation
+	to the data by iterated weighted least squares. Each approach can
+	be regarded as the solution to an intuitively appealing minimization
+	problem, where the solution is exact in one case, approximate in
+	the other. Both procedures have proved to be successful over a wide
+	variety of data sets as will be demonstrated with real and simulated
+	data.},
+  copyright = {Copyright ï¿½ 1979 Royal Statistical Society},
+  jstor_articletype = {research-article},
+  jstor_formatteddate = {1979},
+  language = {English},
+  owner = {tobias.kley},
+  publisher = {Blackwell Publishing for the Royal Statistical Society},
+  timestamp = {2011.11.26}
+}
+
 @MANUAL{Kley2014,
   title = {quantspec: Quantile-based Spectral Analysis Functions},
   author = {Tobias Kley},
   year = {2014},
-  note = {R package version~1.0-0},
+  note = {R package version~1.0-1},
   owner = {kley},
-  timestamp = {2014.03.12}
+  timestamp = {2014.03.12},
+  url = {http://CRAN.R-project.org/package=quantspec}
 }
 
 @PHDTHESIS{Kley2014a,
@@ -92,6 +216,37 @@
   timestamp = {2010.10.23}
 }
 
+@ARTICLE{LeeRao2012,
+  author = {Lee, Junbum and Rao, Suhasini Subba},
+  title = {The Quantile Spectral Density and Comparison Based Tests for Nonlinear
+	Time Series},
+  journal = {arXiv preprint},
+  year = {2012},
+  owner = {kley},
+  timestamp = {2014.01.24},
+  url = {http://arxiv.org/abs/1112.2759}
+}
+
+@ARTICLE{Li2014,
+  author = {T.-H. Li},
+  title = {Quantile Periodogram and Time-Dependent Variance},
+  journal = {Journal of Time Series Analysis},
+  year = {2014},
+  volume = {forthcoming},
+  owner = {kley},
+  timestamp = {2014.05.08}
+}
+
+@BOOK{Li2013,
+  title = {Time Series with Mixed Spectra: Theory and Methods},
+  publisher = {CRC Press},
+  year = {2013},
+  author = {Ta-Hsin Li},
+  address = {Boca Raton},
+  owner = {kley},
+  timestamp = {2014.01.29}
+}
+
 @ARTICLE{Li2012,
   author = {Li, Ta-Hsin},
   title = {Quantile Periodograms},
@@ -126,6 +281,20 @@
 	rate variability in the presence of ectopic events and artifacts.},
   owner = {tobias},
   timestamp = {2010.06.16}
+}
+
+@INCOLLECTION{Mikosch1998,
+  author = {Mikosch, T.},
+  title = {Periodogram Estimates from Heavy-Tailed Data},
+  booktitle = {A Practical Guide to Heavy Tails: Statistical Techniques for Analysing
+	Heavy-Tailed Distributions},
+  publisher = {Birkh{\"a}user},
+  year = {1998},
+  editor = {R. A. Adler and R. Feldman and M. S. Taqqu},
+  pages = {241--258},
+  address = {Boston},
+  owner = {kley},
+  timestamp = {2014.01.29}
 }
 
 @MANUAL{R2012,
