@@ -471,7 +471,7 @@ setMethod(f = "getMeanPG",
       pfreq <- closest.pos(object@frequencies, frequencies)
       plevels1 <- closest.pos(getLevels(object,1), levels.1)
       plevels2 <- closest.pos(getLevels(object,2), levels.2)
-      return(object@meanPG[pfreq, plevels1, plevels2])
+      return(object@meanPG[pfreq, plevels1, plevels2, drop=F])
     }
 )
 
