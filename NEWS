@@ -1,3 +1,11 @@
+quantspec 1.0-1
+===============
+
+ o  Fixed a mistake in QRegEstimator (in v1.0-0, the complex conjugate of
+    the estimator was returned).
+ o  Fixed a mistake where 1 x 1 QuantileSD plots failed to be created.
+ o  Improved the vignette.
+
 
 quantspec 1.0-0
 ===============

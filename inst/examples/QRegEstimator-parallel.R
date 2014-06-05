@@ -4,7 +4,7 @@ Y <- rnorm(100) # Try 2000 and parallel computation will in fact be faster.
 
 # Compute without using snowfall capabilities
 system.time(
-  qRegEst1 <- qRegEstimator(Y, levels=seq(0.25,0.75,0.25), parallel=FALSE)
+  qRegEst1 <- qRegEstimator(Y, levels=seq(0.25,0.75,0.25), method="fn", parallel=FALSE)
 )
 
 # Set up snowfall
@@ -14,7 +14,7 @@ sfExportAll()
 
 # Compare how much faster the computation is when done in parallel
 system.time(
-  qRegEst2 <- qRegEstimator(Y, levels=seq(0.25,0.75,0.25), parallel=TRUE)
+  qRegEst2 <- qRegEstimator(Y, levels=seq(0.25,0.75,0.25), method="fn", parallel=TRUE)
 )
 
 sfStop()
