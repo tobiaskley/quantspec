@@ -311,6 +311,7 @@ setMethod(f = "getValues",
 #' @param frequencies a vector of frequencies for which to get the result
 #' @param levels.1 the first vector of levels for which to get the result
 #' @param levels.2 the second vector of levels for which to get the result
+#' @param impl choose "R" or "C" for one of the two implementations available
 #'
 #' @return Returns the estimate described above.
 #'
@@ -325,85 +326,120 @@ setMethod(f = "getSdNaive",
     definition = function(object,
         frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
         levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2)) {
+        levels.2=getLevels(object,2),
+        impl=c("R","C")) {
 
       if (class(getWeight(object)) != "KernelWeight") {
         stop("getSdNaive currently only available for 'KernelWeight'.")
       }
-
+      
+      Y <- object@qPG@freqRep@Y
+      objLevels1 <- object@levels[[1]]
+      objLevels2 <- object@levels[[2]]
+      
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
-        frequencies <- 2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y)
+        frequencies <- 2*pi*(0:(length(Y)-1))/length(Y)
       }
       if (!hasArg(levels.1)) {
-        levels.1 <- object@levels[[1]]
+        levels.1 <- objLevels1
       }
       if (!hasArg(levels.2)) {
-        levels.2 <- object@levels[[2]]
+        levels.2 <- objLevels2
+      }
+      if (!hasArg(impl)) {
+        impl <- "R"
       }
       # end: workaround
 
       if (object@env$sdNaive.done == FALSE) {
 
         weight <- object@weight
-        N <- length(object@qPG@freqRep@Y)
-        K1 <- length(object@levels[[1]])
-        K2 <- length(object@levels[[2]])
+        N <- length(Y)
+        K1 <- length(objLevels1)
+        K2 <- length(objLevels2)
 
-        WW <- getValues(weight, N=N)[c(2:N,1)] # WW[j] corresponds to W_n(2 pi j/n)
-        WW3 <- rep(WW,4)
-
-        V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N)[,,,1], dim=c(N-1,K1,K2))
-
-        res <- array(0,dim=c(N,K1,K2))
-
-        M1 <- matrix(0, ncol=N-1, nrow=N)
-        M2 <- matrix(0, ncol=N-1, nrow=N)
-        M3 <- matrix(0, ncol=N-1, nrow=N)
-        M4 <- matrix(0, ncol=N-1, nrow=N)
-        for (j in 1:N) {
-          M1[j,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j-(1:(N-1))]
-          M2[j,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j+(1:(N-1))]
-          M3[j,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j-(1:(N-1))]
-          M4[j,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j+(1:(N-1))]
-        }
-
-        for (k1 in 1:K1) {
-          for (k2 in 1:K2) {
-            if (k1 <= k2) {
-              V1 <- matrix(Re(V[,k1,k1]) * Re(V[,k2,k2]), ncol=1)
-              V2 <- matrix(abs(V[,k1,k2])^2, ncol=1)
-
-              A1 <- rowSums(M1 %*% V1)
-              B1 <- rowSums(M2 %*% V2)
-
-              Sr1 <- A1+B1
-
-              if (k1 == k2) {
-                S <- Sr1
+        if (impl == "R") {
+          
+          #####
+          ## Variant 1: more or less vectorized... 
+          #####
+          WW <- getValues(weight, N=N)[c(2:N,1)] # WW[j] corresponds to W_n(2 pi j/n)
+          WW3 <- rep(WW,4) 
+          
+          V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N)[,,,1], dim=c(N-1,K1,K2))     
+          res <- array(0,dim=c(N,K1,K2))
+  
+          M1 <- matrix(0, ncol=N-1, nrow=N)
+          M2 <- matrix(0, ncol=N-1, nrow=N)
+          M3 <- matrix(0, ncol=N-1, nrow=N)
+          M4 <- matrix(0, ncol=N-1, nrow=N)
+          for (j in 0:(N-1)) { # Test 1:N
+            M1[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j-(1:(N-1))]
+            M2[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j+(1:(N-1))]
+            M3[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j-(1:(N-1))]
+            M4[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j+(1:(N-1))]
+          }
+  
+          for (k1 in 1:K1) {
+            for (k2 in 1:K2) {
+              if (k1 <= k2) {
+                V1 <- matrix(Re(V[,k1,k1]) * Re(V[,k2,k2]), ncol=1)
+                V2 <- matrix(abs(V[,k1,k2])^2, ncol=1)
+  
+                A1 <- rowSums(M1 %*% V1)
+                B1 <- rowSums(M2 %*% V2)
+  
+                Sr1 <- A1+B1
+  
+                if (k1 == k2) {
+                  S <- Sr1
+                } else {
+                  A2 <- rowSums(M3 %*% V1)
+                  B2 <- rowSums(M4 %*% V2)
+                  Sr2 <- A2+B2
+                  Si <- A1+B1-A2-B2
+                  S <- (1/2) * complex(real = Sr1+Sr2, imaginary = Si)
+                }
+                res[,k1,k2] <- (2*pi/N)^2 * S / (weight@env$Wnj[c(N,1:(N-1))])^2
               } else {
-                A2 <- rowSums(M3 %*% V1)
-                B2 <- rowSums(M4 %*% V2)
-                Sr2 <- A2+B2
-                Si <- A1+B1-A2-B2
-                S <- (1/2) * complex(real = Sr1+Sr2, imaginary = Si)
+                res[,k1,k2] <- res[,k2,k1]
               }
-              res[,k1,k2] <- (2*pi/N)^2 * S / weight@env$Wnj^2
-            } else {
-              res[,k1,k2] <- res[,k2,k1]
             }
           }
+  
+          sqrt.cw <- function(z) {
+            return(complex(real=sqrt(max(Re(z),0)), imaginary=sqrt(max(Im(z),0))))
+          }
+          res <- array(apply(res,c(1,2,3),sqrt.cw),dim=c(N,K1,K2))
+  
+          #####
+          ## END Variant 1: more or less vectorized... 
+          #####
+          
         }
-
-        sqrt.cw <- function(z) {
-          return(complex(real=sqrt(max(Re(z),0)), imaginary=sqrt(max(Im(z),0))))
+        
+        if (impl == "C") {     
+          #####
+          ## Variant 2: using C++
+          #####
+          
+          WW <- getValues(weight, N=N) 
+          V <- array(getValues(object, frequencies = 2*pi*(0:(N-1))/N)[,,,1], dim=c(N,K1,K2))     
+          res <- .computeSdNaive(V, WW)
+     
+          #####
+          ## END Variant 2: using C++ (cppFunction)
+          #####
+          
         }
-        res <- array(apply(res,c(1,2,3),sqrt.cw),dim=c(N,K1,K2))
-
+        
         object@env$sdNaive.done <- TRUE
         object@env$sdNaive <- res[1:(floor(N/2)+1),,, drop=F]
-      }
+          resObj <- res[1:(floor(N/2)+1),,, drop=F]
+      } # End of 'if (object@env$sdNaive.done == FALSE) {'
 
+      resObj <- object@env$sdNaive
       ##############################
       ## (Similar) Code also in Class-FreqRep!!!
       ##############################
@@ -431,12 +467,12 @@ setMethod(f = "getSdNaive",
       }
 
       # Select columns
-      c.1.pos <- closest.pos(object@levels[[1]],levels.1)
-      c.2.pos <- closest.pos(object@levels[[2]],levels.2)
+      c.1.pos <- closest.pos(objLevels1,levels.1)
+      c.2.pos <- closest.pos(objLevels2,levels.2)
 
       # Select rows
-      r1.pos <- closest.pos(object@frequencies,frequencies[frequencies <= pi])
-      r2.pos <- closest.pos(-1*(2*pi-object@frequencies),-1*frequencies[frequencies > pi])
+      r1.pos <- closest.pos(oF,f[f <= pi])
+      r2.pos <- closest.pos(-1*(2*pi-oF),-1*f[f > pi])
 
       J <- length(frequencies)
       K1 <- length(levels.1)
@@ -444,10 +480,10 @@ setMethod(f = "getSdNaive",
       res <- array(dim=c(J, K1, K2))
 
       if (length(r1.pos) > 0) {
-        res[1:length(r1.pos),,] <- object@env$sdNaive[r1.pos,c.1.pos,c.2.pos]
+        res[1:length(r1.pos),,] <- resObj[r1.pos,c.1.pos,c.2.pos]
       }
       if (length(r2.pos) > 0) {
-        res[(length(r1.pos)+1):J,,] <- Conj(object@env$sdNaive[r2.pos,c.1.pos,c.2.pos])
+        res[(length(r1.pos)+1):J,,] <- Conj(resObj[r2.pos,c.1.pos,c.2.pos])
       }
 
       return(res)

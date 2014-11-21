@@ -87,7 +87,10 @@ NULL
 #' @import graphics
 #' @import methods
 #' @import stats4
-#' @import testthat
+#' @importFrom Rcpp evalCpp
+#' 
+#' @useDynLib quantspec
+
 #'
 #' @references
 #' Kley, T. (2014a). Quantile-Based Spectral Analysis: Asymptotic Theory and

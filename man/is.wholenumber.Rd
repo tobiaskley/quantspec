@@ -13,7 +13,8 @@ is.wholenumber(x, tol = .Machine$double.eps^0.5)
            to be performed.}
 }
 \value{
-Returns the time series as a numeric.
+Returns a vector of logicals with the same length as \code{x}; each
+        element \code{i} is \code{TRUE} iff \code{x[i]} is an integer.
 }
 \description{
 Borrowed from the example in \code{\link[base]{integer}}.

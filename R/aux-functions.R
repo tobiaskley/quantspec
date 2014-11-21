@@ -194,7 +194,8 @@ timeSeriesValidator <- function(Y) {
 #' @param tol an optional parameter specifying to which precision the check is
 #'            to be performed.
 #'
-#' @return Returns the time series as a numeric.
+#' @return Returns a vector of logicals with the same length as \code{x}; each
+#'         element \code{i} is \code{TRUE} iff \code{x[i]} is an integer.
 #'
 #' @examples
 #' \dontrun{

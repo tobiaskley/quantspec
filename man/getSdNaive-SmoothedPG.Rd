@@ -9,7 +9,8 @@ periodogram.}
 \usage{
 \S4method{getSdNaive}{SmoothedPG}(object, frequencies = 2 * pi *
   (0:(length(object@qPG@freqRep@Y) - 1))/length(object@qPG@freqRep@Y),
-  levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2))
+  levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2),
+  impl = c("R", "C"))
 }
 \arguments{
 \item{object}{\code{\link{SmoothedPG}} of which to get the estimates for the
@@ -20,6 +21,8 @@ standard deviation.}
 \item{levels.1}{the first vector of levels for which to get the result}
 
 \item{levels.2}{the second vector of levels for which to get the result}
+
+\item{impl}{choose "R" or "C" for one of the two implementations available}
 }
 \value{
 Returns the estimate described above.
