@@ -3,7 +3,6 @@ context("SmoothedPG")
 test_that("smoothedPG works as expected- compare to naively computed estimator",{
       
       set.seed(2581)
-      
       Y <- rnorm(64)
       
       freq <- 2*pi*(0:63)/64
@@ -109,4 +108,8 @@ test_that("smoothedPG works as expected for various levels",{
       expect_that(dim(W.fft),equals(c(64,3,3,1)))
       expect_that(W.fft,equals(W.fft.ref.1))
 
+      W.fft.sd <- getSdNaive(sPG.fft)
+      expect_that(dim(W.fft.sd),equals(c(64,3,3)))
+      expect_that(W.fft.sd,equals(W.fft.sd.ref))
+      
     })

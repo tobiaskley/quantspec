@@ -3,6 +3,7 @@
 
 ## Simulate a time series Y1,...,Y128 from the QAR(1) process discussed in
 ## Dette et. al (2014).
+set.seed(2581)
 Y <- ts1(128)
 
 ## For a defined set of quantile levels ... 

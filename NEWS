@@ -1,3 +1,12 @@
+quantspec 1.0-2
+===============
+
+ o  Reimplemented getSdNaive using Rcpp.
+ o  Moved the unit tests to tests/testthat, which is now recommended practice
+ 	(cf. https://github.com/hadley/testthat).
+ o  Stylistically revised the vignette.
+
+
 quantspec 1.0-1
 ===============
 

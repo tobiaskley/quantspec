@@ -25,7 +25,7 @@ set.seed(2581)
 
 %% almost as usual
 \author{Tobias Kley\\Ruhr-Universit\"at Bochum}
-\title{Quantile-based Spectral Analysis in an Object-oriented Framework
+\title{Quantile-Based Spectral Analysis in an Object-Oriented Framework
 and a Reference Implementation in \proglang{R}: The \pkg{quantspec} Package}
 
 %% for pretty printing and a nice hypersummary also set:
@@ -50,9 +50,9 @@ primary interest is not the design of the \pkg{quantspec} package, but how to
 use it, can read the tutorial and worked examples (Sections~\ref{sec:3}
 and~\ref{sec:4}) independently.
 
-This introduction to the \proglang{R} package \pkg{quantspec} is a (slightly)
-modified version of a paper (to be) submitted to the \emph{Journal of
-Statistical Software}.}
+This introduction to the \proglang{R} package \pkg{quantspec} is
+a (slightly) modified version of a paper (to be) submitted to the \emph{Journal
+of Statistical Software}.}
 
 \Keywords{time series, spectral analysis, periodogram, quantile regression, copulas, ranks, \proglang{R}, \pkg{quantspec}, framework, object-oriented design}
 \Plainkeywords{time series, spectral analysis, periodogram, quantile regression, copulas, ranks, R, quantspec, framework, object-oriented design}
@@ -384,7 +384,7 @@ In the next sections, all classes of the framework and their relations are going
 \subsection[The base class QSpecQuantity and its successors]{The base class \code{QSpecQuantity} and its successors}
 
 Many of the quantities important for the quantile-based spectral analysis of a stationary time series [i.\,e., the estimators of Definitions~\ref{def:qregPG}--\ref{def:SmclippedPG} and the model quantities~\eqref{def:LapSD}--\eqref{def:cumCopSD}] are of the functional form,
-\[Q_b: F \times T_1 \times T_2 \rightarrow \mathbb{C}, \quad b=1,\ldots,B\]
+\[Q_b: F \times T_1 \times T_2 \rightarrow \mathbb{C}, \quad b=1,\ldots,B,\]
 where $F \subset \mathbb{R}$ is a set of frequencies [e.\,g, $F = [0,2\pi)$] and $T_1, T_2 \subset \bar{\mathbb{R}}$ are sets of levels. To provide a common interface to these objects the abstract class \code{QSpecQuantity} was introduced. Its data fields (i.\,e., the array \code{values}, a vector of reals \code{frequencies} and a list with two vectors of reals \code{levels}), are designed to store the sets
 \begin{equation*}
 \begin{split}
@@ -410,7 +410,8 @@ from the abstract class \code{QSpecQuantity}. Two such classes, \code{QuantilePG
 \begin{figure}[t]
   \centering
   \scalebox{1.2}{\includegraphics{../man/figures/main.pdf}}
-  \caption{Classes implementing the quantile-based periodograms and smoothed periodograms}
+  \caption{Classes implementing the quantile-based periodograms and smoothed
+  periodograms.}
   \label{fig:classdiagram1}
 \end{figure}
 
@@ -438,7 +439,7 @@ d_{n}^{q}(\omega) & \quad q \in Q_1 \cup Q_2, \ \omega \in F,
 respectively. In the framework this fact is incorporated by introduction of the abstract class \code{FreqRep} and its two subclasses \code{ClippedFT} and \code{QRegEstimator}, where the actual computations are implemented via the method \code{initialization()}. The class \code{FreqRep} serves as a common interface to the quantities in~\eqref{eqn:FR}. It provides data fields to store various information, including
 \begin{itemize}
   \item the observations \code{Y} from which the quantities were computed,
-  \item the \code{frequencies} and \code{levels} for which the computation was performed, and
+  \item the \code{frequencies} and \code{levels} for which the computation was performed,
   \item the result of the computation, which is stored in an array \code{values}.
 \end{itemize}
 Further more, a flag \code{isRankBased} indicates whether, prior to the main computations, the observations $(X_t)$ were transformed to pseudo-observations $(\hat F_n(X_t))$. Performing this extra step will yield $\hat b_{n,R}^{\tau}(\omega)$ instead of $\hat b_{n}^{\tau}(\omega)$ or $d_{n,R}^{\tau}(\omega)$ instead of $d_{n}^{\tau}(\omega)$, respectively.
@@ -454,7 +455,8 @@ smoothed periodograms are all defined similarly, in the sense that computing the
 \begin{figure}[t]
   \centering
   \scalebox{1.2}{\includegraphics{../man/figures/csd.pdf}}
-  \caption{Classes for the numerical computation of (integrated) copula and Laplace spectral densities via simulation} % and their relations to each other
+  \caption{Classes for the numerical computation of (integrated) copula and
+  Laplace spectral densities via simulation.} % and their relations to each other
   \label{fig:classdiagram2}
 \end{figure}
 
@@ -464,7 +466,7 @@ To obtain access to a quantity of the form~\eqref{def:LapSD} or~\eqref{def:CopSD
 
 To obtain access to quantities of the form~\eqref{def:cumLapSD} or~\eqref{def:cumCopSD}, an instance of~\code{IntegrQuantileSD} can be created. For the computation an object of type~\code{QuantileSD} is created and subsequently the integral is approximated via a Riemann sum.
 
-\section[Reference implementation: The R-package quantspec]{Reference implementation: The \proglang{R}-package \pkg{quantspec}}
+\section[Reference implementation: The R package quantspec]{Reference implementation: The \proglang{R} package \pkg{quantspec}}
 \label{sec:3}
 \subsection{Overview}
 
@@ -488,7 +490,7 @@ To install a package from the source code straight from the repository use the
 \code{install_github} function of the \pkg{devtools} package~\citep{devtools}. More precisely, install the \pkg{devtools} package, if it's not already installed, and call
 
 \begin{Code}
-R> devtools::install_github("tobiaskley/quantspec", ref="master")
+R> devtools::install_github("tobiaskley/quantspec", ref = "master")
 \end{Code}
 
 Instead of using \code{"master"}, another branch (e.\,g., \code{develop} to pull
@@ -518,7 +520,7 @@ in Table~\ref{tab:Constructors}.
   \centering
     \begin{tabular}{lll}
     \toprule
-    Constructor & Type of Object & Quantities Computed \\
+    Constructor & Type of object & Quantities computed \\
     \midrule
     \texttt{clippedFT}           & \texttt{ClippedFT}         & $d_n^q(\omega)$, $d_{n,R}^{\tau}(\omega)$      \\
     \texttt{qRegEstimator}       & \texttt{QRegEstimator}     & $b_n^{\tau}(\omega)$, $b_{n,R}^{\tau}(\omega)$ \\
@@ -547,27 +549,28 @@ within the online help system of \proglang{R} is available. After loading the
 package, which is done by calling
 
 <<>>=
-library(quantspec)
+library("quantspec")
 @
 
 the help file of the package, which provides an overview on the design, can be
 called by executing
 
 <<eval=FALSE>>=
-help(quantspec)       # alternatively: package?quantspec
+help("quantspec")
 @
 
-on the \proglang{R} command line. Note that an index of all available
+on the \proglang{R} command line.
+Note that an index of all available
 functions can be accessed at the very bottom of the page. If for example more
 information on the constructor of \texttt{QRegEstimator} and on
 the class itself is desired, then
 
 <<eval=FALSE>>=
-help(qRegEstimator)
-help(QRegEstimator)   # alternatively: class?QRegEstimator
+help("qRegEstimator")
+help("QRegEstimator")
 @
 
-should be invoked. Using this class to determine the frequency
+should be invoked.Using this class to determine the frequency
 representation $b_{n,R}^{\tau}(\omega)$, for $\tau \in \{0.25, 0.5, 0.75\}$
 would look as follows. In a toy example, where eight independent random
 variables $X_0, \ldots, X_7 \sim N(0,1)$ are generated and used to compute
@@ -575,7 +578,7 @@ $b_{n,R}^{\tau}(\omega)$, call
 
 <<>>=
 Y  <- rnorm(8)
-bn <- qRegEstimator(Y, levels = c(0.25,0.5,0.75))
+bn <- qRegEstimator(Y, levels = c(0.25, 0.5, 0.75))
 @
 
 By default the computation is done for all Fourier frequencies $\omega
@@ -600,17 +603,17 @@ getFrequencies(bn)
 getParallel(bn)
 @
 
-To invoke a method \code{f} with parameters \code{p1,...,pk} of an
-object \code{obj} the call is \code{f(obj,p1,...,pk)}. An
+To invoke a method \code{f} with parameters \code{p1, ..., pk} of an
+object \code{obj} the call is \code{f(obj, p1, ..., pk)}. An
 example is to invoke the accessor function \code{getValues}, which is equipped
 with parameters to get the values associated with certain \code{frequencies} or
 \code{levels}. An exemplary call looks like this:
 
 <<>>=
-getValues(bn, levels = c(0.25,0.5))
+getValues(bn, levels = c(0.25, 0.5))
 @
 
-Note that the result is returned as an array of dimension \code{c(J,K,B+1)},
+Note that the result is returned as an array of dimension \code{c(J, K, B + 1)},
 where in the present case \code{B = 0} bootstrap replications were performed.
 For a detailed description on how to use the function \code{getValues} in
 the above mentioned case, access the online help via the command
@@ -630,8 +633,8 @@ normally distributed random variables execute the following lines on the
 \proglang{R} shell:
 
 <<plotbn,eval=FALSE>>=
-dn <- clippedFT(rnorm(32), levels = seq(0.05,0.95,0.05))
-plot(dn, frequencies = 2*pi*(0:64)/32, levels = c(0.25,0.5))
+dn <- clippedFT(rnorm(32), levels = seq(0.05, 0.95, 0.05))
+plot(dn, frequencies = 2 * pi * (0:64) / 32, levels = c(0.25, 0.5))
 @
 
 \begin{figure}[t]
@@ -641,7 +644,7 @@ plot(dn, frequencies = 2*pi*(0:64)/32, levels = c(0.25,0.5))
 @
 \end{center}
   \vspace*{-0.7cm}\caption{Plot of the \code{FrequencyRepresentation} object
-  \code{bn}}
+  \code{bn}.}
   \label{fig:plotdn}
 \end{figure}
 
@@ -674,8 +677,8 @@ The \pkg{quantspec} package includes three demos that can be accessed
 via
 
 <<eval=FALSE>>=
-demo(sp500)
-demo(wheatprices)
+demo("sp500")
+demo("wheatprices")
 demo("qar-simulation")
 @
 
@@ -714,7 +717,7 @@ For a start, use the following \proglang{R} script to plot the data, the
 autocovariances of the returns and the autocovariances of the squared returns.
 
 <<plotSP,eval=FALSE>>=
-library(zoo)
+library("zoo")
 plot(sp500,            xlab = "time t", ylab = "", main = "")
 acf(coredata(sp500),   xlab = "lag k",  ylab = "", main = "")
 acf(coredata(sp500)^2, xlab = "lag k",  ylab = "", main = "")
@@ -734,7 +737,7 @@ par(def.par)  #- reset to default
   \vspace*{-0.7cm}\caption{Returns $(Y_t)$ of the S\&P~500 returns example
   data (left), autocovariances ${\rm Cov}(Y_{t+k}, Y_t)$ of the returns
   (middle), and autocovariances ${\rm Cov}(Y_{t+k}^2, Y_t^2)$ of the squared returns
-  (right)}
+  (right).}
   \label{fig:plotSP}
 \end{figure}
 
@@ -759,12 +762,12 @@ replications determined from a moving blocks bootstrap with block length $\ell =
 32$, it suffices to execute the first command of the following script:
 
 <<SPquantilePG,eval=FALSE>>=
-CR <- quantilePG(sp500, levels.1 = c(0.05,0.5,0.95),
+CR <- quantilePG(sp500, levels.1 = c(0.05, 0.5, 0.95),
     type = "clipped", type.boot = "mbb", B = 250, l = 32)
 freq <- getFrequencies(CR)
-plot(CR, levels = c(0.05,0.5,0.95),
+plot(CR, levels = c(0.05, 0.5, 0.95),
     frequencies = freq[freq > 0 & freq <= pi],
-    ylab = expression({I[list(n,R)]^{list(tau[1],tau[2])}}(omega)))
+    ylab = expression({I[list(n, R)]^{list(tau[1], tau[2])}}(omega)))
 @
 
 Using the second command it is possible to learn for which frequencies the
@@ -785,9 +788,9 @@ extreme quantile levels more closely a plot showing the CR periodogram
 only for frequencies $\omega \in [0,\pi/5]$ can be generated using the following script:
 
 <<SPquantilePG2,eval=FALSE>>=
-plot(CR, levels = c(0.05,0.5,0.95),
+plot(CR, levels = c(0.05, 0.5, 0.95),
     frequencies = freq[freq > 0 & freq <= pi/5],
-    ylab = expression({I[list(n,R)]^{list(tau[1],tau[2])}}(omega)))
+    ylab = expression({I[list(n, R)]^{list(tau[1], tau[2])}}(omega)))
 @
 
 The plot is shown in Figure~\ref{fig:SPquantilePG2}.
@@ -805,7 +808,7 @@ complete list of the available kernels call
 
 
 <<eval=FALSE>>=
-help(kernels)
+help("kernels")
 @
 
 \pagebreak
@@ -814,10 +817,10 @@ periodogram from \code{CR} using the Epanechnikov kernel and bandwidth \code{bw
 = 0.07} the first of the following two commands need to be executed.
 
 <<SPsmoothedPG,eval=FALSE>>=
-sPG <- smoothedPG(CR, weight=kernelWeight(W=W1, bw=0.07))
-plot(sPG, levels = c(0.05,0.5,0.95), type.scaling = "individual",
+sPG <- smoothedPG(CR, weight = kernelWeight(W = W1, bw = 0.07))
+plot(sPG, levels = c(0.05, 0.5, 0.95), type.scaling = "individual",
     frequencies = freq[freq > 0 & freq <= pi], ptw.CIs = 0.1,
-    ylab = expression(hat(G)[list(n,R)](list(tau[1],tau[2],omega))))
+    ylab = expression(hat(G)[list(n, R)](list(tau[1], tau[2], omega))))
 @
 
 Of course, the second line initiates plotting the smoothed CR periodogram, which
@@ -832,10 +835,10 @@ intervals can be plotted using the option \code{type.CIs = "boot.full"}, as is
 shown in the following script:
 
 <<SPsmoothedPGboot,eval=FALSE>>=
-plot(sPG, levels = c(0.05,0.5,0.95), type.scaling = "real-imaginary",
+plot(sPG, levels = c(0.05, 0.5, 0.95), type.scaling = "real-imaginary",
     ptw.CIs = 0.1, type.CIs = "boot.full",
     frequencies = freq[freq > 0 & freq <= pi],
-    ylab = expression(hat(G)[list(n,R)](list(tau[1],tau[2],omega))))
+    ylab = expression(hat(G)[list(n, R)](list(tau[1], tau[2], omega))))
 @
 
 For illustrative purposes a different type of scaling was used for the second
@@ -865,7 +868,7 @@ probability theorist easier.
 \end{center}
   \vspace*{-2.5cm}\caption{Plot of the \code{QuantilePG} object
   \code{CR}, computed from the \code{sp500} time series;~ \protect\\
-  \hspace*{1.7cm}$\omega \in (0,\pi]$}
+  \hspace*{1.7cm}$\omega \in (0,\pi]$.}
   \label{fig:SPquantilePG}
 \begin{center}
 \vspace*{-1.5cm}
@@ -875,7 +878,7 @@ probability theorist easier.
 \end{center}
   \vspace*{-2.5cm}\caption{Plot of the \code{QuantilePG} object
   \code{CR}, computed from the \code{sp500} time series;~ \protect\\
-  \hspace*{1.7cm}$\omega \in (0,\pi/5]$}.
+  \hspace*{1.7cm}$\omega \in (0,\pi/5]$.}
   \label{fig:SPquantilePG2}
 \end{figure}
 
@@ -889,7 +892,7 @@ probability theorist easier.
 \end{center}
   \vspace*{-2.5cm}\caption{Plot of the \code{SmoothedPG} object
   \code{sCR}, computed from the \code{sp500} time series;\protect\\
-  \hspace*{1.7cm}\code{type.scaling = "individual"}, \code{ptw.CIs = 0.1}}
+  \hspace*{1.7cm}\code{type.scaling = "individual"}, \code{ptw.CIs = 0.1}.}
   \label{fig:SPsmoothedPG}
 
 \begin{center}
@@ -903,7 +906,7 @@ probability theorist easier.
   series;\protect\\
   \hspace*{1.7cm}\code{type.scaling = "real-imaginary"}, \code{ptw.CIs =
   0.1},\protect\\
-  \hspace*{1.7cm}\code{type.CIs = "boot.full"}}
+  \hspace*{1.7cm}\code{type.CIs = "boot.full"}.}
   \label{fig:SPsmoothedPGboot}
 \end{figure}
 \setkeys{Gin}{width=\textwidth}
@@ -911,7 +914,7 @@ probability theorist easier.
 %\FloatBarrier
 
 \clearpage
-\subsection{A simulation study -- analysing a quantile autoregressive
+\subsection{A simulation study: Analysing a quantile autoregressive
 process}
 
 In this section using the \pkg{quantspec} package from the perspective of a
@@ -942,9 +945,9 @@ The following, two-line script can be used to generate the graphical
 representation of the copula spectral density that is on display in Figure~\ref{fig:csdQAR}
 
 <<csdQAR,eval=FALSE>>=
-csd <- quantileSD(N=2^9, seed.init = 2581, type = "copula",
-        ts = ts1, levels.1 = c(0.25, 0.5, 0.75), R = 100, quiet=TRUE)
-plot(csd, ylab = expression(f[list(q[tau[1]],q[tau[2]])](omega)))
+csd <- quantileSD(N = 2^9, seed.init = 2581, type = "copula",
+        ts = ts1, levels.1 = c(0.25, 0.5, 0.75), R = 100, quiet = TRUE)
+plot(csd, ylab = expression(f[list(q[tau[1]], q[tau[2]])](omega)))
 @
 
 When analysing a time series model the recommended practice is to compute
@@ -979,8 +982,8 @@ of code:
 
 <<csdQARhighprecPlot,eval=FALSE>>=
 load("csd-qar1.rdata")
-plot(csd, frequencies = 2*pi*(1:2^8)/2^9,
-    ylab = expression(f[list(q[tau[1]],q[tau[2]])](omega)))
+plot(csd, frequencies = 2 * pi * (1:2^8) / 2^9,
+    ylab = expression(f[list(q[tau[1]], q[tau[2]])](omega)))
 @
 
 The parameter \code{frequencies} was used when plotting the copula spectral
@@ -992,11 +995,11 @@ performs, plot the smoothed CR periodogram computed from one simulated QAR(1)
 time series of length 512:
 
 <<eval=FALSE>>=
-sCR <- smoothedPG(ts1(512), levels.1 = c(0.25,0.5,0.75),
-    weight=kernelWeight(W=W1, bw=0.1))
+sCR <- smoothedPG(ts1(512), levels.1 = c(0.25, 0.5, 0.75),
+    weight = kernelWeight(W = W1, bw = 0.1))
 plot(sCR, qsd = csd,
-    ylab = bquote(paste(hat(G)[list(n,R)](list(tau[1],tau[2],omega)),
-    " and ", f[list(q[tau[1]],q[tau[2]])](omega))))
+    ylab = bquote(paste(hat(G)[list(n, R)](list(tau[1], tau[2], omega)),
+    " and ", f[list(q[tau[1]], q[tau[2]])](omega))))
 @
 
 The generated plot is on display in Figure~\ref{fig:oneQAR}. It is worth
@@ -1017,15 +1020,15 @@ ts <- ts1
 N <- 128
 R <- 5000
 
-freq <- 2*pi*(1:16)/32
+freq <- 2  * pi * (1:16) / 32
 levels <- c(0.25, 0.5, 0.75)
 
 J <- length(freq)
 K <- length(levels)
 
-sims  <- array(0, dim=c(4,R,J,K,K))
+sims  <- array(0, dim=c(4, R, J, K, K))
 
-weight <- kernelWeight(W=W1, bw=0.3)
+weight <- kernelWeight(W = W1, bw = 0.3)
 @
 
 Setting the seed in the very beginning allows for reproducible results.
@@ -1072,11 +1075,11 @@ using the Epanechnikov kernel and the (rather large) bandwidth of $b_n = 0.3$.
 \vspace*{-2.5cm}
 <<fig=TRUE, echo=FALSE, width=6, height=6>>=
 set.seed(020581)
-sCR <- smoothedPG(ts1(512), levels.1 = c(0.25,0.5,0.75),
-        weight=kernelWeight(W=W1, bw=0.1))
+sCR <- smoothedPG(ts1(512), levels.1 = c(0.25, 0.5, 0.75),
+        weight = kernelWeight(W = W1, bw = 0.1))
 plot(sCR, qsd = csd,
-    ylab = bquote(paste(hat(G)[list(n,R)](list(tau[1],tau[2],omega)),
-    " and ", f[list(q[tau[1]],q[tau[2]])](omega))))
+    ylab = bquote(paste(hat(G)[list(n, R)](list(tau[1], tau[2], omega)),
+    " and ", f[list(q[tau[1]], q[tau[2]])](omega))))
 @
 \end{center}
   \vspace*{-2.5cm}\caption{Plot of a smoothed CR periodogram,\protect\\
@@ -1094,15 +1097,15 @@ For the actual simulation the following \code{for} loop can be used:
 for (i in 1:R) {
   Y <- ts(N)
 
-  CR  <- quantilePG(Y, levels.1=levels, type="clipped")
-  LP  <- quantilePG(Y, levels.1=levels, type="qr")
-  sCR <- smoothedPG(CR, weight=weight)
-  sLP <- smoothedPG(LP, weight=weight)
+  CR  <- quantilePG(Y, levels.1=levels, type = "clipped")
+  LP  <- quantilePG(Y, levels.1=levels, type = "qr")
+  sCR <- smoothedPG(CR, weight = weight)
+  sLP <- smoothedPG(LP, weight = weight)
 
-  sims[1,i,,,] <- getValues(CR, frequencies=freq)[,,,1]
-  sims[2,i,,,] <- getValues(LP, frequencies=freq)[,,,1]
-  sims[3,i,,,] <- getValues(sCR, frequencies=freq)[,,,1]
-  sims[4,i,,,] <- getValues(sLP, frequencies=freq)[,,,1]
+  sims[1, i, , , ] <- getValues(CR,  frequencies=freq)[, , , 1]
+  sims[2, i, , , ] <- getValues(LP,  frequencies=freq)[, , , 1]
+  sims[3, i, , , ] <- getValues(sCR, frequencies=freq)[, , , 1]
+  sims[4, i, , , ] <- getValues(sLP, frequencies=freq)[, , , 1]
 }
 @
 
@@ -1116,10 +1119,10 @@ arrays \code{sims} and \code{trueV} the root integrated mean squared errors are
 computed as follows:
 
 <<eval=FALSE>>=
-trueV <- getValues(csd, frequencies=freq)
-SqDev <- array(apply(sims, c(1,2),
-        function(x) {abs(x-trueV)^2}), dim=c(J,K,K,4,R))
-rimse <- sqrt(apply(SqDev, c(2,3,4), mean))
+trueV <- getValues(csd, frequencies = freq)
+SqDev <- array(apply(sims, c(1, 2),
+        function(x) {abs(x - trueV)^2}), dim=c(J, K, K, 4, R))
+rimse <- sqrt(apply(SqDev, c(2, 3, 4), mean))
 @
 
 \begin{Schunk}
