@@ -53,44 +53,48 @@ setMethod(
       .Object@B <- B
 
       # Define variables with dimensions
-      T <- length(Y)
+      T <- dim(Y)[1]
+      D <- dim(Y)[2]
       K <- length(levels)
       J <- length(frequencies)
 
       # Convert Y to "pseudo data", if isRankBased == TRUE
       if (isRankBased) {
-        data <- rank(Y) / T
+        data <- apply(Y,2,rank) / T
       } else {
         data <- Y
       }
 
       # Define a matrix to store I{Y_t <= q_k}
-      IndMatrix <- matrix(0, nrow=T, ncol=K*(B+1))
+      IndMatrix <- matrix(0, nrow=T, ncol=K*D*(B+1))
 
       levels <- sort(levels)
-      sortedData <- sort(data)
-
-      # Fill the matrix
-      t <- 1
-      for (i in 1:K) {
-        while (t <= T && sortedData[t] <= levels[i]) {t <- t+1}
-        if (t > 1) {
-          IndMatrix[1:(t-1),i] <- 1
+      
+      for (d in 1:D) {
+        sortedData <- sort(data[,d])
+  
+        # Fill the matrix
+        t <- 1
+        for (i in 1:K) {
+          while (t <= T && sortedData[t] <= levels[i]) {t <- t+1}
+          if (t > 1) {
+            IndMatrix[1:(t-1),(d-1)*K+i] <- 1
+          }
         }
+        IndMatrix[,(d-1)*K+1:K] <- IndMatrix[rank(data[,d]),(d-1)*K+1:K]
       }
-      IndMatrix[,1:K] <- IndMatrix[rank(data),1:K]
-
+      
       if (B > 0) {
         pos.boot <- getPositions(.Object@positions.boot,B)
         for (b in 1:B) {
-          IndMatrix[,(b*K+1):((b+1)*K)] <- IndMatrix[pos.boot[,b],1:K]
+          IndMatrix[,(b*(K*D)+1):((b+1)*(K*D))] <- IndMatrix[pos.boot[,b],1:(K*D)]
         }
       }
 
       cfft <- mvfft(IndMatrix)
 
       # Modify object to return (only requested frequencies!)
-      .Object@values <- array(cfft[unique(T/(2*pi)*frequencies)+1,], dim=c(J,K,B+1))
+      .Object@values <- array(cfft[unique(T/(2*pi)*frequencies)+1,], dim=c(J,D,K,B+1))
 
       # Return object
       return(.Object)
@@ -102,7 +106,7 @@ setMethod(
 #'
 #' The parameter \code{type.boot} can be set to choose a block bootstrapping
 #' procedure. If \code{"none"} is chosen, a moving blocks bootstrap with
-#' \code{l=length(Y)} and \code{N=length(Y)} would be done. Note that in that
+#' \code{l=lenTS(Y)} and \code{N=lenTS(Y)} would be done. Note that in that
 #' case one would also chose \code{B=0} which means that \code{getPositions}
 #' would never be called. If \code{B>0} then each bootstrap replication would
 #' be the undisturbed time series.
@@ -113,9 +117,9 @@ setMethod(
 #'
 #' @keywords Constructors
 #'
-#' @param Y A \code{vector} of real numbers containing the time series from
-#'          which to determine the quantile periodogram or a \code{ts} object
-#'          or a \code{zoo} object.
+#' @param Y A \code{matrix} of real numbers containing the time series from
+#'          which to determine the quantile periodogram as columns, or a
+#' 					\code{ts} object or a \code{zoo} object.
 #' @param frequencies A vector containing frequencies at which to determine the
 #'                    quantile periodogram.
 #' @param levels A vector of length \code{K} containing the levels at which the
@@ -136,7 +140,7 @@ setMethod(
 #' For an example see \code{\link{FreqRep}}.
 ################################################################################
 clippedFT <- function( Y,
-    frequencies=2*pi/length(Y) * 0:(length(Y)-1),
+    frequencies=2*pi/lenTS(Y) * 0:(lenTS(Y)-1),
     levels = 0.5,
     isRankBased=TRUE,
     B = 0,
@@ -159,14 +163,14 @@ clippedFT <- function( Y,
   }
 
   # Check validity of frequencies
-  frequencies <- frequenciesValidator(frequencies, length(Y))
+  frequencies <- frequenciesValidator(frequencies, lenTS(Y))
 
   type.boot <- match.arg(type.boot, c("none","mbb"))[1]
   switch(type.boot,
       "none" = {
-        bootPos <- movingBlocks(length(Y),length(Y))},
+        bootPos <- movingBlocks(lenTS(Y),lenTS(Y))},
       "mbb" = {
-        bootPos <- movingBlocks(l,length(Y))}
+        bootPos <- movingBlocks(l,lenTS(Y))}
   )
 
   freqRep <- new(

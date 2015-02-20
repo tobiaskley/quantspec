@@ -5,10 +5,12 @@ NULL
 #' Class for a Quantile Spectral Estimator.
 #'
 #' \code{QSpecQuantity} is an S4 class that provides a common interface to
-#' objects that are of the functional form \eqn{f(\omega; x_1, x_2)}{f(w; x1, x2)},
-#' where \eqn{\omega}{w} is a frequency parameter and \eqn{x_1, x_2}{x1, x2} are
-#' level parameters. For each combination of parameters a complex number can be
-#' stored.
+#' objects that are of the functional form
+#' \eqn{f^{j_1, j_2}(\omega; x_1, x_2)}{f^{j1,j2}(w; x1, x2)},
+#' where \eqn{j_1, j_2}{j1, j2} are indices denoting components of a time series
+#' or process, \eqn{\omega}{w} is a frequency parameter and
+#' \eqn{x_1, x_2}{x1, x2} are level parameters. For each combination of
+#' parameters a complex number can be stored.
 #' Examples for objects of this kind currently include the quantile (i. e.,
 #' Laplace or copula) spectral
 #' density kernel [cf. \code{\link{QuantileSD}} for an implementation], an
@@ -23,7 +25,8 @@ NULL
 #'
 #' @keywords S4-classes
 #'
-#' @slot values The array holding the values \eqn{f(\omega; x_1, x_2)}{f(w; x1, x2)}.
+#' @slot values The array holding the values
+#' 							\eqn{f^{j_1, j_2}(\omega; x_1, x_2)}{f^{j1,j2}(w; x1, x2)}.
 #' @slot frequencies The frequencies \eqn{\omega}{w} for which the values are
 #'                    available.
 #' @slot levels A list of vectors containing the levels \eqn{x_i}{xi} serving

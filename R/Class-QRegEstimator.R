@@ -68,16 +68,16 @@ setMethod(
       .Object@parallel <- parallel
 
       # Define variables with dimensions
-      T <- length(Y)
+      T <- lenTS(Y)
       K <- length(levels)
       J <- length(frequencies)
 
-      # values[,,1] contains the non-bootstrapped values
-      values <- array(dim=c(J,K,B+1))
+      # values[,,,1] contains the non-bootstrapped values
+      values <- array(dim=c(J,dim(Y)[2],K,B+1))
 
       # Convert Y to "pseudo data", if isRankBased == TRUE
       if (isRankBased) {
-        data <- rank(Y) / T
+        data <- apply(Y,2,rank) / T
       } else {
         data <- Y
       }
@@ -121,22 +121,25 @@ setMethod(
       }
 
       for (b in 0:B) {
-        if (b == 0) {
-          qRegSolX <- function(omega){qRegSol(data,omega)}
-        } else {
-          pos.boot <- getPositions(.Object@positions.boot,B)
-          qRegSolX <- function(omega){qRegSol(data[pos.boot],omega)}
+        for (d in 1:(dim(data)[2])) {
+          if (b == 0) {
+            qRegSolX <- function(omega){qRegSol(data[,d],omega)}
+          } else {
+            pos.boot <- getPositions(.Object@positions.boot,B)
+            qRegSolX <- function(omega){qRegSol(data[pos.boot,d],omega)}
+          }
+  
+          if (parallel) {
+            listVals <- sfLapply(frequencies, qRegSolX)
+          } else {
+            listVals <- lapply(frequencies, qRegSolX)
+          }
+          values[,d,,b+1] <- aperm(array(unlist(listVals),dim=c(K,J)), perm=c(2,1))
         }
-
-        if (parallel) {
-          listVals <- sfLapply(frequencies, qRegSolX)
-        } else {
-          listVals <- lapply(frequencies, qRegSolX)
-        }
-        values[,,b+1] <- aperm(array(unlist(listVals),dim=c(K,J)), perm=c(2,1))
       }
 
-      .Object@values <- values
+      #.Object@values <- values
+      .Object@values <- array(values, dim=c(J,dim(Y)[2],K,B+1))
 
       # Return object
       return(.Object)
@@ -205,7 +208,7 @@ setMethod(f = "getParallel",
 #' inst/examples/QRegEstimator-parallel.R
 ################################################################################
 qRegEstimator <- function( Y,
-    frequencies=2*pi/length(Y) * 0:(length(Y)-1),
+    frequencies=2*pi/lenTS(Y) * 0:(lenTS(Y)-1),
     levels = 0.5,
     isRankBased=TRUE,
     B = 0,
@@ -230,14 +233,14 @@ qRegEstimator <- function( Y,
   }
 
   # Check validity of frequencies
-  frequencies <- frequenciesValidator(frequencies, length(Y))
+  frequencies <- frequenciesValidator(frequencies, lenTS(Y))
 
   type.boot <- match.arg(type.boot, c("none","mbb"))[1]
   switch(type.boot,
       "none" = {
-        bootPos <- movingBlocks(length(Y),length(Y))},
+        bootPos <- movingBlocks(lenTS(Y),lenTS(Y))},
       "mbb" = {
-        bootPos <- movingBlocks(l,length(Y))}
+        bootPos <- movingBlocks(l,lenTS(Y))}
   )
 
   method <- match.arg(method, c("br", "fn", "pfn", "fnc", "lasso", "scad"))[1]
