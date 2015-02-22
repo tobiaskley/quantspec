@@ -110,9 +110,16 @@ setMethod(f = "show",
     J <- length(object@frequencies)
     K1 <- length(object@levels[[1]])
     K2 <- length(object@levels[[2]])
-    B <- dim(values)[4]
+    
+    if (length(dim(values))==4) {
+      B <- dim(values)[4]
+      D <- 1
+    } else { # D > 1
+      B <- dim(values)[6]
+      D <- dim(values)[2]
+    }
 
-    cat(paste("\n",class(object)," (J=",J,", K1=",K1,", K2=",K2,", B+1=",B,")\n", sep=""))
+    cat(paste("\n",class(object)," (J=",J,", D=",D,", K1=",K1,", K2=",K2,", B+1=",B,")\n", sep=""))
 
     if (J <= 7) {
       cat("Frequencies: ", object@frequencies,"\n")
@@ -132,13 +139,22 @@ setMethod(f = "show",
       cat("Levels 2   : ", object@levels[[2]][1:5],"..",object@levels[[2]][(K2-4):K2],"\n")
     }
 
+    #cat("\nValues:\n")
+    if (D == 1) {
       cat("\nValues:\n")
+    } else {
+      cat("\nValues of first component:\n")
+    }
 
     resultMatr <- matrix(nrow=J, ncol=K1*K2)
     cn <- rep(0,K1*K2)
     for (k1 in 1:K1) {
       for (k2 in 1:K2) {
-        resultMatr[,k1+(k2-1)*K1] <- values[,k1,k2, 1]
+        if (D == 1) {
+          resultMatr[,k1+(k2-1)*K1] <- values[,k1,k2, 1]
+        } else {
+          resultMatr[,k1+(k2-1)*K1] <- values[,1,k1,1,k2, 1]
+        }
         cn[k1+(k2-1)*K1] <- paste(object@levels[[1]][k1],"/",object@levels[[2]][k2], sep="")
       }
     }

@@ -5,7 +5,7 @@
 \alias{quantilePG}
 \title{Create an instance of the \code{\link{QuantilePG}} class.}
 \usage{
-quantilePG(Y, frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
+quantilePG(Y, frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1),
   levels.1 = 0.5, levels.2 = levels.1, isRankBased = TRUE,
   type = c("clipped", "qr"), type.boot = c("none", "mbb"), B = 0, l = 0,
   method = c("br", "fn", "pfn", "fnc", "lasso", "scad"), parallel = FALSE)

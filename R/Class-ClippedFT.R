@@ -94,8 +94,8 @@ setMethod(
       cfft <- mvfft(IndMatrix)
 
       # Modify object to return (only requested frequencies!)
-      .Object@values <- array(cfft[unique(T/(2*pi)*frequencies)+1,], dim=c(J,D,K,B+1))
-
+      .Object@values <- array(cfft[unique(T/(2*pi)*frequencies)+1,], dim=c(J,K,D,B+1))
+      .Object@values <- aperm(.Object@values, perm=c(1,3,2,4))
       # Return object
       return(.Object)
     }

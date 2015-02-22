@@ -7,7 +7,7 @@
 \title{Get values from a quantile periodogram.}
 \usage{
 \S4method{getValues}{QuantilePG}(object, frequencies = 2 * pi *
-  (0:(length(object@freqRep@Y) - 1))/length(object@freqRep@Y),
+  (0:(lenTS(object@freqRep@Y) - 1))/lenTS(object@freqRep@Y),
   levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2))
 }
 \arguments{

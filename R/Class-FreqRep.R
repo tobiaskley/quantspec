@@ -478,11 +478,16 @@ tryCatch({
       par(mar=c(2,2,1,1))
 
       for (j in d) {
-        plot(x=frequencies/(2*pi), y=Re(values[,j,i,1]),
+        if (dim(x@Y)[2] == 1) {
+          V <- values[,i,1]
+        } else {
+          V <- values[,j,i,1]
+        }
+        plot(x=frequencies/(2*pi), y=Re(V),
             type="l", xlab="", ylab="")
         
-        plot(x=frequencies/(2*pi), y=Im(values[,j,i,1]),
-            type="l", xlab="", ylab="")       
+        plot(x=frequencies/(2*pi), y=Im(V),
+            type="l", xlab="", ylab="")
       }
 
     }

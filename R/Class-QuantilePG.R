@@ -120,13 +120,13 @@ setMethod(
     signature = signature(
         object="QuantilePG"),
     definition = function(object,
-        frequencies=2*pi*(0:(length(object@freqRep@Y)-1))/length(object@freqRep@Y),
+        frequencies=2*pi*(0:(lenTS(object@freqRep@Y)-1))/lenTS(object@freqRep@Y),
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2)) {
 
     # workaround: default values don't seem to work for generic functions?
     if (!hasArg(frequencies)) {
-      frequencies <- 2*pi*(0:(length(object@freqRep@Y)-1))/length(object@freqRep@Y)
+      frequencies <- 2*pi*(0:(lenTS(object@freqRep@Y)-1))/lenTS(object@freqRep@Y)
     }
     if (!hasArg(levels.1)) {
       levels.1 <- object@levels[[1]]
@@ -138,7 +138,8 @@ setMethod(
 
     fR <- object@freqRep
 
-    N <- length(fR@Y)
+    N <- dim(fR@Y)[1]
+    D <- dim(fR@Y)[2]
     J <- length(frequencies)
     B <- fR@B
     K1 <- length(levels.1)
@@ -151,9 +152,14 @@ setMethod(
     P2 <- match(levels.2,levels.all)
     x <- getValues(fR, frequencies, levels.all)
 
-    A <- apply(x, c(1,3), function(x){outer(x[P1],Conj(x[P2]),"*")})
-
-    values <- aperm(array(A, dim=c(K1,K2,J,B+1)), perm=c(3,1,2,4))
+    if (D == 1) {
+      A <- apply(x, c(1,3), function(x){outer(x[P1],Conj(x[P2]),"*")})
+      values <- aperm(array(A, dim=c(K1,K2,J,B+1)), perm=c(3,1,2,4))  
+    } else {
+      A <- apply(x, c(1,4), function(x){outer(x[,P1],Conj(x[,P2]),"*")})
+      values <- aperm(array(A, dim=c(D,K1,D,K2,J,B+1)), perm=c(5,1,2,3,4,6))  
+    }
+    
 
     return(1/(2*pi*N) * values)
   }
@@ -224,7 +230,7 @@ setMethod(f = "getFreqRep",
 #' @return Returns an instance of \code{QuantilePG}.
 ################################################################################
 quantilePG <- function( Y,
-                        frequencies=2*pi/length(Y) * 0:(length(Y)-1),
+                        frequencies=2*pi/lenTS(Y) * 0:(lenTS(Y)-1),
                         levels.1 = 0.5,
                         levels.2=levels.1,
                         isRankBased=TRUE,
