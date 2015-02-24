@@ -54,7 +54,6 @@ setMethod(
     f = "initialize",
     signature = "SmoothedPG",
     definition = function(.Object, qPG, weight, frequencies, levels) {
-      #cat("~~~ SmoothedPG: initializator ~~~ \n")
 
       .Object@env <- new.env(parent=emptyenv())
       .Object@env$sdNaive.done <- FALSE
@@ -68,7 +67,7 @@ setMethod(
         stop("'frequencies' needs to be specified as a vector of real numbers")
       }
 
-      N <- length(.Object@qPG@freqRep@Y)
+      N <- lenTS(.Object@qPG@freqRep@Y)
 
       .Object@levels <- levels
       K1 <- length(.Object@levels[[1]])
@@ -94,8 +93,9 @@ setMethod(
 
 
       B <- .Object@qPG@freqRep@B
+      P <- dim(.Object@qPG@freqRep@Y)[2]
 
-      .Object@values <- array(0, dim=c(J,K1,K2,B+1))
+      .Object@values <- array(0, dim=c(J,P,K1,P,K2,B+1))
 
 
       if (class(weight) == "KernelWeight") {
@@ -104,7 +104,8 @@ setMethod(
         Wnj <- weight@env$Wnj
 
         II <- getValues(.Object@qPG, levels.1 = levels[[1]], levels.2 = levels[[2]])
-
+        II <- array(II, dim = c(N,P,K1,P,K2,B+1))
+        
         if (max(freq) > 0) {
 
           # f performs convolution as defined in Brillinger (1975)
@@ -114,17 +115,17 @@ setMethod(
             return((A - B) / Wnj[1:(N-1)])
           }
 
-          res <- (2*pi/N) * apply(II, c(2,3,4), f)
+          res <- (2*pi/N) * apply(II, c(2,3,4,5,6), f)
 
           posFreq <- freq[which(freq != 0)]
           pp <- round(N/(2*pi)*(posFreq %% (2*pi)))
 
-          .Object@values[which(freq != 0),,,] <- res[pp,,,]
+          .Object@values[which(freq != 0),,,,,] <- res[pp,,,,,]
         }
 
         if (min(freq) == 0) {
-          res <- apply(II, c(2,3,4), function(v) {sum(v[2:N]*rev(WW[2:N])) / Wnj[N]})
-          .Object@values[which(freq == 0),,,] <- (2*pi/N) * res
+          res <- apply(II, c(2,3,4,5,6), function(v) {sum(v[2:N]*rev(WW[2:N])) / Wnj[N]})
+          .Object@values[which(freq == 0),,,,,] <- (2*pi/N) * res
         }
         rm(II)
       } else if (class(weight) == "SpecDistrWeight") {
@@ -132,12 +133,23 @@ setMethod(
 
           II <- getValues(.Object@qPG, frequencies = 2*pi*(1:(N-1))/N,
               levels.1 = levels[[1]], levels.2 = levels[[2]])
-          res <- (2*pi/N) * apply(II, c(2,3,4), cumsum)
-
+          #II <- array(II, dim = c(N,P,K1,P,K2,B+1))
+          
+          if (P == 1) {
+            res <- (2*pi/N) * apply(II, c(2,3,4), cumsum)
+            array(res, dim = c(N,P,K1,P,K2,B+1))
+          } else {
+            res <- (2*pi/N) * apply(II, c(2,3,4,5,6), cumsum)
+          }
+          
           posFreq <- freq[which(freq != 0)]
           pp <- round(N/(2*pi)*(posFreq %% (2*pi)))
 
-          .Object@values[which(freq != 0),,,] <- res[pp,,,]
+          if (P == 1) {
+            .Object@values[which(freq != 0),,,,,] <- res[pp,,,]
+          } else {
+            .Object@values[which(freq != 0),,,,,] <- res[pp,,,,,]
+          }
         }
       }
 
@@ -170,6 +182,9 @@ setMethod(
 #' @param frequencies a vector of frequencies for which to get the values
 #' @param levels.1 the first vector of levels for which to get the values
 #' @param levels.2 the second vector of levels for which to get the values
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 data; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
 #'
 #' @return Returns data from the array \code{values} that's a slot of
 #'          \code{object}.
@@ -183,19 +198,27 @@ setMethod(f = "getValues",
     signature = signature(
         "SmoothedPG"),
     definition = function(object,
-        frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
+        frequencies=2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y),
         levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2)) {
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4])) {
 
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
-        frequencies <- 2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y)
+        frequencies <- 2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y)
       }
       if (!hasArg(levels.1)) {
         levels.1 <- object@levels[[1]]
       }
       if (!hasArg(levels.2)) {
         levels.2 <- object@levels[[2]]
+      }
+      if (!hasArg(d1)) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg(d2)) {
+        d2 <- 1:(dim(object@values)[4])
       }
       # end: workaround
 
@@ -239,9 +262,12 @@ setMethod(f = "getValues",
 
 
       J <- length(frequencies)
+      #D <- dim(object@values)[2]
+      D1 <- length(d1)
+      D2 <- length(d2)
       K1 <- length(levels.1)
       K2 <- length(levels.2)
-      res <- array(dim=c(J, K1, K2, object@qPG@freqRep@B+1))
+      res <- array(dim=c(J, D1, K1, D2, K2, object@qPG@freqRep@B+1))
 
 
       if (class(object@weight) == "KernelWeight") {
@@ -251,18 +277,30 @@ setMethod(f = "getValues",
         r2.pos <- closest.pos(-1*(2*pi-oF),-1*f[f > pi])
 
         if (length(r1.pos) > 0) {
-          res[which(f <= pi),,,] <- object@values[r1.pos,c.1.pos,c.2.pos,]
+          res[which(f <= pi),,,,,] <- object@values[r1.pos,d1,c.1.pos,d2,c.2.pos,]
         }
         if (length(r2.pos) > 0) {
-          res[which(f > pi),,,] <- Conj(object@values[r2.pos,c.1.pos,c.2.pos,])
+          res[which(f > pi),,,,,] <- Conj(object@values[r2.pos,d1,c.1.pos,d2,c.2.pos,])
         }
 
       } else if (class(object@weight) == "SpecDistrWeight") {
         # Select rows
         r.pos <- closest.pos(oF, f)
-        res[,,,] <- object@values[r.pos,c.1.pos,c.2.pos,]
+        res[,,,,,] <- object@values[r.pos,,c.1.pos,,c.2.pos,]
       }
-
+      
+      final.dim.res <- c(J)
+      if (D1 > 1) {
+        final.dim.res <- c(final.dim.res,D1)
+      }
+      final.dim.res <- c(final.dim.res,K1)
+      if (D2 > 1) {
+        final.dim.res <- c(final.dim.res,D2)
+      }
+      final.dim.res <- c(final.dim.res,K2, object@qPG@freqRep@B+1)
+      
+      res <- array(res, dim=final.dim.res)
+      
       return(res)
     }
 )
@@ -324,7 +362,7 @@ setMethod(f = "getSdNaive",
     signature = signature(
         object = "SmoothedPG"),
     definition = function(object,
-        frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
+        frequencies=2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y),
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2),
         impl=c("R","C")) {
@@ -339,7 +377,7 @@ setMethod(f = "getSdNaive",
       
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
-        frequencies <- 2*pi*(0:(length(Y)-1))/length(Y)
+        frequencies <- 2*pi*(0:(lenTS(Y)-1))/lenTS(Y)
       }
       if (!hasArg(levels.1)) {
         levels.1 <- objLevels1
@@ -355,7 +393,7 @@ setMethod(f = "getSdNaive",
       if (object@env$sdNaive.done == FALSE) {
 
         weight <- object@weight
-        N <- length(Y)
+        N <- lenTS(Y)
         K1 <- length(objLevels1)
         K2 <- length(objLevels2)
 
@@ -367,7 +405,8 @@ setMethod(f = "getSdNaive",
           WW <- getValues(weight, N=N)[c(2:N,1)] # WW[j] corresponds to W_n(2 pi j/n)
           WW3 <- rep(WW,4) 
           
-          V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N)[,,,1], dim=c(N-1,K1,K2))     
+          # TODO: fix to make it work for all d1, d2!!
+          V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N, d1=1, d2=1)[,,,1], dim=c(N-1,K1,K2))     
           res <- array(0,dim=c(N,K1,K2))
   
           M1 <- matrix(0, ncol=N-1, nrow=N)
@@ -540,7 +579,7 @@ setMethod(f = "getSdBoot",
     signature = signature(
         object = "SmoothedPG"),
     definition = function(object,
-        frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
+        frequencies=2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y),
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2)) {
 
@@ -550,7 +589,7 @@ setMethod(f = "getSdBoot",
 
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
-        frequencies <- 2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y)
+        frequencies <- 2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y)
       }
       if (!hasArg(levels.1)) {
         levels.1 <- object@levels[[1]]
@@ -571,8 +610,9 @@ setMethod(f = "getSdBoot",
         #K2 <- length(object@levels[[2]])
         B <- object@qPG@freqRep@B
 
+        # TODO: fix...
         v <- getValues(object, frequencies = frequencies,
-            levels.1 = levels.1, levels.2 = levels.2)[,,,2:(B+1), drop=F]
+            levels.1 = levels.1, levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=F]
         object@env$sdBoot <- apply(v, c(1,2,3), complex.var)
       }
       return(object@env$sdBoot)
@@ -641,14 +681,14 @@ setMethod(f = "getPointwiseCIs",
     signature = signature(
         object = "SmoothedPG"),
     definition = function(object,
-        frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
+        frequencies=2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y),
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2),
         alpha=.1, type=c("naive.sd", "boot.sd", "boot.full")) {
 
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
-        frequencies <- 2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y)
+        frequencies <- 2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y)
       }
       if (!hasArg(levels.1)) {
         levels.1 <- object@levels[[1]]
@@ -687,16 +727,17 @@ setMethod(f = "getPointwiseCIs",
         v <- getValues(object,
             frequencies = frequencies,
             levels.1 = levels.1,
-            levels.2 = levels.2)[,,,1]
+            levels.2 = levels.2, d1=1, d2=1)[,,,1] # TODO: fix...
         upperCIs <- array(v + sdEstim * qnorm(1-alpha/2), dim = c(J, K1, K2))
         lowerCIs <- array(v + sdEstim * qnorm(alpha/2), dim = c(J, K1, K2))
       } else if (type == "boot.full") {
         # TODO: Error Msg ausgeben falls B == 0
         B <- object@qPG@freqRep@B
+        # TODO: fix...
         v <- getValues(object,
             frequencies = frequencies,
             levels.1 = levels.1,
-            levels.2 = levels.2)[,,,2:(B+1), drop=F]
+            levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=F]
         uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
               imaginary = quantile(Im(x),1-alpha/2))}
         lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
@@ -826,7 +867,7 @@ setMethod(f = "getQuantilePG",
 ################################################################################
 smoothedPG <- function(
     object,
-    frequencies=2*pi/length(object) * 0:(length(object)-1),
+    frequencies=2*pi/lenTS(object) * 0:(lenTS(object)-1),
     levels.1 = 0.5,
     levels.2=levels.1,
     isRankBased=TRUE,
@@ -838,7 +879,7 @@ smoothedPG <- function(
     l = 1,
     weight = kernelWeight()) {
 
-  if (class(object) == "numeric") {
+  if (class(object) == "numeric" | class(object) == "matrix") {
     versConstr <- 1
     Y <- object
   } else if (class(object) == "ts") {
@@ -854,7 +895,7 @@ smoothedPG <- function(
 
     if (!hasArg(frequencies)) {
       Y <- object@freqRep@Y
-      frequencies <- 2*pi/length(Y) * 0:(length(Y)-1)
+      frequencies <- 2*pi/lenTS(Y) * 0:(lenTS(Y)-1)
     }
 
     if (!hasArg(levels.1)) {
@@ -865,7 +906,7 @@ smoothedPG <- function(
     }
 
   } else {
-    stop("object is neither 'numeric', 'ts', 'zoo', nor 'QuantilePG'.")
+    stop("object is neither 'numeric', 'matrix', 'ts', 'zoo', nor 'QuantilePG'.")
   }
 
   if (versConstr == 1) {
@@ -876,7 +917,7 @@ smoothedPG <- function(
 
     J <- length(frequencies)
 
-    qPG <- quantilePG(Y, frequencies = 2*pi/length(Y) * 0:(length(Y)-1),
+    qPG <- quantilePG(Y, frequencies = 2*pi/lenTS(Y) * 0:(lenTS(Y)-1),
         levels.1 = levels.1,
         levels.2 = levels.2,
         isRankBased = isRankBased,
@@ -1014,10 +1055,10 @@ tryCatch({
 
     K <- length(levels)
     values <- getValues(x, frequencies = frequencies,
-        levels.1=levels, levels.2=levels)
+        levels.1=levels, levels.2=levels, d1 = 1, d2 = 1) # TODO ... fix
     if (plotPG) {
       PG <- getValues(x@qPG, frequencies = frequencies,
-          levels.1=levels, levels.2=levels)
+          levels.1=levels, levels.2=levels, d1 = 1, d2 = 1) # TODO ... fix
     }
     if (hasArg(qsd)) {
       j.min <- round(min(frequencies*2^8/(2*pi)))

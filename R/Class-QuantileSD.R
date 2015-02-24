@@ -138,6 +138,9 @@ setMethod(f = "increasePrecision",
 
       sumPG <- object@sumPG
       sumSqPG <- object@sumSqPG
+      
+      J <- dim(sumPG)[1]
+      P <- dim(sumPG)[2]
 
       type <- object@type
 
@@ -186,9 +189,14 @@ setMethod(f = "increasePrecision",
         A <- getValues(quantilePG(Y, type="clipped", isRankBased=rb,
                 levels.1 = levels.1, levels.2 = levels.2),
             frequencies = freq)
-
-        sumPG <- sumPG + A[,,,1]
-        sumSqPG <- sumSqPG + abs(A[,,,1])^2
+        if (length(dim(A)) == 4) {
+          A <- A[,,,1]
+        } else {
+          A <- A[,,,,,1]
+        }
+        A <- array(A, dim = c(J,P,K1,P,K2))
+        sumPG <- sumPG + A 
+        sumSqPG <- sumSqPG + abs(A)^2
       }
 
       object@R <- object@R + R
@@ -200,15 +208,18 @@ setMethod(f = "increasePrecision",
       object@meanPG <- meanPG
 
 
-      values <- array(0, dim=c(L+1,K1,K2))
-      for (j1 in 1:K1) {
-        for (j2 in 1:K2) {
-          Rp <- smooth.spline(x=0:L, y=Re(meanPG[,j1,j2]))$y
-          Ip <- smooth.spline(x=0:L, y=Im(meanPG[,j1,j2]))$y
-          values[,j1,j2] <- complex(real=Rp, imaginary=Ip)
+      values <- array(0, dim=c(L+1,P,K1,P,K2))
+      for (p1 in 1:P) {
+        for (p2 in 1:P) {
+          for (j1 in 1:K1) {
+            for (j2 in 1:K2) {
+              Rp <- smooth.spline(x=0:L, y=Re(meanPG[,p1,j1,p2,j2]))$y
+              Ip <- smooth.spline(x=0:L, y=Im(meanPG[,p1,j1,p2,j2]))$y
+              values[,p1,j1,p2,j2] <- complex(real=Rp, imaginary=Ip)
+            }
+          }
         }
       }
-
       object@values <- values
       object@seed.last <- save_rng()
 
@@ -236,9 +247,12 @@ setMethod(
 
       K1 <- length(getLevels(.Object,1))
       K2 <- length(getLevels(.Object,2))
+      
+      Y_test <- timeSeriesValidator(ts(2))
+      P <- dim(Y_test)[2]
 
-      .Object@sumPG <- array(0, dim=c(L+1,K1,K2))
-      .Object@sumSqPG <- array(0, dim=c(L+1,K1,K2))
+      .Object@sumPG <- array(0, dim=c(L+1,P,K1,P,K2))
+      .Object@sumSqPG <- array(0, dim=c(L+1,P,K1,P,K2))
 
       .Object@seed.last <- seed.last
 
@@ -273,6 +287,9 @@ setMethod(
 #' @param frequencies a vector of frequencies for which to get the values
 #' @param levels.1 the first vector of levels for which to get the values
 #' @param levels.2 the second vector of levels for which to get the values
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 data; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
 #'
 #' @return Returns data from the array \code{values} that's a slot of
 #'          \code{object}.
@@ -285,7 +302,9 @@ setMethod(f = "getValues",
     definition = function(object,
         frequencies=2*pi*(0:(object@N-1))/object@N,
         levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2)) {
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4])) {
 
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
@@ -296,6 +315,12 @@ setMethod(f = "getValues",
       }
       if (!hasArg("levels.2")) {
         levels.2 <- getLevels(object,2)
+      }
+      if (!hasArg("d1")) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg("d2")) {
+        d2 <- 1:(dim(object@values)[4])
       }
       # end: workaround
 
@@ -344,14 +369,28 @@ setMethod(f = "getValues",
       J <- length(frequencies)
       K1 <- length(levels.1)
       K2 <- length(levels.2)
-      res <- array(dim=c(J, K1, K2))
+      D1 <- length(d1)
+      D2 <- length(d2)
+      res <- array(dim=c(J, D1, K1, D2, K2))
 
       if (length(r1.pos) > 0) {
-        res[which(f <= pi),,] <- object@values[r1.pos,c.1.pos,c.2.pos]
+        res[which(f <= pi),,,,] <- object@values[r1.pos,,c.1.pos,,c.2.pos]
       }
       if (length(r2.pos) > 0) {
-        res[which(f > pi),,] <- Conj(object@values[r2.pos,c.1.pos,c.2.pos])
+        res[which(f > pi),,,,] <- Conj(object@values[r2.pos,,c.1.pos,,c.2.pos])
       }
+      
+      final.dim.res <- c(J)
+      if (D1 > 1) {
+        final.dim.res <- c(final.dim.res,D1)
+      }
+      final.dim.res <- c(final.dim.res,K1)
+      if (D2 > 1) {
+        final.dim.res <- c(final.dim.res,D2)
+      }
+      final.dim.res <- c(final.dim.res,K2)
+      
+      res <- array(res, dim=final.dim.res)
 
       return(res)
     }
@@ -446,6 +485,9 @@ setMethod(f = "getTs",
 #' @param frequencies a vector of frequencies for which to get the \code{meanPG}
 #' @param levels.1 the first vector of levels for which to get the \code{meanPG}
 #' @param levels.2 the second vector of levels for which to get the \code{meanPG}
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 \code{meanPG}; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
 #'
 #' @return Returns the array \code{meanPG} that's a slot of \code{object}.
 ################################################################################
@@ -454,7 +496,9 @@ setMethod(f = "getMeanPG",
     definition = function(object,
         frequencies=2*pi*(0:(getN(object)-1))/getN(object),
         levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2)) {
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4])) {
 
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
@@ -466,12 +510,39 @@ setMethod(f = "getMeanPG",
       if (!hasArg("levels.2")) {
         levels.2 <- getLevels(object,2)
       }
+      if (!hasArg("d1")) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg("d2")) {
+        d2 <- 1:(dim(object@values)[4])
+      }
       # end: workaround
 
       pfreq <- closest.pos(object@frequencies, frequencies)
       plevels1 <- closest.pos(getLevels(object,1), levels.1)
       plevels2 <- closest.pos(getLevels(object,2), levels.2)
-      return(object@meanPG[pfreq, plevels1, plevels2, drop=F])
+      
+      J <- length(pfreq)
+      K1 <- length(plevels1)
+      K2 <- length(plevels2)
+      D1 <- length(d1)
+      D2 <- length(d2)
+      
+      res <- object@meanPG[pfreq, d1, plevels1, d2, plevels2, drop=F]
+      
+      final.dim.res <- c(J)
+      if (D1 > 1) {
+        final.dim.res <- c(final.dim.res,D1)
+      }
+      final.dim.res <- c(final.dim.res,K1)
+      if (D2 > 1) {
+        final.dim.res <- c(final.dim.res,D2)
+      }
+      final.dim.res <- c(final.dim.res,K2)
+      
+      res <- array(res, dim=final.dim.res)
+      
+      return(res)
     }
 )
 
@@ -491,6 +562,9 @@ setMethod(f = "getMeanPG",
 #' @param frequencies a vector of frequencies for which to get the \code{stdError}
 #' @param levels.1 the first vector of levels for which to get the \code{stdError}
 #' @param levels.2 the second vector of levels for which to get the \code{stdError}
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 \code{stdError}; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
 #'
 #' @return Returns the array \code{stdError} that's a slot of \code{object}.
 ################################################################################
@@ -499,7 +573,9 @@ setMethod(f = "getStdError",
     definition = function(object,
         frequencies=2*pi*(0:(object@N-1))/object@N,
         levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2)) {
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4])) {
 
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
@@ -511,12 +587,40 @@ setMethod(f = "getStdError",
       if (!hasArg("levels.2")) {
         levels.2 <- getLevels(object,2)
       }
+      if (!hasArg("d1")) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg("d2")) {
+        d2 <- 1:(dim(object@values)[4])
+      }
       # end: workaround
 
       pfreq <- closest.pos(object@frequencies, frequencies)
       plevels1 <- closest.pos(getLevels(object,1), levels.1)
       plevels2 <- closest.pos(getLevels(object,2), levels.2)
-      return(object@stdError[pfreq, plevels1, plevels2])
+      
+      J <- length(pfreq)
+      K1 <- length(plevels1)
+      K2 <- length(plevels2)
+      D1 <- length(d1)
+      D2 <- length(d2)
+      
+      res <- object@stdError[pfreq, d1, plevels1, d2, plevels2, drop=F]
+      
+      final.dim.res <- c(J)
+      if (D1 > 1) {
+        final.dim.res <- c(final.dim.res,D1)
+      }
+      final.dim.res <- c(final.dim.res,K1)
+      if (D2 > 1) {
+        final.dim.res <- c(final.dim.res,D2)
+      }
+      final.dim.res <- c(final.dim.res,K2)
+      
+      res <- array(res, dim=final.dim.res)
+      
+      return(res)
+
     }
 )
 

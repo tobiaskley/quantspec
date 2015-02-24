@@ -5,8 +5,8 @@
 \alias{smoothedPG}
 \title{Create an instance of the \code{SmoothedPG} class.}
 \usage{
-smoothedPG(object, frequencies = 2 * pi/length(object) * 0:(length(object) -
-  1), levels.1 = 0.5, levels.2 = levels.1, isRankBased = TRUE,
+smoothedPG(object, frequencies = 2 * pi/lenTS(object) * 0:(lenTS(object) - 1),
+  levels.1 = 0.5, levels.2 = levels.1, isRankBased = TRUE,
   type = c("clipped", "qr"), type.boot = c("none", "mbb"),
   method = c("br", "fn", "pfn", "fnc", "lasso", "scad"), parallel = FALSE,
   B = 0, l = 1, weight = kernelWeight())
