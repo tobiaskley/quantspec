@@ -8,7 +8,7 @@ NULL
 #'
 #' \code{QuantilePG} is an S4 class that implements the necessary
 #' calculations to determine one of the periodogram-like statistics defined in
-#' Dette et. al (2014) and Kley et. al (2014).
+#' Dette et. al (2014+) and Kley et. al (2015+).
 #'
 #' Performs all the calculations to determine a quantile periodogram from a
 #' \code{FreqRep} object upon initizalization (and on request
@@ -35,10 +35,12 @@ NULL
 #' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
 #' spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+#' [cf. \url{http://arxiv.org/abs/1111.7205}]
 #'
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
+#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \url{http://arxiv.org/abs/1401.8104}.
+#' \emph{Bernoulli}, \bold{forthcoming}.
+#' [cf. \url{http://arxiv.org/abs/1401.8104}]
 #'
 #' @example
 #' inst/examples/QuantilePG.R

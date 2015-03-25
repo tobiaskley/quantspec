@@ -333,7 +333,7 @@ setMethod(f = "show",
       K <- length(object@levels)
       B <- dim(values)[3]
 
-      cat(paste("\n",class(object)," (J=",J,", K=",K,", B+1=",B,")\n", sep=""))
+      cat(paste("\n",class(object)," (J = ",J,", K = ",K,", B+1 = ",B,")\n", sep=""))
 
       if (J <= 7) {
         cat("Frequencies: ", round(object@frequencies,4),"\n")
@@ -357,7 +357,7 @@ setMethod(f = "show",
           function(x){complex(real=round(Re(x),3), imaginary=round(Im(x),3))})
       rownames(res) <- round(object@frequencies,3)[1:nrowShow]
       res <- data.frame(res)
-      names(res) <- paste("tau=",round(getLevels(object)[1:ncolShow],4), sep="")
+      names(res) <- paste("tau = ",round(getLevels(object)[1:ncolShow],4), sep="")
 
       print(res)
     }

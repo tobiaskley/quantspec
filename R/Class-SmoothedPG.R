@@ -290,7 +290,7 @@ setMethod(f = "getValues",
 #' to determine which one this is.
 #'
 #' A precise definition on how the standard deviations of the smoothed quantile
-#' periodogram are estimated is given in Kley et. al (2014). The estimate
+#' periodogram are estimated is given in Kley et. al (2015+). The estimate
 #' returned is denoted by
 #' \eqn{\sigma(\tau_1, \tau_2; \omega)}{sigma(tau1, tau2; omega)} on p. 26 of
 #' the arXiv preprint.
@@ -316,9 +316,10 @@ setMethod(f = "getValues",
 #' @return Returns the estimate described above.
 #'
 #' @references
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
+#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \url{http://arxiv.org/abs/1401.8104}.
+#' \emph{Bernoulli}, \bold{forthcoming}.
+#' [cf. \url{http://arxiv.org/abs/1401.8104}]
 ################################################################################
 setMethod(f = "getSdNaive",
     signature = signature(

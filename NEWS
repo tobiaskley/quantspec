@@ -1,3 +1,11 @@
+quantspec 1.0-3
+===============
+
+ o  Added spaces around = in some show commands.
+ o  Updated vignette to version that was accepted by the JSS.
+ o  Updated references in the technical documentation.
+
+
 quantspec 1.0-2
 ===============
 
