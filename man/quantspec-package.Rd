@@ -4,7 +4,7 @@
 \name{quantspec-package}
 \alias{quantspec}
 \alias{quantspec-package}
-\title{Quantile-based Spectral Analysis of Time Series}
+\title{Quantile-Based Spectral Analysis of Time Series}
 \description{
 Methods to determine, smooth and plot quantile (i. e., Laplace or copula)
 periodograms for univariate time series.

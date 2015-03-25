@@ -2,7 +2,7 @@
 NULL
 
 ################################################################################
-#' Quantile-based Spectral Analysis of Time Series
+#' Quantile-Based Spectral Analysis of Time Series
 #'
 #' Methods to determine, smooth and plot quantile (i. e., Laplace or copula)
 #' periodograms for univariate time series.
