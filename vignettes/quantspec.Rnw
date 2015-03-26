@@ -215,7 +215,7 @@ periodograms) for the Laplace and copula spectra defined in
 Section~\ref{sec:Lcck} are briefly considered.
 For the upcoming definitions denote by $X_0, \ldots, X_{n-1}$ an observed time
 series of the process $(X_t)_{t \in \IZ}$, by
-\[\hat F_n(x) := \sum_{t=0}^{n-1} I\{X_t \leq x\}\]
+\[\hat F_n(x) := \frac{1}{n} \sum_{t=0}^{n-1} I\{X_t \leq x\}\]
 the \emph{empirical distribution function} of $X_0, \ldots, X_{n-1}$, and by
 $\Re z$ and $\Im z$ the real and imaginary part of $z = \Re z + \text{i} \Im z
 \in \IC$, respectively.
