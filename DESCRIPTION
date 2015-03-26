@@ -1,7 +1,7 @@
 Package: quantspec
-Version: 1.0-3
+Version: 1.0-3.99
 Encoding: UTF-8
-Date: 2015-03-25
+Date: 2015-03-26
 Title: Quantile-Based Spectral Analysis of Time Series
 Authors@R: person("Tobias", "Kley", role=c("aut","cre"),
     email = "tobias.kley@ruhr-uni-bochum.de")

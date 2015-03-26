@@ -11,8 +11,8 @@ NULL
 #'  \tabular{ll}{
 #'    \cr Package: \tab quantspec
 #'    \cr Type:    \tab Package
-#'    \cr Version: \tab 1.0-3
-#'    \cr Date:    \tab 2015-03-25
+#'    \cr Version: \tab 1.0-3.99
+#'    \cr Date:    \tab 2015-03-26
 #'    \cr License: \tab GPL (>= 2)
 #'  }
 #'
