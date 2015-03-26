@@ -157,6 +157,7 @@ ARCH1 <- function(n,a0,a1,overhead=500,innov = rnorm) {
 #' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
 #' spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+#' [cf. \url{http://arxiv.org/abs/1111.7205}]
 #'
 #' @examples
 #' # Plot sample paths:

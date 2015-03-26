@@ -9,7 +9,7 @@ NULL
 #' calculations to determine the Fourier transform of the clipped time
 #' series. As a subclass to \code{\link{FreqRep}} it inherits
 #' slots and methods defined there; it servers as a frequency representation of
-#' a time series as described in Kley et. al (2014).
+#' a time series as described in Kley et. al (2015+).
 #'
 #' For each frequency \eqn{\omega} from \code{frequencies} and level \code{q}
 #' from \code{levels} the statistic
@@ -28,9 +28,10 @@ NULL
 #' @keywords S4-classes
 #'
 #' @references
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
+#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \url{http://arxiv.org/abs/1401.8104}.
+#' \emph{Bernoulli}, \bold{forthcoming}.
+#' [cf. \url{http://arxiv.org/abs/1401.8104}]
 #'
 #' @seealso
 #' For an example see \code{\link{FreqRep}}.

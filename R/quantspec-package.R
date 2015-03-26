@@ -2,7 +2,7 @@
 NULL
 
 ################################################################################
-#' Quantile-based Spectral Analysis of Time Series
+#' Quantile-Based Spectral Analysis of Time Series
 #'
 #' Methods to determine, smooth and plot quantile (i. e., Laplace or copula)
 #' periodograms for univariate time series.
@@ -11,8 +11,8 @@ NULL
 #'  \tabular{ll}{
 #'    \cr Package: \tab quantspec
 #'    \cr Type:    \tab Package
-#'    \cr Version: \tab 1.0-2
-#'    \cr Date:    \tab 2014-11-21
+#'    \cr Version: \tab 1.0-3
+#'    \cr Date:    \tab 2015-03-25
 #'    \cr License: \tab GPL (>= 2)
 #'  }
 #'
@@ -37,7 +37,7 @@ NULL
 #' Besides the object-oriented design a few
 #' auxiliary functions exists. They serve as parameters or are mostly for
 #' internal use. A more detailed description of the framework can be found in
-#' the paper on the package (Kley, 2014b).
+#' the paper on the package (Kley, 2015).
 #'
 #' @section Organization of the source code / files in the \code{/R} folder:
 #' All of the source code related to the specification of a certain class is
@@ -58,7 +58,7 @@ NULL
 #' @section Coding Conventions:
 #' To improve readability of the software and documentation this package was
 #' written in the spirit of the ``Coding conventions of the Java Programming
-#' Language'' (Oracle, 2014). In particular, the naming conventions for classes
+#' Language'' (Oracle, 2015). In particular, the naming conventions for classes
 #' and methods have been adopted, where ``Class names should be nouns, in mixed
 #' case with the first letter of each internal word capitalized.'' and
 #' ``Methods should be verbs, in mixed case with the first letter lowercase,
@@ -94,22 +94,26 @@ NULL
 #'
 #' @references
 #' Kley, T. (2014a). Quantile-Based Spectral Analysis: Asymptotic Theory and
-#' Computation. unpublished Ph.D. Dissertation, Ruhr University Bochum.
+#' Computation. Ph.D. Dissertation, Ruhr University Bochum.
+#' \url{http://www-brs.ub.ruhr-uni-bochum.de/netahtml/HSS/Diss/KleyTobias/}.
 #'
-#' Kley, T. (2014b). An Object-oriented Framework for Quantile-based Spectral
+#' Kley, T. (2015). An Object-Oriented Framework for Quantile-Based Spectral
 #' Analysis and a Reference Implementation in R: The quantspec Package.
 #' Vignette to this R package.
 #'
 #' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
 #' spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+#' [cf. \url{http://arxiv.org/abs/1111.7205}]
 #'
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
+#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \url{http://arxiv.org/abs/1401.8104}.
+#' \emph{Bernoulli}, \bold{forthcoming}.
+#' [cf. \url{http://arxiv.org/abs/1401.8104}]
 #'
-#' Oracle (2014). Coding conventions of the Java Programming Language.
-#' \url{http://www.oracle.com/technetwork/java/codeconv-138413.html}.
+#' Oracle (2015). Coding conventions of the Java Programming Language.
+#' \url{http://www.oracle.com/technetwork/java/codeconvtoc-136057.html}.
+#' Accessed 2015-03-25.
 #'
 NULL
 
