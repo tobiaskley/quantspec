@@ -396,6 +396,155 @@ setMethod(f = "getValues",
     }
 )
 
+
+################################################################################
+#' Get values from a quantile spectral density kernel
+#'
+#' If none of the optional parameters is specified then the values are returned
+#' for all Fourier frequencies in \eqn{[0,2\pi)}{[0,2pi)} (base given by slot
+#' \code{N}) and all levels available. The frequencies and levels can be freely
+#' specified. The returned array then has, at position \code{(j,k1,k2,b)},
+#' the value corresponding to the \code{frequencies[j]},
+#' \code{levels.1[k1]} and \code{levels.2[k2]} that are closest to the
+#' \code{frequencies}, \code{levels.1} and \code{levels.2}
+#' available in \code{object}; \code{\link{closest.pos}} is used to determine
+#' what closest to means. \code{b==1} corresponds to the estimator, while
+#' \code{b>1} corresponds to the estimator determiend from the \code{b-1}th
+#' boothstrap replicate.
+#'
+#' @name getCoherency-QuantileSD
+#' @aliases getCoherency,QuantileSD-method
+#'
+#' @keywords Access-functions
+#'
+#' @param object \code{QuantileSD} of which to get the values
+#' @param frequencies a vector of frequencies for which to get the values
+#' @param levels.1 the first vector of levels for which to get the values
+#' @param levels.2 the second vector of levels for which to get the values
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 data; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
+#'
+#' @return Returns data from the array \code{values} that's a slot of
+#'          \code{object}.
+#'
+#' @seealso
+#' For examples on how to use this function go to \code{\link{QuantileSD}}.
+################################################################################
+# TODO: Update documentation!
+setMethod(f = "getCoherency",
+    signature = signature("QuantileSD"),
+    definition = function(object,
+        frequencies=2*pi*(0:(object@N-1))/object@N,
+        levels.1=getLevels(object,1),
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4])) {
+      
+      # workaround: default values don't seem to work for generic functions?
+      if (!hasArg(frequencies)) {
+        frequencies <- 2*pi*(0:(object@N-1))/object@N
+      }
+      if (!hasArg("levels.1")) {
+        levels.1 <- getLevels(object,1)
+      }
+      if (!hasArg("levels.2")) {
+        levels.2 <- getLevels(object,2)
+      }
+      if (!hasArg("d1")) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg("d2")) {
+        d2 <- 1:(dim(object@values)[4])
+      }
+      # end: workaround
+      
+#      ##############################
+#      ## (Similar) Code also in Class-FreqRep!!!
+#      ## (Similar) Code also in Class-SmoothedPG!!!
+#      ##############################
+#      
+#      # Transform all frequencies to [0,2pi)
+#      frequencies <- frequencies %% (2*pi)
+#      
+#      # Create an aux vector with all available frequencies
+#      oF <- object@frequencies
+#      f <- frequencies
+#      
+#      # returns TRUE if x c y
+#      subsetequal.approx <- function(x,y) {
+#        X <- round(x, .Machine$double.exponent-2)
+#        Y <- round(y, .Machine$double.exponent-2)
+#        return(setequal(X,intersect(X,Y)))
+#      }
+#      
+#      C1 <- subsetequal.approx(f[f <= pi], oF)
+#      C2 <- subsetequal.approx(f[f > pi], 2*pi - oF[which(oF != 0 & oF != pi)])
+#      
+#      if (!(C1 & C2)) {
+#        warning("Not all 'values' for 'frequencies' requested were available. 'values' for the next available Fourier frequencies are returned.")
+#      }
+#      
+#      # Select columns
+#      c.1.pos <- closest.pos(getLevels(object,1),levels.1)
+#      c.2.pos <- closest.pos(getLevels(object,2),levels.2)
+#      
+#      if (!subsetequal.approx(levels.1, getLevels(object,1))) {
+#        warning("Not all 'values' for 'levels.1' requested were available. 'values' for the next available level are returned.")
+#      }
+#      
+#      if (!subsetequal.approx(levels.2, getLevels(object,2))) {
+#        warning("Not all 'values' for 'levels.2' requested were available. 'values' for the next available level are returned.")
+#      }
+#      
+#      # Select rows
+#      r1.pos <- closest.pos(oF, f[f <= pi])
+#      r2.pos <- closest.pos(-1*(2*pi-oF),-1*f[f > pi])
+      
+      J <- length(frequencies)
+      K1 <- length(levels.1)
+      K2 <- length(levels.2)
+      D1 <- length(d1)
+      D2 <- length(d2)
+      res <- array(dim=c(J, D1, K1, D2, K2))
+      
+#      if (length(r1.pos) > 0) {
+#        res[which(f <= pi),,,,] <- object@values[r1.pos,,c.1.pos,,c.2.pos]
+#      }
+#      if (length(r2.pos) > 0) {
+#        res[which(f > pi),,,,] <- Conj(object@values[r2.pos,,c.1.pos,,c.2.pos])
+#      }
+#
+
+    #if (class(object@weight) != "KernelWeight") {
+    #  error("Coherency can only be determined if weight is of type KernelWeight.")
+    #}
+    d <- union(d1,d2)
+    V <- getValues(object, d1 = d, d2 = d, frequencies = frequencies)
+    V <- array(V, dim = c(dim(V), 1))
+    
+    d1.pos <- closest.pos(d, d1)
+    d2.pos <- closest.pos(d, d2)
+    
+    res <- .computeCoherency(V, d1.pos, d2.pos)
+
+
+      final.dim.res <- c(J)
+      if (D1 > 1) {
+        final.dim.res <- c(final.dim.res,D1)
+      }
+      final.dim.res <- c(final.dim.res,K1)
+      if (D2 > 1) {
+        final.dim.res <- c(final.dim.res,D2)
+      }
+      final.dim.res <- c(final.dim.res,K2)
+      
+      res <- array(res, dim=final.dim.res)
+      
+      return(res)
+    }
+)
+
 ################################################################################
 #' Get \code{N} from a quantile spectral density kernel
 #'

@@ -193,7 +193,6 @@ setMethod(
 #' An example on how to use this function is analogously to the example given in
 #' \code{\link{getValues-QuantilePG}}.
 ################################################################################
-
 setMethod(f = "getValues",
     signature = signature(
         "SmoothedPG"),
@@ -288,6 +287,107 @@ setMethod(f = "getValues",
         r.pos <- closest.pos(oF, f)
         res[,,,,,] <- object@values[r.pos,,c.1.pos,,c.2.pos,]
       }
+      
+      final.dim.res <- c(J)
+      if (D1 > 1) {
+        final.dim.res <- c(final.dim.res,D1)
+      }
+      final.dim.res <- c(final.dim.res,K1)
+      if (D2 > 1) {
+        final.dim.res <- c(final.dim.res,D2)
+      }
+      final.dim.res <- c(final.dim.res,K2, object@qPG@freqRep@B+1)
+      
+      res <- array(res, dim=final.dim.res)
+      
+      return(res)
+    }
+)
+
+################################################################################
+#' Get coherency from a smoothed quantile periodogram.
+#'
+#' The returned array of \code{values} is of dimension \code{[J,K1,K2,B+1]},
+#' where \code{J=length(frequencies)}, \code{K1=length(levels.1)},
+#' \code{K2=length(levels.2))}, and \code{B} denotes the
+#' value stored in slot \code{B} of \code{freqRep} [that is the number of
+#' boostrap repetitions performed on initialization].
+#' At position \code{(j,k1,k2,b)}
+#' the returned value is the one corresponding to \code{frequencies[j]},
+#' \code{levels.1[k1]} and \code{levels.2[k2]} that are closest to the
+#' \code{frequencies}, \code{levels.1} and \code{levels.2}
+#' available in \code{object}; \code{\link{closest.pos}} is used to determine
+#' what closest to means. \code{b==1} corresponds to the estimate without
+#' bootstrapping; \code{b>1} corresponds to the \code{b-1}st bootstrap estimate.
+#'
+#' @name getCoherency-SmoothedPG
+#' @aliases getCoherency,SmoothedPG-method
+#'
+#' @keywords Access-functions
+#'
+#' @param object \code{SmoothedPG} of which to get the values
+#' @param frequencies a vector of frequencies for which to get the values
+#' @param levels.1 the first vector of levels for which to get the values
+#' @param levels.2 the second vector of levels for which to get the values
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 data; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
+#'
+#' @return Returns data from the array \code{values} that's a slot of
+#'          \code{object}.
+#'
+#' @seealso
+#' An example on how to use this function is analogously to the example given in
+#' \code{\link{getValues-QuantilePG}}.
+################################################################################
+# TODO: Update documentation!
+setMethod(f = "getCoherency",
+    signature = signature(
+        "SmoothedPG"),
+    definition = function(object,
+        frequencies=2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y),
+        levels.1=getLevels(object,1),
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4])) {
+      
+      # workaround: default values don't seem to work for generic functions?
+      if (!hasArg(frequencies)) {
+        frequencies <- 2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y)
+      }
+      if (!hasArg(levels.1)) {
+        levels.1 <- object@levels[[1]]
+      }
+      if (!hasArg(levels.2)) {
+        levels.2 <- object@levels[[2]]
+      }
+      if (!hasArg(d1)) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg(d2)) {
+        d2 <- 1:(dim(object@values)[4])
+      }
+      # end: workaround
+
+      J <- length(frequencies)
+      #D <- dim(object@values)[2]
+      D1 <- length(d1)
+      D2 <- length(d2)
+      K1 <- length(levels.1)
+      K2 <- length(levels.2)
+      res <- array(dim=c(J, D1, K1, D2, K2, object@qPG@freqRep@B+1))
+      
+      
+      if (class(object@weight) != "KernelWeight") {
+        error("Coherency can only be determined if weight is of type KernelWeight.")
+      }
+      d <- union(d1,d2)
+      V <- getValues(object, d1 = d, d2 = d, frequencies = frequencies)
+      
+      d1.pos <- closest.pos(d, d1)
+      d2.pos <- closest.pos(d, d2)
+      
+      res <- .computeCoherency(V, d1.pos, d2.pos)
       
       final.dim.res <- c(J)
       if (D1 > 1) {
