@@ -92,7 +92,7 @@ setMethod(f = "getLevels",
         if (!(j==1 | j==2)) {
           error("Index needs to be either 1 or 2.")
         } else {
-          return(object@levels[[1]])
+          return(object@levels[[j]])
         }
       }
     }
