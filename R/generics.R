@@ -112,6 +112,16 @@ setGeneric("getTs", function(object, ...){standardGeneric("getTs")})
 ## Class-SmoothedPG
 
 #' @name generics-accessors
+#' @aliases getCoherencySdNaive
+#' @export
+setGeneric("getCoherencySdNaive", function(object, ...){standardGeneric("getCoherencySdNaive")})
+
+#' @name generics-accessors
+#' @aliases getCoherencyPointwiseCIs
+#' @export
+setGeneric("getCoherencyPointwiseCIs", function(object, ...){standardGeneric("getCoherencyPointwiseCIs")})
+
+#' @name generics-accessors
 #' @aliases getSdNaive
 #' @export
 setGeneric("getSdNaive", function(object, ...){standardGeneric("getSdNaive")})

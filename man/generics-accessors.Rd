@@ -5,6 +5,8 @@
 \alias{getB}
 \alias{getBw}
 \alias{getCoherency}
+\alias{getCoherencyPointwiseCIs}
+\alias{getCoherencySdNaive}
 \alias{getDescr}
 \alias{getFrequencies}
 \alias{getIsRankBased}
@@ -52,6 +54,10 @@ getR(object, ...)
 getType(object, ...)
 
 getTs(object, ...)
+
+getCoherencySdNaive(object, ...)
+
+getCoherencyPointwiseCIs(object, ...)
 
 getSdNaive(object, ...)
 
