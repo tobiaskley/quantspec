@@ -163,7 +163,7 @@ take the form of the \emph{Laplace spectral density kernel}
 and the \emph{copula spectral density kernel}
 \begin{equation}
   \label{def:CopSD}
-  \mathfrak{f}_{q_{\tau_1}, q_{\tau_2}}(\omega) := \frac{1}{2\pi} \sum_{k=-\infty}^{\infty} \gamma_k^U(q_1, q_2) \text{e}^{-\text{i} k \omega}, \quad \tau_1, \tau_2 \in [0,1], \ \omega \in \IR,
+  \mathfrak{f}_{q_{\tau_1}, q_{\tau_2}}(\omega) := \frac{1}{2\pi} \sum_{k=-\infty}^{\infty} \gamma_k^U(\tau_1, \tau_2) \text{e}^{-\text{i} k \omega}, \quad \tau_1, \tau_2 \in [0,1], \ \omega \in \IR,
 \end{equation}
 where $q_{\tau} := F^{-1}(\tau)$. By the relation
 \[\gamma_k(q_1, q_2) = \int_{-\pi}^{\pi} \text{e}^{\text{i} k \omega} \mathfrak{f}_{q_1, q_2}(\omega) \text{d}{\omega},\]
