@@ -1,3 +1,6 @@
+#' @include generics.R
+NULL
+
 ################################################################################
 #' Class for Generation of Bootstrapped Replications of a Time Series.
 #'

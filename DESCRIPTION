@@ -1,7 +1,7 @@
 Package: quantspec
 Version: 1.0-3.99
 Encoding: UTF-8
-Date: 2015-03-26
+Date: 2015-06-16
 Title: Quantile-Based Spectral Analysis of Time Series
 Authors@R: person("Tobias", "Kley", role=c("aut","cre"),
     email = "tobias.kley@ruhr-uni-bochum.de")
@@ -26,8 +26,9 @@ BugReports: http://github.com/tobiaskley/quantspec/issues
 LazyData: TRUE
 LinkingTo: Rcpp
 Collate:
-    'Class-BootPos.R'
     'generics.R'
+    'Class-BootPos.R'
+    'Class-CircularBlocks.R'
     'aux-functions.R'
     'Class-QSpecQuantity.R'
     'Class-FreqRep.R'
@@ -37,10 +38,12 @@ Collate:
     'Class-Weight.R'
     'Class-KernelWeight.R'
     'Class-MovingBlocks.R'
+    'Class-NonoverlappingBlocks.R'
     'Class-QRegEstimator.R'
     'Class-QuantilePG.R'
     'Class-SmoothedPG.R'
     'Class-SpecDistrWeight.R'
+    'Class-StationaryBlocks.R'
     'RcppExports.R'
     'data.R'
     'deprecated.R'

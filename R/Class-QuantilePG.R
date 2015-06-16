@@ -214,9 +214,15 @@ setMethod(f = "getFreqRep",
 #' @param B number of bootstrap replications
 #' @param l (expected) length of blocks
 #' @param type.boot A flag to choose a method for the block bootstrap; currently
-#'                   two options are implemented: \code{"none"} and \code{"mbb"}
-#'                   which means to do a moving blocks  bootstrap with \code{B}
-#'                   and \code{l} as specified.
+#'                  two options are implemented: \code{"none"}, \code{"mbb"}
+#'                  which means to do a moving blocks bootstrap with \code{B}
+#'                  and \code{l} as specified. Further options are \code{"nbb"},
+#' 								  which means nonoverlapping blocks bootstrap, \code{"cbb"} which
+#' 									means circular bootstrap, and \code{"sb"} which stands for
+#' 								  stationary bootstrap. 
+#' @param resampleEcdf A flag that indicates whether the ecdf used to compute the pseudo
+#' 									  data (if \code{isRankBased==TRUE}) is also determined from
+#' 										the block bootstraped observations.
 #' @param method  method used for computing the quantile regression estimates.
 #'                 The choice is passed to \code{qr}; see the
 #'                 documentation of \code{quantreg} for details.
@@ -231,7 +237,8 @@ quantilePG <- function( Y,
                         levels.2=levels.1,
                         isRankBased=TRUE,
                         type=c("clipped","qr"),
-                        type.boot = c("none","mbb"),
+                        type.boot = c("none","mbb","nbb","cbb","sb"),
+                        resampleEcdf = FALSE,
                         B = 0,
                         l = 0,
                         method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
@@ -257,9 +264,10 @@ quantilePG <- function( Y,
   type <- match.arg(type, c("clipped","qr"))[1]
   switch(type,
     "clipped" = {
-      freqRep <- clippedFT(Y, frequencies, levels.all, isRankBased, B, l, type.boot)},
+      freqRep <- clippedFT(Y, frequencies, levels.all, isRankBased, B, l, type.boot, resampleEcdf)},
     "qr" = {
-      freqRep <- qRegEstimator(Y, frequencies, levels.all, isRankBased, B, l, type.boot, method, parallel)}
+      freqRep <- qRegEstimator(Y, frequencies, levels.all, isRankBased, B, l, type.boot, resampleEcdf, method, parallel)
+    }
   )
 
   obj <- new(

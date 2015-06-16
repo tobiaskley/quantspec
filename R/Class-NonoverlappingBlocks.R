@@ -2,44 +2,44 @@
 NULL
 
 ################################################################################
-#' Class for Moving Blocks Bootstrap implementation.
+#' Class for Nonoverlapping Blocks Bootstrap implementation.
 #'
-#' \code{MovingBlocks} is an S4 class that implements the moving blocks
-#' bootstrap described in \enc{Künsch}{Kuensch} (1989).
+#' \code{NonoverlappingBlocks} is an S4 class that implements the
+#' nonoverlapping blocks bootstrap described in Carlstein (1986).
 #'
-#' \code{MovingBlocks} extends the S4 class
+#' \code{NonoverlappingBlocks} extends the S4 class
 #' \code{\link{BootPos}} and the remarks made in its documentation
 #' apply here as well.
 #'
-#' The Moving Blocks Bootstrap method of \enc{Künsch}{Kuensch} (1989) resamples blocks
-#' randomly, with replacement from the collection of overlapping blocks of
-#' length \code{l} that start with observation 1, 2, \ldots, \code{N-l+1}.
+#' The Nonoverlapping Blocks Bootstrap method of Carlstein (1986) resamples blocks
+#' randomly, with replacement from the collection of nonoverlapping blocks of
+#' length \code{l} that start with observation \eqn{(i-1)l + 1}, where 
+#' \eqn{i = 1, \ldots \lfloor N / l \rfloor}.
 #' A more precise description of the procedure can also be found in
 #' Lahiri (1999), p. 389.
 #'
-#' @name   MovingBlocks-class
-#' @aliases MovingBlocks
-#' @exportClass MovingBlocks
-#'
-#' @encoding latin1
+#' @name   NonoverlappingBlocks-class
+#' @aliases NonoverlappingBlocks
+#' @exportClass NonoverlappingBlocks
 #'
 #' @keywords S4-classes
 #'
-#' @seealso \code{\link{getPositions-MovingBlocks}}
+#' @seealso \code{\link{getPositions-NonoverlappingBlocks}}
 #'
 #' @references
-#' \enc{Künsch}{Kuensch}, H. R. (1989). The jackknife and the bootstrap for general stationary
-#' observations. \emph{The Annals of Statistics}, \bold{17}, 1217--1261.
+#' Carlstein, E. (1986). The use of subseries methods for estimating the
+#' variance of a general statistic from a stationary time series.
+#' \emph{The Annals of Statistics}, \bold{14}, 1171--1179.
 ################################################################################
 
 setClass(
-    Class = "MovingBlocks",
+    Class = "NonoverlappingBlocks",
     contains = "BootPos"
 )
 
 setMethod(
     f = "initialize",
-    signature = "MovingBlocks",
+    signature = "NonoverlappingBlocks",
     definition = function(.Object, l, N) {
 
       .Object@l <- l
@@ -51,12 +51,12 @@ setMethod(
 )
 
 ################################################################################
-#' Get Positions for the Moving Blocks Bootstrap.
+#' Get Positions for the Nonoverlapping Blocks Bootstrap.
 #'
-#' @name getPositions-MovingBlocks
-#' @aliases getPositions,MovingBlocks-method
+#' @name getPositions-NonoverlappingBlocks
+#' @aliases getPositions,NonoverlappingBlocks-method
 #'
-#' @param object a \code{MovingBlocks} object; used to specify the parameters
+#' @param object a \code{NonoverlappingBlocks} object; used to specify the parameters
 #'                \code{N}, \code{l} and the type of the bootstrap.
 #' @param B Number of independent repetitions to bootstrap.
 #'
@@ -66,7 +66,7 @@ setMethod(
 ################################################################################
 
 setMethod(f = "getPositions",
-    signature = "MovingBlocks",
+    signature = "NonoverlappingBlocks",
     definition = function(object, B=1) {
 
     N <- object@N
@@ -77,7 +77,7 @@ setMethod(f = "getPositions",
 
     for (b in 1:B) {
       blocks <- matrix(ncol=nBlocks, nrow=l)
-      blocks[1,] <- floor(runif(n=nBlocks, min=1,max=N-l+1)) #+1
+      blocks[1,] <- floor(runif(n=nBlocks, min=0,max=floor(N/l)))*l+1
       if (l > 1) {
         for (i in 2:l) {
           blocks[i,] <- blocks[1,]+i-1
@@ -92,10 +92,10 @@ setMethod(f = "getPositions",
 
 
 ################################################################################
-#' Create an instance of the \code{\link{MovingBlocks}} class.
+#' Create an instance of the \code{\link{NonoverlappingBlocks}} class.
 #'
-#' @name MovingBlocks-constructor
-#' @aliases movingBlocks
+#' @name NonoverlappingBlocks-constructor
+#' @aliases nonoverlappingBlocks
 #' @export
 #'
 #' @keywords Constructors
@@ -103,17 +103,17 @@ setMethod(f = "getPositions",
 #' @param l the block length for the block bootstrap methods
 #' @param N number of available observations to bootstrap from
 #'
-#' @return Returns an instance of \code{MovingBlocks}.
+#' @return Returns an instance of \code{NonoverlappingBlocks}.
 ################################################################################
 
-movingBlocks <- function( l, N ) {
+nonoverlappingBlocks <- function( l, N ) {
 
   if (!(is.wholenumber(l) && is.wholenumber(N) && 0 < l && l <= N)) {
     stop("'l' and 'N' need to be specified as integers with 0 < l <= N")
   }
 
   obj <- new(
-      Class = "MovingBlocks",
+      Class = "NonoverlappingBlocks",
       l = l,
       N = N
   )

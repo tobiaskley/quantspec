@@ -44,6 +44,12 @@ setGeneric("getIsRankBased",
 setGeneric("getB",
     function(object, ...){standardGeneric("getB")})
 
+#' @name generics-accessors
+#' @aliases getResampleEcdf
+#' @export
+setGeneric("getResampleEcdf",
+    function(object, ...){standardGeneric("getResampleEcdf")})
+
 
 ## Class-QRegEstimator
 

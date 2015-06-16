@@ -44,7 +44,7 @@ setClass(
 setMethod(
     f = "initialize",
     signature = "ClippedFT",
-    definition = function(.Object, Y, isRankBased, levels, frequencies, positions.boot, B) {
+    definition = function(.Object, Y, isRankBased, levels, frequencies, positions.boot, B, resampleEcdf) {
 
       .Object@Y <- Y
       .Object@isRankBased <- isRankBased
@@ -52,42 +52,55 @@ setMethod(
       .Object@frequencies <- frequencies
       .Object@positions.boot <- positions.boot
       .Object@B <- B
+      .Object@resampleEcdf <- resampleEcdf
 
       # Define variables with dimensions
       T <- length(Y)
       K <- length(levels)
       J <- length(frequencies)
-
-      # Convert Y to "pseudo data", if isRankBased == TRUE
-      if (isRankBased) {
-        data <- rank(Y) / T
-      } else {
-        data <- Y
-      }
+      
+      levels <- sort(levels)
 
       # Define a matrix to store I{Y_t <= q_k}
       IndMatrix <- matrix(0, nrow=T, ncol=K*(B+1))
-
-      levels <- sort(levels)
-      sortedData <- sort(data)
-
-      # Fill the matrix
-      t <- 1
-      for (i in 1:K) {
-        while (t <= T && sortedData[t] <= levels[i]) {t <- t+1}
-        if (t > 1) {
-          IndMatrix[1:(t-1),i] <- 1
-        }
-      }
-      IndMatrix[,1:K] <- IndMatrix[rank(data),1:K]
-
+      
       if (B > 0) {
-        pos.boot <- getPositions(.Object@positions.boot,B)
-        for (b in 1:B) {
-          IndMatrix[,(b*K+1):((b+1)*K)] <- IndMatrix[pos.boot[,b],1:K]
+        #pos.boot <- array(getPositions(positions.boot,B), dim = c(T,B))
+        pos.boot <- getPositions(positions.boot, B)
+      }
+      
+      # for all b -- ==0 non-bootstrap, >0 bootstrap
+      for (b in 0:B) {
+        
+        if (b > 0 && resampleEcdf) {
+          pos <- pos.boot[,b]
+        } else {
+          pos <- 1:T
+        }
+        
+        # Convert Y to "pseudo data", if isRankBased == TRUE
+        if (isRankBased) {
+          data <- rank(Y[pos], ties.method = "max") / T
+        } else {
+          data <- Y[pos]
+        }
+  
+        sortedData <- sort(data)
+  
+        if ( (b == 0) || (b > 0 && resampleEcdf) ) {
+          # Fill the matrix
+          t <- 1
+          for (i in 1:K) {
+            while (t <= T && sortedData[t] <= levels[i]) {t <- t+1}
+            if (t > 1) {
+              IndMatrix[1:(t-1), b*K + i] <- 1
+            }
+          }
+          IndMatrix[, b*K + 1:K] <- IndMatrix[rank(data), b*K + 1:K]
+        } else if ( b > 0 && !resampleEcdf ) {
+          IndMatrix[, (b*K+1):((b+1)*K)] <- IndMatrix[pos.boot[,b], 1:K]
         }
       }
-
       cfft <- mvfft(IndMatrix)
 
       # Modify object to return (only requested frequencies!)
@@ -127,9 +140,15 @@ setMethod(
 #' @param B number of bootstrap replications
 #' @param l (expected) length of blocks
 #' @param type.boot A flag to choose a method for the block bootstrap; currently
-#'                  two options are implemented: \code{"none"} and \code{"mbb"}
-#'                  which means to do a moving blocks  bootstrap with \code{B}
-#'                  and \code{l} as specified.
+#'                  two options are implemented: \code{"none"}, \code{"mbb"}
+#'                  which means to do a moving blocks bootstrap with \code{B}
+#'                  and \code{l} as specified. Further options are \code{"nbb"},
+#' 								  which means nonoverlapping blocks bootstrap, \code{"cbb"} which
+#' 									means circular bootstrap, and \code{"sb"} which stands for
+#' 								  stationary bootstrap. 
+#' @param resampleEcdf A flag that indicates whether the ecdf used to compute the pseudo
+#' 									  data (if \code{isRankBased==TRUE}) is also determined from
+#' 										the block bootstraped observations.
 #'
 #' @return Returns an instance of \code{ClippedFT}.
 #'
@@ -142,7 +161,8 @@ clippedFT <- function( Y,
     isRankBased=TRUE,
     B = 0,
     l = 0,
-    type.boot = c("none","mbb")) {
+    type.boot = c("none","mbb","nbb","cbb","sb"),
+    resampleEcdf = FALSE) {
 
   # Verify if all parameters are valid
   Y <- timeSeriesValidator(Y)
@@ -162,12 +182,18 @@ clippedFT <- function( Y,
   # Check validity of frequencies
   frequencies <- frequenciesValidator(frequencies, length(Y))
 
-  type.boot <- match.arg(type.boot, c("none","mbb"))[1]
+  type.boot <- match.arg(type.boot, c("none","mbb","nbb","cbb","sb"))[1]
   switch(type.boot,
       "none" = {
         bootPos <- movingBlocks(length(Y),length(Y))},
       "mbb" = {
-        bootPos <- movingBlocks(l,length(Y))}
+        bootPos <- movingBlocks(l,length(Y))},
+      "nbb" = {
+        bootPos <- nonoverlappingBlocks(l,length(Y))},
+      "cbb" = {
+        bootPos <- circularBlocks(l,length(Y))},
+      "sb" = {
+        bootPos <- stationaryBlocks(l,length(Y))}
   )
 
   freqRep <- new(
@@ -177,7 +203,8 @@ clippedFT <- function( Y,
       levels = sort(levels),
       B = B,
       positions.boot = bootPos,
-      frequencies = frequencies
+      frequencies = frequencies,
+      resampleEcdf
   )
 
   return(freqRep)

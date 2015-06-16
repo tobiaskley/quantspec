@@ -792,9 +792,15 @@ setMethod(f = "getQuantilePG",
 #' @param B number of bootstrap replications
 #' @param l (expected) length of blocks
 #' @param type.boot A flag to choose a method for the block bootstrap; currently
-#'                   two options are implemented: \code{"none"} and \code{"mbb"}
-#'                   which means to do a moving blocks  bootstrap with \code{B}
-#'                   and \code{l} as specified.
+#'                  two options are implemented: \code{"none"}, \code{"mbb"}
+#'                  which means to do a moving blocks bootstrap with \code{B}
+#'                  and \code{l} as specified. Further options are \code{"nbb"},
+#' 								  which means nonoverlapping blocks bootstrap, \code{"cbb"} which
+#' 									means circular bootstrap, and \code{"sb"} which stands for
+#' 								  stationary bootstrap. 
+#' @param resampleEcdf A flag that indicates whether the ecdf used to compute the pseudo
+#' 									  data (if \code{isRankBased==TRUE}) is also determined from
+#' 										the block bootstraped observations.
 #' @param method  method used for computing the quantile regression estimates.
 #'                 The choice is passed to \code{qr}; see the
 #'                 documentation of \code{quantreg} for details.
@@ -832,7 +838,8 @@ smoothedPG <- function(
     levels.2=levels.1,
     isRankBased=TRUE,
     type=c("clipped","qr"),
-    type.boot=c("none","mbb"),
+    type.boot = c("none","mbb","nbb","cbb","sb"),
+    resampleEcdf = FALSE,
     method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
     parallel=FALSE,
     B = 0,
@@ -881,7 +888,7 @@ smoothedPG <- function(
         levels.1 = levels.1,
         levels.2 = levels.2,
         isRankBased = isRankBased,
-        type=type, type.boot = type.boot, B=B, l=l)
+        type=type, type.boot = type.boot, resampleEcdf=resampleEcdf, B=B, l=l)
   } else if (versConstr == 2) {
     qPG <- object
   }

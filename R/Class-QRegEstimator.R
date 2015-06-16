@@ -56,13 +56,14 @@ setClass(
 setMethod(
     f = "initialize",
     signature = "QRegEstimator",
-    definition = function(.Object, Y, isRankBased, levels, frequencies, positions.boot, B, method, parallel) {
+    definition = function(.Object, Y, isRankBased, levels, frequencies, positions.boot, resampleEcdf, B, method, parallel) {
 
       .Object@Y <- Y
       .Object@isRankBased <- isRankBased
       .Object@levels <- levels
       .Object@frequencies <- frequencies
       .Object@positions.boot <- positions.boot
+      .Object@resampleEcdf <- resampleEcdf
       .Object@B <- B
       .Object@method <- method
       .Object@parallel <- parallel
@@ -191,9 +192,15 @@ setMethod(f = "getParallel",
 #' @param B number of bootstrap replications
 #' @param l (expected) length of blocks
 #' @param type.boot A flag to choose a method for the block bootstrap; currently
-#'                   two options are implemented: \code{"none"} and \code{"mbb"}
-#'                   which means to do a moving blocks  bootstrap with \code{B}
-#'                   and \code{l} as specified.
+#'                  two options are implemented: \code{"none"}, \code{"mbb"}
+#'                  which means to do a moving blocks bootstrap with \code{B}
+#'                  and \code{l} as specified. Further options are \code{"nbb"},
+#' 								  which means nonoverlapping blocks bootstrap, \code{"cbb"} which
+#' 									means circular bootstrap, and \code{"sb"} which stands for
+#' 								  stationary bootstrap. 
+#' @param resampleEcdf A flag that indicates whether the ecdf used to compute the pseudo
+#' 									  data (if \code{isRankBased==TRUE}) is also determined from
+#' 										the block bootstraped observations.
 #' @param method  method used for computing the quantile regression estimates.
 #'                 The choice is passed to \code{qr}; see the
 #'                 documentation of \code{quantreg} for details.
@@ -210,7 +217,8 @@ qRegEstimator <- function( Y,
     isRankBased=TRUE,
     B = 0,
     l = 0,
-    type.boot = c("none", "mbb"),
+    type.boot = c("none","mbb","nbb","cbb","sb"),
+    resampleEcdf = FALSE,
     method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
     parallel = FALSE) {
 
@@ -232,12 +240,18 @@ qRegEstimator <- function( Y,
   # Check validity of frequencies
   frequencies <- frequenciesValidator(frequencies, length(Y))
 
-  type.boot <- match.arg(type.boot, c("none","mbb"))[1]
+  type.boot <- match.arg(type.boot, c("none","mbb","nbb","cbb","sb"))[1]
   switch(type.boot,
       "none" = {
         bootPos <- movingBlocks(length(Y),length(Y))},
       "mbb" = {
-        bootPos <- movingBlocks(l,length(Y))}
+        bootPos <- movingBlocks(l,length(Y))},
+      "nbb" = {
+        bootPos <- nonoverlappingBlocks(l,length(Y))},
+      "cbb" = {
+        bootPos <- circularBlocks(l,length(Y))},
+      "sb" = {
+        bootPos <- stationaryBlocks(l,length(Y))}
   )
 
   method <- match.arg(method, c("br", "fn", "pfn", "fnc", "lasso", "scad"))[1]
@@ -249,6 +263,7 @@ qRegEstimator <- function( Y,
       levels = sort(levels),
       B = B,
       positions.boot = bootPos,
+      resampleEcdf = resampleEcdf,
       frequencies = frequencies,
       method = method,
       parallel = parallel

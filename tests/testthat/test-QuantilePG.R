@@ -170,7 +170,7 @@ test_that("quantilePG works as expected with bootstrapping",{
       
       # Check whether it works for all levels, with bootstrapping:
       qPG.fft <- quantilePG(Y, levels.1=lev.ok.all, type="clipped", B=1, l=8, type.boot="mbb")
-      V.qr <- getValues(qPG.qr)
+      V.fft <- getValues(qPG.fft)
       expect_that(dim(V.qr),equals(c(64,3,3,2)))
       expect_that(V.qr,equals(V.qr.ref))
       

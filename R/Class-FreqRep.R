@@ -67,6 +67,9 @@ NULL
 #' @slot positions.boot An object of type \code{\link{BootPos}},
 #'                      that is used to determine the block bootstrapped
 #'                      replicates of the time series.
+#' @slot resampleEcdf A flag that indicates whether the ecdf used to compute the pseudo
+#' 									  data (if \code{isRankBased==TRUE}) is also determined from
+#' 										the block bootstraped observations.
 #' @slot B Number of bootstrap replications to perform.
 #'
 #' @example
@@ -82,7 +85,8 @@ setClass(
         values = "array",
         isRankBased = "logical",
         positions.boot = "BootPos",
-        B = "numeric"
+        B = "numeric",
+        resampleEcdf = "logical"
     )
 )
 
@@ -320,6 +324,26 @@ setMethod(f = "getBootPos",
     signature = "FreqRep",
     definition = function(object) {
       return(object@positions.boot)
+    }
+)
+
+################################################################################
+#' Get \code{resampleEcdf} from a
+#' \code{\link{FreqRep}}.
+#'
+#' @name getResampleEcdf-FreqRep
+#' @aliases getResampleEcdf,FreqRep-method
+#'
+#' @keywords Access-association-functions
+#'
+#' @param object \code{FreqRep} from which to get the
+#'                \code{\link{BootPos}}.
+#' @return Returns the \code{\link{BootPos}} object associated.
+################################################################################
+setMethod(f = "getResampleEcdf",
+    signature = "FreqRep",
+    definition = function(object) {
+      return(object@resampleEcdf)
     }
 )
 
