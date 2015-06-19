@@ -31,6 +31,8 @@ NULL
 #'
 #' @keywords S4-classes
 #'
+#' @slot freqRep a \code{\link{FreqRep}} object where the quantile periodogram will
+#'       be based on.
 #' @references
 #' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
