@@ -86,7 +86,10 @@ setMethod(f = "getValues",
               warning("not all requested 'levels.2' were found")
             }
             
-            return(object@values[,c.1.pos,c.2.pos])
+            ln.1 = length(levels.1)
+            ln.2 = length(levels.2)
+            ln = length(object@values[,c.1.pos,c.2.pos])/(ln.1*ln.2)
+            return(array(object@values[,c.1.pos,c.2.pos],dim = c(ln,ln.1,ln.2)))
           }
 )
 ################################################################################

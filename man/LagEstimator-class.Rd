@@ -4,9 +4,9 @@
 \name{LagEstimator-class}
 \alias{LagEstimator}
 \alias{LagEstimator-class}
-\title{Class for a lag window type estimator.}
+\title{Class for a lag-window type estimator.}
 \description{
-For a given time series Y a lag window estimator of the Form
+For a given time series Y a lag-window estimator of the Form
 \deqn{\hat{f}(\omega) = \sum_{|k|< n-1 } K_n(k) \Gamma(Y_0,Y_k) \exp(-i \omega k)}
 will be calculated on initalization. The \code{LagKernelWeight} K_n is determined
 by the slot \code{weight} and the \code{LagOperator} \eqn{\Gamma(Y_0,Y_k)} is defined
@@ -15,7 +15,7 @@ by the slot lagOp.
 \section{Slots}{
 
 \describe{
-\item{\code{Y}}{the time series where the lag estimator will be applied one}
+\item{\code{Y}}{the time series where the lag estimator was applied one}
 
 \item{\code{weight}}{a \code{\link{Weight}} object to be used as lag window}
 

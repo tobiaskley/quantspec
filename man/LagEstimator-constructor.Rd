@@ -7,7 +7,7 @@
 \usage{
 lagEstimator(Y, frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
   levels.1 = 0.5, levels.2 = levels.1, weight = lagKernelWeight(K =
-  length(Y) - 1, bw = 25), type = c("clippedCov"))
+  length(Y), bw = 25), type = c("clippedCov"))
 }
 \arguments{
 \item{Y}{a time series (\code{numeric}, \code{ts}, or \code{zoo} object) or a
