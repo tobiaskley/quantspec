@@ -8,21 +8,21 @@
 \title{Class for Moving Blocks Bootstrap implementation.}
 \description{
 \code{MovingBlocks} is an S4 class that implements the moving blocks
-bootstrap described in \enc{Künsch}{Kuensch} (1989).
+bootstrap described in \enc{KÃ¼nsch}{Kuensch} (1989).
 }
 \details{
 \code{MovingBlocks} extends the S4 class
 \code{\link{BootPos}} and the remarks made in its documentation
 apply here as well.
 
-The Moving Blocks Bootstrap method of \enc{Künsch}{Kuensch} (1989) resamples blocks
+The Moving Blocks Bootstrap method of \enc{KÃ¼nsch}{Kuensch} (1989) resamples blocks
 randomly, with replacement from the collection of overlapping blocks of
 length \code{l} that start with observation 1, 2, \ldots, \code{N-l+1}.
 A more precise description of the procedure can also be found in
 Lahiri (1999), p. 389.
 }
 \references{
-\enc{Künsch}{Kuensch}, H. R. (1989). The jackknife and the bootstrap for general stationary
+\enc{KÃ¼nsch}{Kuensch}, H. R. (1989). The jackknife and the bootstrap for general stationary
 observations. \emph{The Annals of Statistics}, \bold{17}, 1217--1261.
 }
 \seealso{

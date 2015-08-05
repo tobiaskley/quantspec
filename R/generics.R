@@ -117,6 +117,11 @@ setGeneric("getTs", function(object, ...){standardGeneric("getTs")})
 setGeneric("getCoherencySdNaive", function(object, ...){standardGeneric("getCoherencySdNaive")})
 
 #' @name generics-accessors
+#' @aliases getCoherencePointwiseCIs
+#' @export
+setGeneric("getCoherencePointwiseCIs", function(object, ...){standardGeneric("getCoherencePointwiseCIs")})
+
+#' @name generics-accessors
 #' @aliases getCoherencyPointwiseCIs
 #' @export
 setGeneric("getCoherencyPointwiseCIs", function(object, ...){standardGeneric("getCoherencyPointwiseCIs")})

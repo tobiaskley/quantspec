@@ -11,7 +11,7 @@ smoothed quantile periodogram.}
   (0:(lenTS(object@qPG@freqRep@Y) - 1))/lenTS(object@qPG@freqRep@Y),
   levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2),
   d1 = 1:(dim(object@values)[2]), d2 = 1:(dim(object@values)[4]),
-  impl = c("R", "C"))
+  type = c("1", "2"), impl = c("R", "C"))
 }
 \arguments{
 \item{object}{\code{\link{SmoothedPG}} of which to get the estimates for the
@@ -27,6 +27,9 @@ standard deviation.}
 data; may be a vector of elements 1, ..., D}
 
 \item{d2}{same as d1, but for j2}
+
+\item{type}{can be "1", where cov(Z, Conj(Z)) is subtracted, or "2", where
+it's not}
 
 \item{impl}{choose "R" or "C" for one of the two implementations available}
 }

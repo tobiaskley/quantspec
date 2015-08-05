@@ -460,6 +460,8 @@ setMethod(f = "getCoherency",
 #' @param d1 optional parameter that determine for which j1 to return the
 #' 					 data; may be a vector of elements 1, ..., D
 #' @param d2 same as d1, but for j2
+#' @param type can be "1", where cov(Z, Conj(Z)) is subtracted, or "2", where
+#' 					   it's not
 #' @param impl choose "R" or "C" for one of the two implementations available
 #'
 #' @return Returns the estimate described above.
@@ -479,6 +481,7 @@ setMethod(f = "getCoherencySdNaive",
         levels.2=getLevels(object,2),
         d1 = 1:(dim(object@values)[2]),
         d2 = 1:(dim(object@values)[4]),
+        type = c("1", "2"),
         impl=c("R","C")) {
       
       if (class(getWeight(object)) != "KernelWeight") {
@@ -505,6 +508,9 @@ setMethod(f = "getCoherencySdNaive",
       if (!hasArg(d2)) {
         d2 <- 1:(dim(object@values)[4])
       }
+      if (!hasArg(type)) {
+        impl <- "1"
+      }
       if (!hasArg(impl)) {
         impl <- "R"
       }
@@ -516,7 +522,9 @@ setMethod(f = "getCoherencySdNaive",
       D1 <- length(d1)
       D2 <- length(d2)
       
-      if (object@env$sdCohNaive.done == FALSE) {
+      # TODO: Make this work with type = 1 and type = 2
+      
+      #if (object@env$sdCohNaive.done == FALSE) {
         
         weight <- object@weight
         
@@ -618,9 +626,21 @@ setMethod(f = "getCoherencySdNaive",
                     B <- H1221 - f12*H1222/f22 - f12*Conj(H1112)/f11
                     B <- B + (f12^2/4) * (H1111/f11^2 + 2*Re(H1122/(f11*f22)) + H2222/f22^2)
                     B <- B/(f11*f22)
+                    if (type == "1") {
+                      S <- (1/2) * complex(real = Re(A + B), imaginary = Re(A - B))
+                    } else {
+                      # CORRECT??
+                      # Recall, A == L1212 and B == L1221 ??
+                      R12 <- f12 / sqrt(Re(f11) * Re(f22))
+                      S <- 2 * abs(R12)^2 * A
+                      S <- S + 2 * (Re(R12)^2 - Im(R12)^2) * Re(B)
+                      S <- S + 4 * Re(R12) * Im(R12) * Im(B)
+                    }
                     
-                    S <- (1/2) * complex(real = Re(A + B), imaginary = Re(A - B))
                   }
+                  ## TODO: Comment on the next line!!
+                  ## Is this because S is always a linear combination of the
+                  ## Cov(Lab, Lcd) terms??
                   res[,i1,k1,i2,k2] <- (2*pi/N)^2 * S / (weight@env$Wnj[c(N,1:(N-1))])^2
                   res[,i2,k2,i1,k1] <- res[,i1,k1,i2,k2]
                 }
@@ -631,7 +651,12 @@ setMethod(f = "getCoherencySdNaive",
           sqrt.cw <- function(z) {
             return(complex(real=sqrt(max(Re(z),1e-9)), imaginary=sqrt(max(Im(z),1e-9))))
           }
-          res <- array(apply(res,c(1,2,3,4,5),sqrt.cw), dim = c(N, D1, K1, D2, K2))
+          if (type == "1") {
+            res <- array(apply(res,c(1,2,3,4,5),sqrt.cw), dim = c(N, D1, K1, D2, K2))  
+          } else {
+            res <- array(apply(res,c(1,2,3,4,5),sqrt), dim = c(N, D1, K1, D2, K2))
+          }
+          
           
           #####
           ## END Variant 1: more or less vectorized... 
@@ -739,7 +764,7 @@ setMethod(f = "getCoherencySdNaive",
         object@env$sdCohNaive.done <- TRUE
         object@env$sdCohNaive <- res[1:(floor(N/2)+1),,,,, drop=F]
         resObj <- res[1:(floor(N/2)+1),,,,, drop=F]
-      } # End of 'if (object@env$sdNaive.done == FALSE) {'
+#      } # End of 'if (object@env$sdNaive.done == FALSE) {'
       
       resObj <- object@env$sdCohNaive
       ##############################
@@ -1391,6 +1416,138 @@ setMethod(f = "getPointwiseCIs",
       
       lowerCIs <- array(lowerCIs, dim=final.dim.res)
       upperCIs <- array(upperCIs, dim=final.dim.res)
+      
+      res <- list(lowerCIs = lowerCIs, upperCIs = upperCIs)
+      return(res)
+    }
+)
+
+################################################################################
+#' Get pointwise confidence intervals for the quantile coherence
+#'
+#' TODO
+#'
+#' @name getCoherencePointwiseCIs-SmoothedPG
+#' @aliases getCoherencePointwiseCIs,SmoothedPG-method
+#'
+#' @keywords Access-functions
+#'
+#' @param object \code{SmoothedPG} of which to get the confidence intervals
+#' @param frequencies a vector of frequencies for which to get the result
+#' @param levels.1 the first vector of levels for which to get the result
+#' @param levels.2 the second vector of levels for which to get the result
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 data; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
+#' @param alpha the level of the confidence interval; must be from \eqn{(0,1)}
+#' @param type a flag indicating which type of confidence interval should be
+#'         returned; can take one of the three values discussed above.
+#'
+#' @return Returns a named list of two arrays \code{lowerCIS} and \code{upperCIs}
+#'          containing the lower and upper bounds for the confidence intervals.
+#'
+################################################################################
+# TODO: Update documentation.
+setMethod(f = "getCoherencePointwiseCIs",
+    signature = signature(
+        object = "SmoothedPG"),
+    definition = function(object,
+        frequencies=2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y),
+        levels.1=getLevels(object,1),
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4]),
+        alpha=.1, type=c("naive.sd", "variance stabilized", "boot.sd", "boot.full")) {
+      
+      # workaround: default values don't seem to work for generic functions?
+      if (!hasArg(frequencies)) {
+        frequencies <- 2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y)
+      }
+      if (!hasArg(levels.1)) {
+        levels.1 <- object@levels[[1]]
+      }
+      if (!hasArg(levels.2)) {
+        levels.2 <- object@levels[[2]]
+      }
+      if (!hasArg(alpha)) {
+        alpha <- 0.1
+      }
+      if (!hasArg(d1)) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg(d2)) {
+        d2 <- 1:(dim(object@values)[4])
+      }
+      if (!hasArg(type)) {
+        type <- "naive.sd"
+      }
+      # end: workaround
+      
+      type <- match.arg(type)[1]
+      switch(type,
+          "naive.sd" = {
+            sdEstim <- getCoherencySdNaive(object,
+                frequencies = frequencies,
+                levels.1 = levels.1,
+                levels.2 = levels.2,
+                d1 = d1, d2 = d2, type="2")
+            sdEstim <- Re(sdEstim)},
+          "boot.sd" = {
+            sdEstim <- getSdBoot(object,
+                frequencies = frequencies,
+                levels.1 = levels.1,
+                levels.2 = levels.2)}
+      )
+      
+      J <- length(frequencies)
+      K1 <- length(levels.1)
+      K2 <- length(levels.2)
+      D1 <- length(d1)
+      D2 <- length(d2)
+      
+      
+      if (type == "naive.sd" || type == "boot.sd") {
+        v <- array(getCoherency(object,
+                frequencies = frequencies,
+                levels.1 = levels.1,
+                levels.2 = levels.2, d1=d1, d2=d2), dim = c(J, D1, K1, D2, K2))
+        
+        upperCIs <- array(abs(v)^2 + Re(sdEstim) * qnorm(1-alpha/2), dim = c(J, D1, K1, D2, K2))
+        lowerCIs <- array(abs(v)^2 + Re(sdEstim) * qnorm(alpha/2), dim = c(J, D1, K1, D2, K2))
+        
+        #upperCIs <- array(0.5 * sdEstim^2 * qchisq(1-alpha/2, 2, ncp = abs(v)^2), dim = c(J, D1, K1, D2, K2))
+        #lowerCIs <- array(0.5 * sdEstim^2 * qchisq(alpha/2, 2, ncp = abs(v)^2), dim = c(J, D1, K1, D2, K2))
+      } else if (type == "variance stabilized") {
+        v <- array(getCoherency(object,
+                frequencies = frequencies,
+                levels.1 = levels.1,
+                levels.2 = levels.2, d1=d1, d2=d2), dim = c(J, D1, K1, D2, K2))
+        sigma <- array(1, dim = c(J, D1, K1, D2, K2))
+        sigma[which((frequencies %% pi == 0)),,,,] <- 2
+        W <- getW(getWeight(object))
+        Wsq <- function(x) {W(x)^2}
+        intWsq <- integrate(Wsq, lower=-pi, upper=pi)$value
+        bw <- getBw(getWeight(object))
+        n <- lenTS(object@qPG@freqRep@Y)
+        sigma <- sigma/(pi*bw*n*intWsq)
+        upperCIs <- array(tanh(atanh(abs(v)) + sigma * qnorm(1-alpha/2))^2, dim = c(J, D1, K1, D2, K2))
+        lowerCIs <- array(tanh(atanh(abs(v)) - sigma * qnorm(1-alpha/2))^2, dim = c(J, D1, K1, D2, K2))        
+      } else if (type == "boot.full") {
+        # TODO: Error Msg ausgeben falls B == 0
+        B <- object@qPG@freqRep@B
+        # TODO: fix...
+        v <- getValues(object,
+            frequencies = frequencies,
+            levels.1 = levels.1,
+            levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=F]
+        uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
+              imaginary = quantile(Im(x),1-alpha/2))}
+        lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
+              imaginary = quantile(Im(x),alpha/2))}
+        
+        upperCIs <- apply(v, c(1,2,3), uQuantile)
+        lowerCIs <- apply(v, c(1,2,3), lQuantile)
+      }
       
       res <- list(lowerCIs = lowerCIs, upperCIs = upperCIs)
       return(res)
