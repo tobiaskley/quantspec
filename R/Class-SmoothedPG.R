@@ -509,7 +509,7 @@ setMethod(f = "getCoherencySdNaive",
         d2 <- 1:(dim(object@values)[4])
       }
       if (!hasArg(type)) {
-        impl <- "1"
+        type <- "1"
       }
       if (!hasArg(impl)) {
         impl <- "R"
@@ -1658,7 +1658,7 @@ setMethod(f = "getCoherencyPointwiseCIs",
                 frequencies = frequencies,
                 levels.1 = levels.1,
                 levels.2 = levels.2,
-                d1 = d1, d2 = d2)},
+                d1 = d1, d2 = d2, type="1")},
           "boot.sd" = {
             sdEstim <- getSdBoot(object,
                 frequencies = frequencies,
