@@ -94,6 +94,6 @@ setMethod(
   }
   
 
-  
-  return(new("ClippedCov",Y=Y ,maxLag=maxLag ,levels.1=levels.1 ,levels.2=levels.2,isRankBased = isRankBased))
+  obj = new("ClippedCov",Y=Y ,maxLag=maxLag ,levels.1=levels.1 ,levels.2=levels.2,isRankBased = isRankBased)
+  return(obj)
 }

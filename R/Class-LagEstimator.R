@@ -23,11 +23,19 @@ NULL
 #' @slot weight a \code{\link{Weight}} object to be used as lag window
 #' @slot lagOp a \code{\link{LagOperator}} object that determines which
 #'             kind of bivariate structure should be calculated.
+#' @slot env An environment to allow for slots which need to be
+#'       accessable in a call-by-reference manner:
+#'       \describe{
+#'         \item{\code{sdNaive}}{An array used for storage of the naively
+#'             estimated standard deviations of the smoothed periodogram.}
+#'         \item{\code{sdNaive.done}}{a flag indicating whether \code{sdNaive}
+#'             has been set yet.}}
 #'
 ################################################################################
 setClass(
   Class = "LagEstimator",
   representation=representation(
+    env = "environment",
     Y = "numeric",
     weight = "Weight",
     lagOp = "LagOperator"   
@@ -39,9 +47,9 @@ setMethod(
   f = "initialize",
   signature = "LagEstimator",
   definition = function(.Object, Y,frequencies,lagOp,weight){
-   
-    levels.1 = getLevels(lagOp,1)
-    levels.2 = getLevels(lagOp,2)
+    
+     levels.1 = lagOp@levels.1
+     levels.2 = lagOp@levels.2
     
     .Object@Y = Y
     .Object@frequencies = frequenciesValidator(frequencies, length(Y), steps=1:6)
@@ -49,6 +57,10 @@ setMethod(
     .Object@levels[[2]] = levels.2
     .Object@weight = weight
     .Object@lagOp = lagOp
+    .Object@env <- new.env(parent=emptyenv())
+    .Object@env$sdNaive.done <- FALSE
+    
+    .Object@env$sdNaive <- array()
     
     levels.all = union(levels.1,levels.2)
     ln1 = length(levels.1)
@@ -209,6 +221,273 @@ setMethod(f = "getValues",
           }
 )
 
+################################################################################
+#' Get estimates for the standard deviation of the lagEstimator derived from
+#' the asymptotics (see Birr et al (2015))
+#'
+#' Determines and returns an array of dimension \code{[J,K1,K2]},
+#' where \code{J=length(frequencies)}, \code{K1=length(levels.1)}, and
+#' \code{K2=length(levels.2))}.
+#' At position \code{(j,k1,k2)} the returned value is the standard deviation 
+#' estimated corresponding to \code{frequencies[j]}, \code{levels.1[k1]} and 
+#' \code{levels.2[k2]} that are closest to the \code{frequencies}, \code{levels.1}
+#' and \code{levels.2} available in \code{object}; \code{\link{closest.pos}} is 
+#' used to determine what closest to means.
+#'
+#' Requires that the \code{\link{LagEstimator}} is available at all Fourier
+#' frequencies from \eqn{(0,\pi]}{(0,pi]}. If this is not the case the missing
+#' values are imputed by taking one that is available and has a frequency
+#' that is closest to the missing Fourier frequency; \code{closest.pos} is used
+#' to determine which one this is.
+#'
+#' Note the ``standard deviation'' estimated here is not the square root of the
+#' complex-valued variance. It's real part is the square root of the variance
+#' of the real part of the estimator and the imaginary part is the square root
+#' of the imaginary part of the variance of the estimator.
+#'
+#' @name getSdNaive-LagEstimator
+#' @aliases getSdNaive,LagEstimator-method
+#'
+#' @keywords Access-functions
+#'
+#' @param object \code{\link{LagEstimator}} of which to get the estimates for the
+#'                standard deviation.
+#' @param frequencies a vector of frequencies for which to get the result
+#' @param levels.1 the first vector of levels for which to get the result
+#' @param levels.2 the second vector of levels for which to get the result
+#' 
+#'
+#' @return Returns the estimate described above.
+#'
+################################################################################
+setMethod(f = "getSdNaive",
+          signature = signature(
+            object = "LagEstimator"),
+          definition = function(object,
+                                frequencies=2*pi*(0:(length(object@Y)-1))/length(object@Y),
+                                levels.1=getLevels(object,1),
+                                levels.2=getLevels(object,2)) {
+            
+            if (class(object@weight) != "LagKernelWeight") {
+              stop("getSdNaive currently only available for 'LagKernelWeight'.")
+            }
+            
+            
+            objLevels1 <- object@levels[[1]]
+            objLevels2 <- object@levels[[2]]
+            Y <- object@Y
+            # workaround: default values don't seem to work for generic functions?
+            if (!hasArg(frequencies)) {
+              frequencies <- 2*pi*(0:(length(Y)-1))/length(Y)
+            }
+            if (!hasArg(levels.1)) {
+              levels.1 <- objLevels1
+            }
+            if (!hasArg(levels.2)) {
+              levels.2 <- objLevels2
+            }
+            # end: workaround
+            
+            if (object@env$sdNaive.done == FALSE) {
+              
+              weight <- object@weight
+              Bn = weight@bw
+              N <- length(Y)
+              K1 <- length(objLevels1)
+              K2 <- length(objLevels2)
+               
+                V <- getValues(object, frequencies = 2*pi*(1:(N-1))/N)    
+                Sigma <- array(0,dim=c(N-1,K1,K2))
+                K_Int = integrate(function(x){getW(weight)(x)^2},lower = -1, upper = 1)$value
+                #print(K_Int)
+                for(k1 in 1:K1){
+                  for(k2 in k1:K2){
+                    Sigma[,k1,k2] = sqrt(K_Int*Re(V[,k1,k1])*Re(V[,k2,k2]))
+                    Sigma[,k2,k1] = Sigma[,k1,k2]
+                  }
+                }
+                
+              object@env$sdNaive.done <- TRUE
+              object@env$sdNaive <- sqrt(Bn/N)*(Re(Sigma)>0)*(complex(real = Re(Sigma),imaginary = Re(Sigma)))
+            } # End of 'if (object@env$sdNaive.done == FALSE) {'
+            
+            resObj <- object@env$sdNaive
+            ##############################
+            ## (Similar) Code also in Class-FreqRep!!!
+            ##############################
+            
+            # Transform all frequencies to [0,2pi)
+            frequencies <- frequencies %% (2*pi)
+            
+            # Create an aux vector with all available frequencies
+            oF <- object@frequencies
+            f <- frequencies
+            
+            # returns TRUE if x c y
+            subsetequal.approx <- function(x,y) {
+              X <- round(x, .Machine$double.exponent-2)
+              Y <- round(y, .Machine$double.exponent-2)
+              return(setequal(X,intersect(X,Y)))
+            }
+            
+            C1 <- subsetequal.approx(f[f <= pi], oF)
+            C2 <- subsetequal.approx(f[f > pi], 2*pi - oF[which(oF != 0 & oF != pi)])
+            
+            # Ist dann der Fall wenn die frequencies nicht geeignete FF sind!!
+            if (!(C1 & C2)) {
+              warning("Not all 'values' for 'frequencies' requested were available. 'values' for the next available Fourier frequencies are returned.")
+            }
+            
+            # Select columns
+            c.1.pos <- closest.pos(objLevels1,levels.1)
+            c.2.pos <- closest.pos(objLevels2,levels.2)
+            
+            # Select rows
+            r1.pos <- closest.pos(oF,f[f <= pi])
+            r2.pos <- closest.pos(-1*(2*pi-oF),-1*f[f > pi])
+            
+            J <- length(frequencies)
+            K1 <- length(levels.1)
+            K2 <- length(levels.2)
+            res <- array(dim=c(J, K1, K2))
+            
+            if (length(r1.pos) > 0) {
+              res[1:length(r1.pos),,] <- resObj[r1.pos,c.1.pos,c.2.pos]
+            }
+            if (length(r2.pos) > 0) {
+              res[(length(r1.pos)+1):J,,] <- Conj(resObj[r2.pos,c.1.pos,c.2.pos])
+            }
+            
+            return(res)
+          }
+)
+
+################################################################################
+#' Get pointwise confidence intervals for the quantile spectral density kernel
+#'
+#' Returns a list of two arrays \code{lowerCIs} and \code{upperCIs} that contain
+#' the upper and lower limits for a level \code{1-alpha} confidence interval of
+#' the copula spectral density kernel. Each array is of dimension \code{[J,K1,K2]},
+#' where \code{J=length(frequencies)}, \code{K1=length(levels.1)}, and
+#' \code{K2=length(levels.2))}.
+#' At position \code{(j,k1,k2)} the real (imaginary) part of the returned values
+#' are the bounds of the confidence interval for the the real (imaginary) part
+#' of the quantile spectrum, which corresponds to
+#' \code{frequencies[j]}, \code{levels.1[k1]} and \code{levels.2[k2]} closest
+#' to the Fourier frequencies, \code{levels.1} and \code{levels.2}
+#' available in \code{object}; \code{\link{closest.pos}} is used to determine
+#' what closest to means.
+#'
+#' Currently, only one \code{type} of confidence interval is
+#' available:
+#' \itemize{
+#'   \item \code{"naive.sd"}: confidence intervals based on the asymptotic
+#'           normality of the lag-window estimator; standard deviations
+#'           are estimated using \code{\link{getSdNaive}}.
+#'  }
+#'
+#' @name getPointwiseCIs-LagEstimator
+#' @aliases getPointwiseCIs,LagEstimator-method
+#'
+#' @keywords Access-functions
+#'
+#' @param object \code{LagEstimator} of which to get the confidence intervals
+#' @param frequencies a vector of frequencies for which to get the result
+#' @param levels.1 the first vector of levels for which to get the result
+#' @param levels.2 the second vector of levels for which to get the result
+#' @param alpha the level of the confidence interval; must be from \eqn{(0,1)}
+#' @param type a flag indicating which type of confidence interval should be
+#'         returned; can only take one values at the moment.
+#'
+#' @return Returns a named list of two arrays \code{lowerCIS} and \code{upperCIs}
+#'          containing the lower and upper bounds for the confidence intervals.
+#'
+#' @examples
+#' lagEst <- lagEstimator(rnorm(2^10), levels.1=0.5)
+#' CI.upper <- Re(getPointwiseCIs(lagEst)$upperCIs[,1,1])
+#' CI.lower <- Re(getPointwiseCIs(lagEst)$lowerCIs[,1,1])
+#' freq = 2*pi*(0:1023)/1024
+#' plot(x = freq, y = rep(0.25/(2*pi),1024),
+#'    ylim=c(min(CI.lower), max(CI.upper)),
+#'    type="l", col="red") # true spectrum
+#' lines(x = freq, y = CI.upper)
+#' lines(x = freq, y = CI.lower)
+################################################################################
+setMethod(f = "getPointwiseCIs",
+          signature = signature(
+            object = "LagEstimator"),
+          definition = function(object,
+                                frequencies=2*pi*(0:(length(object@Y)-1))/length(object@Y),
+                                levels.1=getLevels(object,1),
+                                levels.2=getLevels(object,2),
+                                alpha=.1, type=c("naive.sd")) {
+            
+            # workaround: default values don't seem to work for generic functions?
+            if (!hasArg(frequencies)) {
+              frequencies <- 2*pi*(0:(length(object@Y)-1))/length(object@Y)
+            }
+            if (!hasArg(levels.1)) {
+              levels.1 <- object@levels[[1]]
+            }
+            if (!hasArg(levels.2)) {
+              levels.2 <- object@levels[[2]]
+            }
+            if (!hasArg(alpha)) {
+              alpha <- 0.1
+            }
+            if (!hasArg(type)) {
+              type <- "naive.sd"
+            }
+            # end: workaround
+            
+            type <- match.arg(type)[1]
+            switch(type,
+                   "naive.sd" = {
+                     sdEstim <- getSdNaive(object,
+                                           frequencies = frequencies,
+                                           levels.1 = levels.1,
+                                           levels.2 = levels.2)},
+                   "boot.sd" = {
+                     sdEstim <- getSdBoot(object,
+                                          frequencies = frequencies,
+                                          levels.1 = levels.1,
+                                          levels.2 = levels.2)}
+            )
+            
+            J <- length(frequencies)
+            K1 <- length(levels.1)
+            K2 <- length(levels.2)
+            
+            
+            if (type == "naive.sd" || type == "boot.sd") {
+              v <- getValues(object,
+                             frequencies = frequencies,
+                             levels.1 = levels.1,
+                             levels.2 = levels.2)[,,]
+              upperCIs <- array(v + sdEstim * qnorm(1-alpha/2), dim = c(J, K1, K2))
+              lowerCIs <- array(v + sdEstim * qnorm(alpha/2), dim = c(J, K1, K2))
+            } else if (type == "boot.full") {
+              # TODO: Error Msg ausgeben falls B == 0
+              B <- object@qPG@freqRep@B
+              v <- getValues(object,
+                             frequencies = frequencies,
+                             levels.1 = levels.1,
+                             levels.2 = levels.2)[,,,2:(B+1), drop=F]
+              uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
+                                                imaginary = quantile(Im(x),1-alpha/2))}
+              lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
+                                                imaginary = quantile(Im(x),alpha/2))}
+              
+              upperCIs <- apply(v, c(1,2,3), uQuantile)
+              lowerCIs <- apply(v, c(1,2,3), lQuantile)
+            }
+            
+            res <- list(lowerCIs = lowerCIs, upperCIs = upperCIs)
+            return(res)
+          }
+)
+
+
   ################################################################################
   #' Create an instance of the \code{LagEstimator} class.
   #'
@@ -245,7 +524,7 @@ lagEstimator <- function(Y,
                          frequencies=2*pi/length(Y) * 0:(length(Y)-1),
                          levels.1 = .5,
                          levels.2 = levels.1,
-                         weight = lagKernelWeight(K = length(Y),bw = 25),
+                         weight = lagKernelWeight(K = length(Y),bw = 100),
                          type = c("clippedCov")
                          ){
   
@@ -261,7 +540,7 @@ lagEstimator <- function(Y,
     versConstr <- 1
     Y <- coredata(Y)
   } else if ( is(Y,"LagOperator")) {
-    LagOp = Y
+    lagOp = Y
     versConstr <- 2
     if (!hasArg(frequencies)) {
       Z <- Y@Y
@@ -311,7 +590,7 @@ lagEstimator <- function(Y,
 #' @param ptw.CIs the confidence level for the confidence intervals to be
 #'                 displayed; must be a number from [0,1]; if null, then no
 #'                 confidence intervals will be plotted.
-#'                 TO BE DONE!
+#'                 
 #' @param ratio quotient of width over height of the subplots; use this
 #'               parameter to produce landscape or portrait shaped plots.
 #' @param widthlab width for the labels (left and bottom); default is
@@ -331,6 +610,10 @@ lagEstimator <- function(Y,
 #'                      the values display in these subportion of plots. The
 #'                      option \code{"all"} will scale the subplots to the minimum and
 #'                      maximum in all of the subplots.
+#' @param type.CIs indicates the method to be used for determining the
+#'                 confidence intervals; the methods available are those
+#'                  provided by
+#'                 \code{\link{getPointwiseCIs-LagEstimator}}.
 #' @param frequencies a set of frequencies for which the values are to be
 #'                    plotted.
 #' @param levels a set of levels for which the values are to be plotted.
@@ -347,15 +630,19 @@ lagEstimator <- function(Y,
 setMethod(f = "plot",
           signature = signature("LagEstimator"),
           definition = function(x,
-                                ptw.CIs = 0, 
+                                ptw.CIs = 0.1, 
                                 ratio = 3/2, widthlab = lcm(1), xlab = expression(omega/2*pi), ylab = NULL,
                                 type.scaling = c("individual", "real-imaginary", "all"),
                                 frequencies=x@frequencies,
+                                type.CIs = c("naive.sd"),
                                 levels=intersect(x@levels[[1]], x@levels[[2]])) {
             
             def.par <- par(no.readonly = TRUE) # save default, for resetting...
             
             # workaround: default values don't seem to work for generic functions?
+            if (!hasArg(ptw.CIs)) {
+              ptw.CIs <- 0.1
+            }
             if (!hasArg(frequencies)) {
               frequencies <- x@frequencies
             }

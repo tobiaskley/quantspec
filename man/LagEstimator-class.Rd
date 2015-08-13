@@ -21,6 +21,14 @@ by the slot lagOp.
 
 \item{\code{lagOp}}{a \code{\link{LagOperator}} object that determines which
 kind of bivariate structure should be calculated.}
+
+\item{\code{env}}{An environment to allow for slots which need to be
+accessable in a call-by-reference manner:
+\describe{
+  \item{\code{sdNaive}}{An array used for storage of the naively
+      estimated standard deviations of the smoothed periodogram.}
+  \item{\code{sdNaive.done}}{a flag indicating whether \code{sdNaive}
+      has been set yet.}}}
 }}
 \keyword{S4-classes}
 

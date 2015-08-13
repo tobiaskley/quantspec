@@ -6,19 +6,18 @@
 \alias{plot-LagEstimator}
 \title{Plot the values of a \code{\link{LagEstimator}}.}
 \usage{
-\S4method{plot}{LagEstimator,ANY}(x, ptw.CIs = 0, ratio = 3/2,
+\S4method{plot}{LagEstimator,ANY}(x, ptw.CIs = 0.1, ratio = 3/2,
   widthlab = lcm(1), xlab = expression(omega/2 * pi), ylab = NULL,
   type.scaling = c("individual", "real-imaginary", "all"),
-  frequencies = x@frequencies, levels = intersect(x@levels[[1]],
-  x@levels[[2]]))
+  frequencies = x@frequencies, type.CIs = c("naive.sd"),
+  levels = intersect(x@levels[[1]], x@levels[[2]]))
 }
 \arguments{
 \item{x}{The \code{\link{LagEstimator}} object to plot}
 
 \item{ptw.CIs}{the confidence level for the confidence intervals to be
-displayed; must be a number from [0,1]; if null, then no
-confidence intervals will be plotted.
-TO BE DONE!}
+                displayed; must be a number from [0,1]; if null, then no
+                confidence intervals will be plotted.}
 
 \item{ratio}{quotient of width over height of the subplots; use this
 parameter to produce landscape or portrait shaped plots.}
@@ -46,6 +45,11 @@ maximum in all of the subplots.}
 
 \item{frequencies}{a set of frequencies for which the values are to be
 plotted.}
+
+\item{type.CIs}{indicates the method to be used for determining the
+confidence intervals; the methods available are those
+ provided by
+\code{\link{getPointwiseCIs-LagEstimator}}.}
 
 \item{levels}{a set of levels for which the values are to be plotted.}
 }
