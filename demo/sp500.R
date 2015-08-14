@@ -1,7 +1,7 @@
 ################################################################################
 # Analysis of the S&P 500 stock index, 2004-2006:
 # -----------------------------------------------
-# In this demo the S&P 500 time series is analysed ans some features are
+# In this demo the S&P 500 time series is analyzed and some features are
 # explained.
 ################################################################################
 
@@ -43,6 +43,16 @@ plot(sPG, levels=c(0.05,0.5,0.95), type.scaling="individual",
 # This becomes even more evident when the same scaling for
 # real and imaginary parts is used;
 # for a change plot confidence intervals determined from the
-# bootstraped estimator. 
+# bootstrapped estimator. 
 plot(sPG, levels=c(0.05,0.5,0.95), type.scaling="real-imaginary",
     frequencies=f, ptw.CIs = 0.1, type.CIs="boot.full")
+
+# We can also estimate the spectra using a lag-window type estimator,
+# based on Clipped Covariances. The main difference is that smoothing
+# is applied in the time domain. 
+lagOp <- clippedCov(Y,levels.1 = c(0.05,0.5,0.95))
+weight <- lagKernelWeight(W = WParzen,  bw = 25, K = length(Y))
+lagEst <- lagEstimator(lagOp,weight = weight) 
+plot(lagEst,ptw.CIs = 0.1,levels = c(0.05,0.5,0.95),type.scaling= "individual",type.CIs = "naive.sd")
+
+
