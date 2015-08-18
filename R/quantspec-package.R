@@ -12,7 +12,7 @@ NULL
 #'    \cr Package: \tab quantspec
 #'    \cr Type:    \tab Package
 #'    \cr Version: \tab 1.0-3.99
-#'    \cr Date:    \tab 2015-03-26
+#'    \cr Date:    \tab 2015-08-18
 #'    \cr License: \tab GPL (>= 2)
 #'  }
 #'

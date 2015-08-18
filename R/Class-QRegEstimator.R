@@ -53,6 +53,7 @@ setClass(
 )
 
 #' @importFrom quantreg rq
+#' @importFrom snowfall sfLapply
 setMethod(
     f = "initialize",
     signature = "QRegEstimator",

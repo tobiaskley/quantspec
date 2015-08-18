@@ -34,7 +34,7 @@ W0 <- function(x){
 #' plot(x=seq(-8,8,0.05), y=W1(seq(-8,8,0.05)), type="l")
 ################################################################################
 W1 <- function(x){
-  W1.simple <- function(x) {if (abs(x) <= pi) {1/pi * .75*(1-(x/pi)^2)/pi } else {0}}
+  W1.simple <- function(x) {if (abs(x) <= pi) {.75*(1-(x/pi)^2)/pi } else {0}}
   return(Vectorize(W1.simple)(x))
 }
 

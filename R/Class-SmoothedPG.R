@@ -81,7 +81,7 @@ setMethod(
       } else if (class(weight) == "SpecDistrWeight") {
         freq <- frequenciesValidator(frequencies, N, steps=c(1:3,5:6))
       } else {
-        error("Cannot handle this type of Weight object.")
+        stop("Cannot handle this type of Weight object.")
       }
 
       .Object@frequencies <- freq

@@ -117,7 +117,7 @@ setMethod(f = "getLevels",
               return(levels)
             } else {
               if (!(j==1 | j==2)) {
-                error("Index needs to be either 1 or 2.")
+                stop("Index needs to be either 1 or 2.")
               } else {
                 if(j==1){return(object@levels.1)}
                 if(j==2){return(object@levels.2)}
