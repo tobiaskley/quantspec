@@ -8,9 +8,10 @@ NULL
 #' \code{Weights} is an S4 class that provides a common interface to
 #' implementations of a weighting function \eqn{W_n(\omega)}{Wn(w)}.
 #'
-#' Currently two implementations are available:
-#'     (1) \code{\link{KernelWeight}} and
-#'     (2) \code{\link{SpecDistrWeight}}.
+#' Currently three implementations are available:
+#'     (1) \code{\link{KernelWeight}},
+#'     (2) \code{\link{LagKernelWeight}} and
+#'     (3) \code{\link{SpecDistrWeight}}.
 #'
 #' @name Weight-class
 #' @aliases Weight

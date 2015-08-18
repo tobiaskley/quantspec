@@ -9,15 +9,11 @@ using namespace Rcpp;
 ComplexVector computeSdNaive(ComplexVector V, NumericVector W);
 RcppExport SEXP quantspec_computeSdNaive(SEXP VSEXP, SEXP WSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< ComplexVector >::type V(VSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type W(WSEXP );
-        ComplexVector __result = computeSdNaive(V, W);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< ComplexVector >::type V(VSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type W(WSEXP);
+    __result = Rcpp::wrap(computeSdNaive(V, W));
+    return __result;
 END_RCPP
 }
