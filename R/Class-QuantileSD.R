@@ -100,6 +100,8 @@ setClass(
 #'
 #' @name increasePrecision-QuantileSD
 #' @aliases increasePrecision,QuantileSD-method
+#' 
+#' @importFrom stats smooth.spline
 #'
 #' @param object The \code{\link{QuantileSD}} of which to increase the precision.
 #' @param R value of which to enlarge R
@@ -548,6 +550,9 @@ setMethod(f = "getQuantilePG",
 #' @name QuantileSD-constructor
 #' @aliases quantileSD
 #' @export
+#' 
+#' @importFrom stats rnorm
+#' @importFrom stats runif
 #'
 #' @keywords Constructors
 #'

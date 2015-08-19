@@ -9,6 +9,9 @@
 #' @name ts-models-QAR1
 #' @aliases QAR1
 #' @export
+#' 
+#' @importFrom stats qnorm
+#' @importFrom stats runif
 #'
 #' @param n length of the time series to be returned
 #' @param th1 parameter function with one argument \code{u} defined on
@@ -43,6 +46,8 @@ QAR1 <- function(n,th1=function(u){1.9*((u-0.5))}, overhead=1000, th0=qnorm) {
 #' @name ts-models-AR1
 #' @aliases AR1
 #' @export
+#' 
+#' @importFrom stats rnorm
 #'
 #' @param n length of the time series to be returned
 #' @param a parameter of the model
@@ -78,6 +83,8 @@ AR1 <- function(n,a,overhead=500,innov=rnorm) {
 #' @name ts-models-AR2
 #' @aliases AR2
 #' @export
+#' 
+#' @importFrom stats rnorm
 #'
 #' @param n length of the time series to be returned
 #' @param a1 parameter
@@ -113,6 +120,8 @@ AR2 <- function(n,a1,a2,overhead=500,innov=rnorm) {
 #' @name ts-models-ARCH1
 #' @aliases ARCH1
 #' @export
+#' 
+#' @importFrom stats rnorm
 #'
 #' @param n length of the time series to be returned
 #' @param a0 parameter
@@ -148,8 +157,9 @@ ARCH1 <- function(n,a0,a1,overhead=500,innov = rnorm) {
 #'
 #' @name ts-models
 #' @aliases ts1
-#'
 #' @export
+#' 
+#' @importFrom stats qnorm
 #'
 #' @param n length of the time series to be returned
 #'
@@ -163,8 +173,6 @@ ARCH1 <- function(n,a0,a1,overhead=500,innov = rnorm) {
 #' # Plot sample paths:
 #' plot(ts1(100), type="l")
 ################################################################################
-
-
 ts1 <- function(n){QAR1(n,th0=function(x){0.1*qnorm(x)})}
 
 ################################################################################
@@ -174,6 +182,8 @@ ts1 <- function(n){QAR1(n,th0=function(x){0.1*qnorm(x)})}
 #' @name ts-models
 #' @aliases ts2
 #' @export
+#' 
+#' @importFrom stats rnorm
 #'
 #' @references
 #' Li, T.-H. (2012). Quantile Periodograms.
@@ -200,6 +210,8 @@ ts2 <- function(n){
 #' @name ts-models
 #' @aliases ts3
 #' @export
+#' 
+#' @importFrom stats rnorm
 #'
 #' @references
 #' Lee, J., & Subba Rao, S. (2012).

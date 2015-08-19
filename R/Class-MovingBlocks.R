@@ -55,6 +55,8 @@ setMethod(
 #'
 #' @name getPositions-MovingBlocks
 #' @aliases getPositions,MovingBlocks-method
+#' 
+#' @importFrom stats runif
 #'
 #' @param object a \code{MovingBlocks} object; used to specify the parameters
 #'                \code{N}, \code{l} and the type of the bootstrap.

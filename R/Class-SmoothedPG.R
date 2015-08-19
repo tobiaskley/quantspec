@@ -50,6 +50,7 @@ setClass(
     contains = "QSpecQuantity"
 )
 
+#' @importFrom stats convolve
 setMethod(
     f = "initialize",
     signature = "SmoothedPG",
@@ -525,6 +526,8 @@ setMethod(f = "getSdNaive",
 #'
 #' @name getSdBoot-SmoothedPG
 #' @aliases getSdBoot,SmoothedPG-method
+#' 
+#' @importFrom stats sd
 #'
 #' @keywords Access-functions
 #'
@@ -613,6 +616,9 @@ setMethod(f = "getSdBoot",
 #'
 #' @name getPointwiseCIs-SmoothedPG
 #' @aliases getPointwiseCIs,SmoothedPG-method
+#' 
+#' @importFrom stats qnorm
+#' @importFrom stats quantile
 #'
 #' @keywords Access-functions
 #'
@@ -923,6 +929,7 @@ smoothedPG <- function(
 #' @export
 #'
 #' @importFrom abind abind
+#' @importFrom grDevices gray
 #'
 #' @param x  The \code{\link{SmoothedPG}} object to plot
 #' @param plotPG a flag indicating weater the \code{QuantilePG} object

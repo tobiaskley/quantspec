@@ -38,11 +38,13 @@ setClass(
     env = "environment",
     Y = "numeric",
     weight = "Weight",
-    lagOp = "LagOperator"   
+    lagOp = "LagOperator"
   ),
   contains = "QSpecQuantity"
 )
 
+#' @importFrom stats quantile
+#' @importFrom stats fft
 setMethod(
   f = "initialize",
   signature = "LagEstimator",
@@ -247,6 +249,8 @@ setMethod(f = "getValues",
 #'
 #' @name getSdNaive-LagEstimator
 #' @aliases getSdNaive,LagEstimator-method
+#' 
+#' @importFrom stats integrate
 #'
 #' @keywords Access-functions
 #'
@@ -389,6 +393,9 @@ setMethod(f = "getSdNaive",
 #' @name getPointwiseCIs-LagEstimator
 #' @aliases getPointwiseCIs,LagEstimator-method
 #'
+#' @importFrom stats qnorm
+#' @importFrom stats quantile
+#' 
 #' @keywords Access-functions
 #'
 #' @param object \code{LagEstimator} of which to get the confidence intervals

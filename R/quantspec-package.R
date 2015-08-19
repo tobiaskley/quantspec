@@ -11,21 +11,29 @@ NULL
 #'  \tabular{ll}{
 #'    \cr Package: \tab quantspec
 #'    \cr Type:    \tab Package
-#'    \cr Version: \tab 1.0-3.99
-#'    \cr Date:    \tab 2015-08-18
+#'    \cr Version: \tab 1.1-0
+#'    \cr Date:    \tab 2015-08-19
 #'    \cr License: \tab GPL (>= 2)
 #'  }
 #'
 #' @section Contents:
-#' The \pkg{quantspec} package contains an hierachy of S4 classes with
+#' The \pkg{quantspec} package contains a hierachy of S4 classes with
 #' corresponding methods and functions serving as constructors. The following
 #' class diagrams provide an overview on the structure of the package. In the
-#' first class diagram the classes implementing the estimators are implemented.
+#' first and second class diagram the classes implementing the estimators are
+#' shown. In the first diagram the classes related to periodogram-based
+#' estimation are displayed:  
 #'
 #' \if{html}{\figure{main.png}{options: width=960}}
 #' \if{latex}{\figure{main.pdf}{options: width=15cm}}
+#' 
+#' In the second diagram the classes related to lag window-based
+#' estimation are displayed:
+#' 
+#' \if{html}{\figure{main2.png}{options: width=960}}
+#' \if{latex}{\figure{main2.pdf}{options: width=10cm}}
 #'
-#' In the second class diagram the classes implementing model quantities are
+#' In the third class diagram the classes implementing model quantities are
 #' displayed. A relation to the ``empirical classes'' is given via the fact that
 #' the quantile spectral densities are computed by simulation of quantile
 #' periodograms and a common abstract superclass \code{QSpecQuantity} which

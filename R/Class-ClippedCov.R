@@ -15,7 +15,7 @@ NULL
 #'
 #' @keywords S4-classes
 #'
-#' 
+#'
 #'
 ################################################################################
 
@@ -24,6 +24,8 @@ setClass(
   contains = "LagOperator"
 )
 
+#' @importFrom stats quantile
+#' @importFrom stats acf
 setMethod( 
   f = "initialize",
   signature = "ClippedCov",
