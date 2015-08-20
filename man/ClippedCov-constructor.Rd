@@ -6,7 +6,8 @@
 \title{Create an instance of the \code{\link{ClippedCov}} class.}
 \usage{
 clippedCov(Y, maxLag = length(Y) - 1, levels.1 = c(0.5),
-  levels.2 = levels.1, isRankBased = TRUE)
+  levels.2 = levels.1, isRankBased = TRUE, B = 0, l = 0,
+  type.boot = c("none", "mbb"))
 }
 \arguments{
 \item{Y}{Time series to calculate the copula covariance from}
@@ -18,6 +19,15 @@ clippedCov(Y, maxLag = length(Y) - 1, levels.1 = c(0.5),
 \item{levels.2}{a vector of numerics that determines the level of clipping}
 
 \item{isRankBased}{If true the time series is first transformed to pseudo data.}
+
+\item{B}{number of bootstrap replications}
+
+\item{l}{(expected) length of blocks}
+
+\item{type.boot}{A flag to choose a method for the block bootstrap; currently
+                 two options are implemented: \code{"none"} and \code{"mbb"}
+                 which means to do a moving blocks  bootstrap with \code{B}
+                 and \code{l} as specified.}
 }
 \value{
 Returns an instance of \code{ClippedCov}.
@@ -29,7 +39,7 @@ Create an instance of the \code{\link{ClippedCov}} class.
 ccf <- clippedCov(rnorm(100), maxLag = 10, levels.1 =c(0.1,0.5,0.9))
 dim(getValues(ccf))
 #print values for levels (.5,.5)
-print(getValues(ccf)[,2,2])
+print(getValues(ccf)[,2,2,1])
 }
 \seealso{
 \code{\link{LagOperator}}

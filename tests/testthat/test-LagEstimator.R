@@ -63,7 +63,7 @@ test_that("lagEstimator works as expected",{
     }
   }
   
-  expect_equal(dim(V),c(100,3,3))
-  expect_equal(V,res)
+  expect_equal(dim(V),c(100,3,3,1))
+  expect_equal(V[,,,1],res)
 }
 )

@@ -7,7 +7,9 @@
 \alias{getDescr}
 \alias{getFrequencies}
 \alias{getIsRankBased}
+\alias{getLagOperator}
 \alias{getLevels}
+\alias{getMaxLag}
 \alias{getMeanPG}
 \alias{getN}
 \alias{getParallel}
@@ -31,6 +33,10 @@ getValues(object, ...)
 getIsRankBased(object, ...)
 
 getB(object, ...)
+
+getLagOperator(object, ...)
+
+getMaxLag(object, ...)
 
 getParallel(object, ...)
 

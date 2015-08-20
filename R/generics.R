@@ -45,6 +45,24 @@ setGeneric("getB",
     function(object, ...){standardGeneric("getB")})
 
 
+## Class-LagEstimator
+
+#' @name generics-accessors
+#' @aliases getLagOperator
+#' @export
+setGeneric("getLagOperator",
+    function(object, ...){standardGeneric("getLagOperator")})
+
+
+## Class-LagOperator
+
+#' @name generics-accessors
+#' @aliases getMaxLag
+#' @export
+setGeneric("getMaxLag",
+    function(object, ...){standardGeneric("getMaxLag")})
+
+
 ## Class-QRegEstimator
 
 #' @name generics-accessors

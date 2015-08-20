@@ -10,7 +10,7 @@ periodogram.}
 \S4method{getSdNaive}{SmoothedPG}(object, frequencies = 2 * pi *
   (0:(length(object@qPG@freqRep@Y) - 1))/length(object@qPG@freqRep@Y),
   levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2),
-  impl = c("R", "C"))
+  impl = c("C", "R"))
 }
 \arguments{
 \item{object}{\code{\link{SmoothedPG}} of which to get the estimates for the

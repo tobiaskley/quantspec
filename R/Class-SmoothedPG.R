@@ -329,7 +329,7 @@ setMethod(f = "getSdNaive",
         frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2),
-        impl=c("R","C")) {
+        impl=c("C","R")) {
 
       if (class(getWeight(object)) != "KernelWeight") {
         stop("getSdNaive currently only available for 'KernelWeight'.")
@@ -549,7 +549,7 @@ setMethod(f = "getSdBoot",
         levels.2=getLevels(object,2)) {
 
       if (class(getWeight(object)) != "KernelWeight") {
-        stop("getSdNaive currently only available for 'KernelWeight'.")
+        stop("getSdBoot currently only available for 'KernelWeight'.")
       }
 
       # workaround: default values don't seem to work for generic functions?
@@ -564,7 +564,7 @@ setMethod(f = "getSdBoot",
       }
       # end: workaround
 
-      if (dim(object@env$sdBoot) == 1) {
+      #if (object@env$sdBoot.done) {
 
         complex.var <- function(x) {
           return(complex(real = sd(Re(x)), imaginary = sd(Im(x))))
@@ -578,7 +578,8 @@ setMethod(f = "getSdBoot",
         v <- getValues(object, frequencies = frequencies,
             levels.1 = levels.1, levels.2 = levels.2)[,,,2:(B+1), drop=F]
         object@env$sdBoot <- apply(v, c(1,2,3), complex.var)
-      }
+      #  object@env$sdBoot.done <- TRUE
+      #}
       return(object@env$sdBoot)
     }
 )
@@ -703,7 +704,7 @@ setMethod(f = "getPointwiseCIs",
         v <- getValues(object,
             frequencies = frequencies,
             levels.1 = levels.1,
-            levels.2 = levels.2)[,,,2:(B+1), drop=F]
+            levels.2 = levels.2)[,,,2:(B+1), drop=FALSE]
         uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
               imaginary = quantile(Im(x),1-alpha/2))}
         lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),

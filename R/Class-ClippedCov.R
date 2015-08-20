@@ -14,9 +14,7 @@ NULL
 #' @aliases ClippedCov
 #'
 #' @keywords S4-classes
-#'
-#'
-#'
+#' 
 ################################################################################
 
 setClass(
@@ -29,15 +27,18 @@ setClass(
 setMethod( 
   f = "initialize",
   signature = "ClippedCov",
-  definition = function(.Object,Y,maxLag,levels.1,levels.2,isRankBased) {
+  definition = function(.Object, Y, maxLag, levels.1, levels.2, isRankBased, positions.boot, B) {
+    
     .Object@maxLag = maxLag
     .Object@levels.1 = levels.1
     .Object@levels.2 = levels.2
     .Object@Y = Y
+    .Object@positions.boot <- positions.boot
+    .Object@B <- B
     
-    n = length(Y)
-    ln.1 = length(levels.1)
-    ln.2 = length(levels.2)
+    n <- length(Y)
+    ln.1 <- length(levels.1)
+    ln.2 <- length(levels.2)
     levels.all = union(levels.1,levels.2)
     ln = length(levels.all)
     
@@ -48,14 +49,29 @@ setMethod(
     }
     
     
-    Clipped <- matrix(0, nrow=n, ncol=ln)
+    Clipped <- array(0, dim = c(n, ln, B+1))
     for (l in 1:ln) {
-      Clipped[,l] <- (Y <= Q[l]) - levels.all[l] 
+      Clipped[,l,1] <- (Y <= Q[l]) - levels.all[l] 
     }
+    if (B > 0) {
+      pos.boot <- getPositions(.Object@positions.boot,B)
+      for (b in 1:B) {
+        Clipped[,,b+1] <- Clipped[pos.boot[,b],,1]
+      }
+    }
+    
     pos.1 = match(levels.1,levels.all)
     pos.2 = match(levels.2,levels.all)
     
-    .Object@values = array(acf(Clipped,type="covariance", lag.max = maxLag, plot = FALSE, demean = FALSE)$acf[,pos.1,pos.2],dim = c(n,max(ln.1,1),max(ln.2,1)))
+    val <- array(dim = c(n, max(ln.1,1), max(ln.2,1), B+1))
+    
+    for (b in 0:B) {
+      val[,,,b+1] = array(acf(Clipped[,,b+1], type="covariance", lag.max = maxLag, plot = FALSE, demean = FALSE)$acf[,pos.1,pos.2],
+          dim = c(n, max(ln.1,1), max(ln.2,1)))
+    }
+    
+    .Object@values = val
+    
     return(.Object) 
   })
 
@@ -73,6 +89,12 @@ setMethod(
 #' @param levels.1 a vector of numerics that determines the level of clipping
 #' @param levels.2 a vector of numerics that determines the level of clipping
 #' @param isRankBased If true the time series is first transformed to pseudo data.
+#' @param B number of bootstrap replications
+#' @param l (expected) length of blocks
+#' @param type.boot A flag to choose a method for the block bootstrap; currently
+#'                  two options are implemented: \code{"none"} and \code{"mbb"}
+#'                  which means to do a moving blocks  bootstrap with \code{B}
+#'                  and \code{l} as specified.
 #' 
 #' @return Returns an instance of \code{ClippedCov}.
 #'
@@ -82,10 +104,17 @@ setMethod(
 #' ccf <- clippedCov(rnorm(100), maxLag = 10, levels.1 =c(0.1,0.5,0.9))
 #' dim(getValues(ccf))
 #' #print values for levels (.5,.5)
-#' print(getValues(ccf)[,2,2])
+#' print(getValues(ccf)[,2,2,1])
 
 ################################################################################
-  clippedCov <- function(Y,maxLag = length(Y) - 1,levels.1 = c(.5),levels.2 = levels.1,isRankBased = TRUE){
+clippedCov <- function( Y,
+    maxLag = length(Y) - 1,
+    levels.1 = c(.5),
+    levels.2 = levels.1,
+    isRankBased = TRUE,
+    B = 0,
+    l = 0,
+    type.boot = c("none","mbb")){
     
   if(!(maxLag < length(Y)))
   {maxLag = length(Y) - 1
@@ -95,7 +124,24 @@ setMethod(
     stop("'levels' needs to be specified as a vector of real numbers")
   }
   
-
-  obj = new("ClippedCov",Y=Y ,maxLag=maxLag ,levels.1=levels.1 ,levels.2=levels.2,isRankBased = isRankBased)
+  type.boot <- match.arg(type.boot, c("none","mbb"))[1]
+  switch(type.boot,
+      "none" = {
+        bootPos <- movingBlocks(length(Y),length(Y))},
+      "mbb" = {
+        bootPos <- movingBlocks(l,length(Y))}
+  )
+  
+  obj = new(
+      Class = "ClippedCov",
+      Y = Y,
+      maxLag = maxLag,
+      levels.1 = levels.1,
+      levels.2 = levels.2,
+      isRankBased = isRankBased,
+      B = B,
+      positions.boot = bootPos
+  )
+      
   return(obj)
 }

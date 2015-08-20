@@ -17,7 +17,8 @@ Currently one implementation is available:
 \section{Slots}{
 
 \describe{
-\item{\code{values}}{an array of dimension \code{c(maxLag,length(levels.1),length(levels.2))} containing the values of the operator.}
+\item{\code{values}}{an array of dimension \code{c(maxLag,length(levels.1),length(levels.2))}
+containing the values of the operator.}
 
 \item{\code{Y}}{is the time series the operator shall be applied to}
 
@@ -28,6 +29,12 @@ Currently one implementation is available:
 \item{\code{isRankBased}}{A flag that is \code{FALSE} if the determined \code{values}
 are based on the original time series and \code{TRUE} if it
 is based on the ranks.}
+
+\item{\code{positions.boot}}{An object of type \code{\link{BootPos}},
+that is used to determine the block bootstrapped
+replicates of the time series.}
+
+\item{\code{B}}{Number of bootstrap replications to perform.}
 }}
 \keyword{S4-classes}
 
