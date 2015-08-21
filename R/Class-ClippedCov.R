@@ -4,11 +4,18 @@
 NULL
 
 ################################################################################
-#' Class to calculate copula covariances from a time series with given levels. 
+#' Class to calculate copula covariances from a time series with given levels.
+#'  
 #' Calculates for each combination of levels \eqn{(\tau_1,\tau_2)}{(tau1,tau2)} 
-#' and for all \eqn{k< \code{maxLag}}{k<maxLag} the copula covariances
+#' and for all \eqn{k < \code{maxLag}}{k<maxLag} the copula covariances
 #' \eqn{Cov(1_{X_0 < \tau_1},1_{X_k < \tau_2})}{Cov(Ind{X0<tau1},Ind{Xk<tau2})}
 #' and writes it to \code{values[k]} from its superclass \code{\link{LagOperator}}.
+#' 
+#' For each lag \code{k = 0, ..., maxLag} and combination of levels
+#' \eqn{(\tau_1, \tau_2)}{(tau1, tau2)} from \code{levels.1 x levels.2} the
+#' statistic
+#' \deqn{\frac{1}{n} \sum_{t=1}^{n-k} ( I\{\hat F_n(Y_t) \leq \tau_1\} - \tau_1) ( I\{\hat F_n(Y_{t+k}) \leq \tau_2\} - \tau_2)}
+#' is determined and stored to the array \code{values}.
 #' 
 #' @name ClippedCov-class
 #' @aliases ClippedCov
@@ -45,7 +52,7 @@ setMethod(
     if(isRankBased){
       if(((max(levels.all) > 1) | (min(levels.all)<0)))
       {stop("all levels must be in [0,1] for a Ranked based estimation")}
-      Q = quantile(Y,probs = levels.all)
+      Q = quantile(Y, probs = levels.all)
     }
     
     
@@ -69,6 +76,7 @@ setMethod(
       val[,,,b+1] = array(acf(Clipped[,,b+1], type="covariance", lag.max = maxLag, plot = FALSE, demean = FALSE)$acf[,pos.1,pos.2],
           dim = c(n, max(ln.1,1), max(ln.2,1)))
     }
+    val <- aperm(val, c(1,3,2,4))
     
     .Object@values = val
     
@@ -88,7 +96,8 @@ setMethod(
 #' @param maxLag maximum lag between observations that should be used
 #' @param levels.1 a vector of numerics that determines the level of clipping
 #' @param levels.2 a vector of numerics that determines the level of clipping
-#' @param isRankBased If true the time series is first transformed to pseudo data.
+#' @param isRankBased If true the time series is first transformed to pseudo data;
+#' 										currently only rank-based estimation is possible.
 #' @param B number of bootstrap replications
 #' @param l (expected) length of blocks
 #' @param type.boot A flag to choose a method for the block bootstrap; currently
@@ -115,7 +124,11 @@ clippedCov <- function( Y,
     B = 0,
     l = 0,
     type.boot = c("none","mbb")){
-    
+  
+  if (!isRankBased) {
+    stop("non rank-based version currently not available")
+  }
+
   if(!(maxLag < length(Y)))
   {maxLag = length(Y) - 1
    warning("maxLag must be smaller then length of dataset, set to maximum")}

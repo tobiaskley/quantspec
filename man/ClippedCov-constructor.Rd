@@ -18,7 +18,8 @@ clippedCov(Y, maxLag = length(Y) - 1, levels.1 = c(0.5),
 
 \item{levels.2}{a vector of numerics that determines the level of clipping}
 
-\item{isRankBased}{If true the time series is first transformed to pseudo data.}
+\item{isRankBased}{If true the time series is first transformed to pseudo data;
+currently only rank-based estimation is possible.}
 
 \item{B}{number of bootstrap replications}
 
