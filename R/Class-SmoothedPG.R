@@ -28,6 +28,8 @@ NULL
 #'       \describe{
 #'         \item{\code{sdNaive}}{An array used for storage of the naively
 #'             estimated standard deviations of the smoothed periodogram.}
+#'         \item{\code{sdNaive.freq}}{a vector indicating for which frequencies
+#' 							\code{sdNaive} has been computed so far.}
 #'         \item{\code{sdNaive.done}}{a flag indicating whether \code{sdNaive}
 #'             has been set yet.}
 #'         \item{\code{sdBoot}}{An array used for storage of the standard
@@ -54,29 +56,31 @@ setMethod(
     f = "initialize",
     signature = "SmoothedPG",
     definition = function(.Object, qPG, weight, frequencies, levels) {
-
+      
       .Object@env <- new.env(parent=emptyenv())
-      .Object@env$sdNaive.done <- FALSE
-      .Object@env$sdCohNaive.done <- FALSE
-      #.Object@env$sdNaive.freq.done <- c()
+      # .Object@env$sdNaive.done <- FALSE
+      # .Object@env$sdCohNaive.done <- FALSE
+      .Object@env$sdNaive.freq <- c()
+      .Object@env$sdCohNaive.freq <- c()
+      
       #.Object@env$sdCohNaive.freq.done <- c()
       
       .Object@env$sdBoot.done <- FALSE
-
+      
       .Object@qPG <- qPG
       .Object@weight <- weight
-
-
+      
+      
       if (!(is.vector(frequencies)  && is.numeric(frequencies))) {
         stop("'frequencies' needs to be specified as a vector of real numbers")
       }
-
+      
       N <- lenTS(.Object@qPG@freqRep@Y)
-
+      
       .Object@levels <- levels
       K1 <- length(.Object@levels[[1]])
       K2 <- length(.Object@levels[[2]])
-
+      
       # Transform all frequencies to Fourier frequencies
       # and remove redundancies
       if (class(weight) == "KernelWeight") {
@@ -86,54 +90,53 @@ setMethod(
       } else {
         error("Cannot handle this type of Weight object.")
       }
-
+      
       .Object@frequencies <- freq
-
+      
       J <- length(freq)
-
+      
 #      N <- lenTS(Y)
 #      K1 <- length(objLevels1)
 #      K2 <- length(objLevels2)
 #      D1 <- length(d1)
 #      D2 <- length(d2)
-            
-      .Object@env$sdNaive <- array() # dim=c(floor(N/2)+1, D1, K1, D2, K2))
-      .Object@env$sdCohNaive <- array() # dim=c(floor(N/2)+1, D1, K1, D2, K2))
-      .Object@env$sigSq <- 0
-      .Object@env$sdBoot <- array()
-
-
+      
       B <- .Object@qPG@freqRep@B
       P <- dim(.Object@qPG@freqRep@Y)[2]
-
+      
+      .Object@env$sdNaive <- array(0, dim=c(floor(N/2)+1, P, K1, P, K2) )
+      .Object@env$sdCohNaive <- array(0, dim=c(floor(N/2)+1, P, K1, P, K2) ) # dim=c(floor(N/2)+1, D1, K1, D2, K2))
+      .Object@env$sdCohSqNaive <- array(0, dim=c(floor(N/2)+1, P, K1, P, K2) )
+      .Object@env$sigSq <- 0
+      .Object@env$sdBoot <- array()
+      
       .Object@values <- array(0, dim=c(J,P,K1,P,K2,B+1))
-
-
+      
       if (class(weight) == "KernelWeight") {
-
+        
         WW <- getValues(.Object@weight, N=N)
         Wnj <- weight@env$Wnj
-
+        
         II <- getValues(.Object@qPG, levels.1 = levels[[1]], levels.2 = levels[[2]])
         II <- array(II, dim = c(N,P,K1,P,K2,B+1))
         
         if (max(freq) > 0) {
-
+          
           # f performs convolution as defined in Brillinger (1975)
           f <- function(v) {
             A <- convolve(v[c(2:N,1)], rev(WW), type="c")[2:N]
             B <- WW[2:N] * v[1]
             return((A - B) / Wnj[1:(N-1)])
           }
-
+          
           res <- (2*pi/N) * apply(II, c(2,3,4,5,6), f)
-
+          
           posFreq <- freq[which(freq != 0)]
           pp <- round(N/(2*pi)*(posFreq %% (2*pi)))
-
+          
           .Object@values[which(freq != 0),,,,,] <- res[pp,,,,,]
         }
-
+        
         if (min(freq) == 0) {
           res <- apply(II, c(2,3,4,5,6), function(v) {sum(v[2:N]*rev(WW[2:N])) / Wnj[N]})
           .Object@values[which(freq == 0),,,,,] <- (2*pi/N) * res
@@ -141,7 +144,7 @@ setMethod(
         rm(II)
       } else if (class(weight) == "SpecDistrWeight") {
         if (max(freq) > 0) {
-
+          
           II <- getValues(.Object@qPG, frequencies = 2*pi*(1:(N-1))/N,
               levels.1 = levels[[1]], levels.2 = levels[[2]])
           #II <- array(II, dim = c(N,P,K1,P,K2,B+1))
@@ -155,7 +158,7 @@ setMethod(
           
           posFreq <- freq[which(freq != 0)]
           pp <- round(N/(2*pi)*(posFreq %% (2*pi)))
-
+          
           if (P == 1) {
             .Object@values[which(freq != 0),,,,,] <- res[pp,,,]
           } else {
@@ -163,7 +166,7 @@ setMethod(
           }
         }
       }
-
+      
       return(.Object)
     }
 )
@@ -213,7 +216,7 @@ setMethod(f = "getValues",
         levels.2=getLevels(object,2),
         d1 = 1:(dim(object@values)[2]),
         d2 = 1:(dim(object@values)[4])) {
-
+      
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
         frequencies <- 2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y)
@@ -231,46 +234,46 @@ setMethod(f = "getValues",
         d2 <- 1:(dim(object@values)[4])
       }
       # end: workaround
-
+      
       ##############################
       ## (Similar) Code also in Class-FreqRep!!!
       ## (Similar) Code also in Class-QuantileSD!!!
       ##############################
-
+      
       # Transform all frequencies to [0,2pi)
       frequencies <- frequencies %% (2*pi)
-
+      
       # Create an aux vector with all available frequencies
       oF <- object@frequencies
       f <- frequencies
-
+      
       # returns TRUE if x c y
       subsetequal.approx <- function(x,y) {
         X <- round(x, .Machine$double.exponent-2)
         Y <- round(y, .Machine$double.exponent-2)
         return(setequal(X,intersect(X,Y)))
       }
-
+      
       C1 <- subsetequal.approx(f[f <= pi], oF)
       C2 <- subsetequal.approx(f[f > pi], 2*pi - oF[which(oF != 0 & oF != pi)])
-
+      
       if (!(C1 & C2)) {
         warning("Not all 'values' for 'frequencies' requested were available. 'values' for the next available Fourier frequencies are returned.")
       }
-
+      
       # Select columns
       c.1.pos <- closest.pos(object@levels[[1]],levels.1)
       c.2.pos <- closest.pos(object@levels[[2]],levels.2)
-
+      
       if (!subsetequal.approx(levels.1, object@levels[[1]])) {
         warning("Not all 'values' for 'levels.1' requested were available. 'values' for the next available level are returned.")
       }
-
+      
       if (!subsetequal.approx(levels.2, object@levels[[2]])) {
         warning("Not all 'values' for 'levels.2' requested were available. 'values' for the next available level are returned.")
       }
-
-
+      
+      
       J <- length(frequencies)
       #D <- dim(object@values)[2]
       D1 <- length(d1)
@@ -278,21 +281,21 @@ setMethod(f = "getValues",
       K1 <- length(levels.1)
       K2 <- length(levels.2)
       res <- array(dim=c(J, D1, K1, D2, K2, object@qPG@freqRep@B+1))
-
-
+      
+      
       if (class(object@weight) == "KernelWeight") {
-
+        
         # Select rows
         r1.pos <- closest.pos(oF, f[f <= pi])
         r2.pos <- closest.pos(-1*(2*pi-oF),-1*f[f > pi])
-
+        
         if (length(r1.pos) > 0) {
           res[which(f <= pi),,,,,] <- object@values[r1.pos,d1,c.1.pos,d2,c.2.pos,]
         }
         if (length(r2.pos) > 0) {
           res[which(f > pi),,,,,] <- Conj(object@values[r2.pos,d1,c.1.pos,d2,c.2.pos,])
         }
-
+        
       } else if (class(object@weight) == "SpecDistrWeight") {
         # Select rows
         r.pos <- closest.pos(oF, f)
@@ -375,7 +378,7 @@ setMethod(f = "getCoherency",
         d2 <- 1:(dim(object@values)[4])
       }
       # end: workaround
-
+      
       J <- length(frequencies)
       #D <- dim(object@values)[2]
       D1 <- length(d1)
@@ -406,6 +409,7 @@ setMethod(f = "getCoherency",
       }
       final.dim.res <- c(final.dim.res,K2, object@qPG@freqRep@B+1)
       
+      res[is.nan(res)] <- NA
       res <- array(res, dim=final.dim.res)
       
       return(res)
@@ -522,9 +526,18 @@ setMethod(f = "getCoherencySdNaive",
       D1 <- length(d1)
       D2 <- length(d2)
       
-      # TODO: Make this work with type = 1 and type = 2
+      ## First determine which frequencies still have to be computed:
+      #  i. e. for which j is 2*pi*j / N is to be computed.
       
-      #if (object@env$sdCohNaive.done == FALSE) {
+      J.requested <- round(frequenciesValidator(frequencies, N = N) * N / (2*pi))  ## TODO: check if rounding required??
+      J.toCompute <- setdiff(J.requested, object@env$sdCohNaive.freq)
+      
+      J <- length(J.toCompute)
+      
+      if ( J > 0 ) {
+        
+        # TODO: Make this work with type = 1 and type = 2
+        #if (object@env$sdCohNaive.done == FALSE) {
         
         weight <- object@weight
         
@@ -563,7 +576,7 @@ setMethod(f = "getCoherencySdNaive",
               }
             }
           }
-
+          
           lC <- matrix(lC[1:(i-1),], ncol = 8, nrow = i-1)
           lC <- unique(lC)
           
@@ -575,8 +588,9 @@ setMethod(f = "getCoherencySdNaive",
           
           # TODO: fix to make it work for all d1, d2!!
           V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N, d1=d1, d2=d2), dim=c(N-1,D1,K1,D2,K2))     
-          res <- array(0,dim=c(N,D1,K1,D2,K2))
-          auxRes <- array(0,dim=c(nrow(lC), N))
+          res_coh <- array(0,dim=c(J,D1,K1,D2,K2))
+          res_cohSq <- array(0,dim=c(J,D1,K1,D2,K2))
+          auxRes <- array(0,dim=c(nrow(lC), J))
           
           M1 <- matrix(0, ncol=N-1, nrow=N)
           M2 <- matrix(0, ncol=N-1, nrow=N)
@@ -589,6 +603,9 @@ setMethod(f = "getCoherencySdNaive",
             #M4[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j+(1:(N-1))]
           }
           
+          M1 <- M1[J.toCompute+1,]
+          M2 <- M2[J.toCompute+1,]
+          
           for (r in 1:nrow(lC)) {
             jt <- lC[r,]
             V1 <- matrix(V[,jt[1],jt[2],jt[5],jt[6]] * V[,jt[3],jt[4],jt[7],jt[8]], ncol=1)
@@ -597,7 +614,9 @@ setMethod(f = "getCoherencySdNaive",
             auxRes[r,] <- rowSums(M1 %*% V1) + rowSums(M2 %*% V2)
           }
           
-          V <- array(getValues(object, frequencies = 2*pi*(0:(N-1))/N, d1=d1, d2=d2), dim=c(N,D1,K1,D2,K2))
+          V <- array(getValues(object, frequencies = 2*pi*(J.toCompute)/N, d1=d1, d2=d2), dim=c(J,D1,K1,D2,K2))
+          Coh <- array(getCoherency(object, frequencies = 2*pi*(J.toCompute)/N, d1=d1, d2=d2), dim=c(J,D1,K1,D2,K2))
+          
           
           for (i1 in 1:D1) {
             for (k1 in 1:K1) {
@@ -605,7 +624,8 @@ setMethod(f = "getCoherencySdNaive",
                 for (k2 in 1:K2) {
                   #r <- which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i2 & lC[,4] == k2 & lC[,5] == i1 & lC[,6] == k1 & lC[,7] == i2 & lC[,8] == k2)
                   if (i1 == i2 && k1 == k2) {
-                    S <- 0
+                    S_coh <- 0
+                    S_cohSq <- 0
                   } else {
                     H1111 <- auxRes[which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i1 & lC[,4] == k1 & lC[,5] == i1 & lC[,6] == k1 & lC[,7] == i1 & lC[,8] == k1),]
                     H1112 <- auxRes[which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i1 & lC[,4] == k1 & lC[,5] == i1 & lC[,6] == k1 & lC[,7] == i2 & lC[,8] == k2),]
@@ -626,23 +646,29 @@ setMethod(f = "getCoherencySdNaive",
                     B <- H1221 - f12*H1222/f22 - f12*Conj(H1112)/f11
                     B <- B + (f12^2/4) * (H1111/f11^2 + 2*Re(H1122/(f11*f22)) + H2222/f22^2)
                     B <- B/(f11*f22)
-                    if (type == "1") {
-                      S <- (1/2) * complex(real = Re(A + B), imaginary = Re(A - B))
-                    } else {
-                      # CORRECT??
-                      # Recall, A == L1212 and B == L1221 ??
-                      R12 <- f12 / sqrt(Re(f11) * Re(f22))
-                      S <- 2 * abs(R12)^2 * A
-                      S <- S + 2 * (Re(R12)^2 - Im(R12)^2) * Re(B)
-                      S <- S + 4 * Re(R12) * Im(R12) * Im(B)
-                    }
+                    
+                    #if (type == "1") {
+                    S_coh <- (1/2) * complex(real = Re(A + B), imaginary = Re(A - B))
+                    #} else {
+                    # CORRECT??
+                    # Recall, A == L1212 and B == L1221 ??
+                    #R12 <- f12 / sqrt(abs(f11) * abs(f22)) # note that f11, f22 can be negative if weights are negative
+                    R12 <- Coh[,i1,k1,i2,k2]
+                    S_cohSq <- 2 * abs(R12)^2 * A
+                    S_cohSq <- S_cohSq + 2 * (Re(R12)^2 - Im(R12)^2) * Re(B)
+                    S_cohSq <- S_cohSq + 4 * Re(R12) * Im(R12) * Im(B)
+                    #}
                     
                   }
                   ## TODO: Comment on the next line!!
                   ## Is this because S is always a linear combination of the
                   ## Cov(Lab, Lcd) terms??
-                  res[,i1,k1,i2,k2] <- (2*pi/N)^2 * S / (weight@env$Wnj[c(N,1:(N-1))])^2
-                  res[,i2,k2,i1,k1] <- res[,i1,k1,i2,k2]
+                  
+                  res_coh[,i1,k1,i2,k2] <- (2*pi/N)^2 * S_coh / ((weight@env$Wnj[c(N,1:(N-1))])[J.toCompute+1])^2
+                  res_coh[,i2,k2,i1,k1] <- res_coh[,i1,k1,i2,k2]
+                  
+                  res_cohSq[,i1,k1,i2,k2] <- (2*pi/N)^2 * S_cohSq / ((weight@env$Wnj[c(N,1:(N-1))])[J.toCompute+1])^2
+                  res_cohSq[,i2,k2,i1,k1] <- res_cohSq[,i1,k1,i2,k2]
                 }
               }
             }
@@ -651,11 +677,11 @@ setMethod(f = "getCoherencySdNaive",
           sqrt.cw <- function(z) {
             return(complex(real=sqrt(max(Re(z),1e-9)), imaginary=sqrt(max(Im(z),1e-9))))
           }
-          if (type == "1") {
-            res <- array(apply(res,c(1,2,3,4,5),sqrt.cw), dim = c(N, D1, K1, D2, K2))  
-          } else {
-            res <- array(apply(res,c(1,2,3,4,5),sqrt), dim = c(N, D1, K1, D2, K2))
-          }
+          #if (type == "1") {
+          res_coh <- array(apply(res_coh,c(1,2,3,4,5),sqrt.cw), dim = c(J, D1, K1, D2, K2))  
+          #} else {
+          res_cohSq <- array(apply(res_cohSq,c(1,2,3,4,5),sqrt), dim = c(J, D1, K1, D2, K2))
+          #}
           
           
           #####
@@ -761,12 +787,23 @@ setMethod(f = "getCoherencySdNaive",
 #          
 #        }
         
-        object@env$sdCohNaive.done <- TRUE
-        object@env$sdCohNaive <- res[1:(floor(N/2)+1),,,,, drop=F]
-        resObj <- res[1:(floor(N/2)+1),,,,, drop=F]
+        #object@env$sdCohNaive.done <- TRUE
+        #object@env$sdCohNaive <- res[1:(floor(N/2)+1),,,,, drop=F]
+        #resObj <- res[1:(floor(N/2)+1),,,,, drop=F]
+        
+        object@env$sdCohNaive.freq <- union(object@env$sdCohNaive.freq, J.toCompute)
+        object@env$sdCohNaive[J.toCompute+1,,,,] <- res_coh
+        object@env$sdCohSqNaive[J.toCompute+1,,,,] <- res_cohSq
+        
+      } # End of if (J > 0)
 #      } # End of 'if (object@env$sdNaive.done == FALSE) {'
       
-      resObj <- object@env$sdCohNaive
+      if (type == "1") {
+        resObj <- object@env$sdCohNaive
+      } else {
+        resObj <- object@env$sdCohSqNaive
+      }
+      
       ##############################
       ## (Similar) Code also in Class-FreqRep!!!
       ##############################
@@ -883,7 +920,7 @@ setMethod(f = "getSdNaive",
         d1 = 1:(dim(object@values)[2]),
         d2 = 1:(dim(object@values)[4]),
         impl=c("R","R2","C")) {
-
+      
       if (class(getWeight(object)) != "KernelWeight") {
         stop("getSdNaive currently only available for 'KernelWeight'.")
       }
@@ -912,19 +949,27 @@ setMethod(f = "getSdNaive",
         impl <- "R"
       }
       # end: workaround
-
+      
       N <- lenTS(Y)
       K1 <- length(objLevels1)
       K2 <- length(objLevels2)
       D1 <- length(d1)
       D2 <- length(d2)
-       
       
-      if (object@env$sdNaive.done == FALSE) {
-      #if (!identical(object@env$sdNaive.freq.done, frequencies)) {
-
+      ## First determine which frequencies still have to be computed:
+      #  i. e. for which j is 2*pi*k / N is to be computed.
+      
+      J.requested <- round(frequenciesValidator(frequencies, N = N) * N / (2*pi))  ## TODO: check if rounding required??
+      J.toCompute <- setdiff(J.requested, object@env$sdNaive.freq)
+      
+      J <- length(J.toCompute)
+      
+      if ( J > 0 ) {
+        #if (object@env$sdNaive.done == FALSE) {
+        #if (!identical(object@env$sdNaive.freq.done, frequencies)) {
+        
         weight <- object@weight
-
+        
         # Define a list which covariances to estimate
         # List shall be a matrix with rows
         # (ja ta jb tb jc tc jd td)
@@ -932,7 +977,7 @@ setMethod(f = "getSdNaive",
         # by default all combinations shall be computed
         
         if (impl == "R") {
-
+          
           lC <- matrix(ncol = 8, nrow = K1*K2*D1*D2 + K1*D1*(K2*D2-1))
           
           i <- 1
@@ -962,8 +1007,8 @@ setMethod(f = "getSdNaive",
           
           # TODO: fix to make it work for all d1, d2!!
           V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N, d1=d1, d2=d2), dim=c(N-1,D1,K1,D2,K2))     
-          res <- array(0,dim=c(N,D1,K1,D2,K2))
-          auxRes <- array(0,dim=c(K1*K2*D1*D2 + K1*D1*(K2*D2-1), N))
+          res <- array(0,dim=c(J,D1,K1,D2,K2))
+          auxRes <- array(0,dim=c(K1*K2*D1*D2 + K1*D1*(K2*D2-1), J))
           
           M1 <- matrix(0, ncol=N-1, nrow=N)
           M2 <- matrix(0, ncol=N-1, nrow=N)
@@ -975,7 +1020,10 @@ setMethod(f = "getSdNaive",
             #M3[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j-(1:(N-1))]
             #M4[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j+(1:(N-1))]
           }
-  
+          
+          M1 <- M1[J.toCompute+1,]
+          M2 <- M2[J.toCompute+1,]
+          
           for (r in 1:nrow(lC)) {
             jt <- lC[r,]
             V1 <- matrix(V[,jt[1],jt[2],jt[5],jt[6]] * V[,jt[3],jt[4],jt[7],jt[8]], ncol=1)
@@ -984,7 +1032,7 @@ setMethod(f = "getSdNaive",
             auxRes[r,] <- rowSums(M1 %*% V1) + rowSums(M2 %*% V2)
             #auxRes[r,2,] <- rowSums(M3 %*% V1) + rowSums(M4 %*% V2)
           }
-                  
+          
           for (i1 in 1:D1) {
             for (k1 in 1:K1) {
               for (i2 in 1:D2) {
@@ -996,173 +1044,176 @@ setMethod(f = "getSdNaive",
                     r2 <- which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i2 & lC[,4] == k2 & lC[,5] == i2 & lC[,6] == k2 & lC[,7] == i1 & lC[,8] == k1)
                     S <- (1/2) * complex(real = Re(auxRes[r,] + auxRes[r2,]), imaginary = Re(auxRes[r,] - auxRes[r2,]))
                   }
-                  res[,i1,k1,i2,k2] <- (2*pi/N)^2 * S / (weight@env$Wnj[c(N,1:(N-1))])^2
+                  
+                  #res[,i1,k1,i2,k2] <- (2*pi/N)^2 * S / (weight@env$Wnj[c(N,1:(N-1))])^2
+                  res[,i1,k1,i2,k2] <- (2*pi/N)^2 * S / ((weight@env$Wnj[c(N,1:(N-1))])[J.toCompute+1])^2
                   res[,i2,k2,i1,k1] <- res[,i1,k1,i2,k2]
                 }
               }
             }
           }
-  
+          
           sqrt.cw <- function(z) {
             return(complex(real=sqrt(max(Re(z),0)), imaginary=sqrt(max(Im(z),0))))
           }
-          res <- array(apply(res,c(1,2,3,4,5),sqrt.cw), dim = c(N, D1, K1, D2, K2))
-  
+          res <- array(apply(res,c(1,2,3,4,5),sqrt.cw), dim = c(J, D1, K1, D2, K2))
+          
           #####
           ## END Variant 1: more or less vectorized... 
           #####
           
         }
-
-        
-        if (impl == "R2") {
-
-          lC <- matrix(ncol = 8, nrow = K1*K2*D1*D2) # + K1*D1*(K2-1)*(D2-1))
-          
-          i <- 1
-          for (k1 in 1:K1) {
-            for (i1 in 1:D1) {
-              for (k2 in 1:K2) {
-                for (i2 in 1:D2) {
-                  lC[i,] <- rep(c(i1,k1,i2,k2),2)
-                  i <- i + 1
-                  #if (i1 != i2 || k1 != k2) {
-                  #  lC[i,] <- c(i1,k1,i2,k2,i2,k2,i1,k1)
-                  #  i <- i + 1 
-                  #}
-                }
-              }
-            }
-          }
-          
-          #####
-          ## Variant 2: more or less vectorized... 
-          #####
-          WW <- getValues(weight, N = N)[c(2:N,1)] # WW[j] corresponds to W_n(2 pi j/n)
-          WW3 <- rep(WW,4) 
-          
-          # TODO: fix to make it work for all d1, d2!!
-          V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N, d1=d1, d2=d2), dim=c(N-1,D1,K1,D2,K2))     
-          res <- array(0,dim=c(N,D1,K1,D2,K2))
-          auxRes <- array(0,dim=c(D1*K1*D2*K2, 2, N))
-          
-          M1 <- matrix(0, ncol=N-1, nrow=N)
-          M2 <- matrix(0, ncol=N-1, nrow=N)
-          M3 <- matrix(0, ncol=N-1, nrow=N)
-          M4 <- matrix(0, ncol=N-1, nrow=N)
-          for (j in 0:(N-1)) { # Test 1:N
-            M1[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j-(1:(N-1))]
-            M2[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j+(1:(N-1))]
-            M3[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j-(1:(N-1))]
-            M4[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j+(1:(N-1))]
-          }
-          
-          for (r in 1:nrow(lC)) {
-            jt <- lC[r,]
-            V1 <- matrix(V[,jt[1],jt[2],jt[5],jt[6]] * V[,jt[3],jt[4],jt[7],jt[8]], ncol=1)
-            V2 <- matrix(V[,jt[1],jt[2],jt[7],jt[8]] * V[,jt[3],jt[4],jt[5],jt[6]], ncol=1)
-            
-            auxRes[r,1,] <- rowSums(M1 %*% V1) + rowSums(M2 %*% V2)
-            auxRes[r,2,] <- rowSums(M3 %*% V1) + rowSums(M4 %*% V2)
-          }
-          
-          for (i1 in 1:D1) {
-            for (k1 in 1:K1) {
-              for (i2 in i1:D2) {
-                for (k2 in k1:K2) {
-                  r <- which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i2 & lC[,4] == k2 & lC[,5] == i1 & lC[,6] == k1 & lC[,7] == i2 & lC[,8] == k2)
-                  if (i1 == i2 && k1 == k2) {
-                    S <- auxRes[r,1,]
-                  } else {
-                    #r2 <- which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i2 & lC[,4] == k2 & lC[,5] == i2 & lC[,6] == k2 & lC[,7] == i1 & lC[,8] == k1)
-                    S <- (1/2) * complex(real = Re(auxRes[r,1,] + auxRes[r,2,]), imaginary = Re(auxRes[r,1,] - auxRes[r,2,]))
-                  }
-                  res[,i1,k1,i2,k2] <- (2*pi/N)^2 * S / (weight@env$Wnj[c(N,1:(N-1))])^2
-                  res[,i2,k2,i1,k1] <- res[,i1,k1,i2,k2]
-                }
-              }
-            }
-          }
-          
-          sqrt.cw <- function(z) {
-            return(complex(real=sqrt(max(Re(z),0)), imaginary=sqrt(max(Im(z),0))))
-          }
-          res <- array(apply(res,c(1,2,3,4,5),sqrt.cw), dim = c(N, D1, K1, D2, K2))
-          
-          #####
-          ## END Variant 2: more or less vectorized... 
-          #####
-          
-        }
         
         
-        if (impl == "C") {     
-          #####
-          ## Variant 2: using C++
-          #####
-          
-          WW <- getValues(weight, N=N) 
-          V <- array(getValues(object, frequencies = 2*pi*(0:(N-1))/N)[,,,,,1], dim=c(N,K1,K2))     
-          res <- .computeSdNaive(V, WW)
-     
-          #####
-          ## END Variant 2: using C++ (cppFunction)
-          #####
-          
-        }
+#        if (impl == "R2") {
+#
+#          lC <- matrix(ncol = 8, nrow = K1*K2*D1*D2) # + K1*D1*(K2-1)*(D2-1))
+#          
+#          i <- 1
+#          for (k1 in 1:K1) {
+#            for (i1 in 1:D1) {
+#              for (k2 in 1:K2) {
+#                for (i2 in 1:D2) {
+#                  lC[i,] <- rep(c(i1,k1,i2,k2),2)
+#                  i <- i + 1
+#                  #if (i1 != i2 || k1 != k2) {
+#                  #  lC[i,] <- c(i1,k1,i2,k2,i2,k2,i1,k1)
+#                  #  i <- i + 1 
+#                  #}
+#                }
+#              }
+#            }
+#          }
+#          
+#          #####
+#          ## Variant 2: more or less vectorized... 
+#          #####
+#          WW <- getValues(weight, N = N)[c(2:N,1)] # WW[j] corresponds to W_n(2 pi j/n)
+#          WW3 <- rep(WW,4) 
+#          
+#          # TODO: fix to make it work for all d1, d2!!
+#          V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N, d1=d1, d2=d2), dim=c(N-1,D1,K1,D2,K2))     
+#          res <- array(0,dim=c(N,D1,K1,D2,K2))
+#          auxRes <- array(0,dim=c(D1*K1*D2*K2, 2, N))
+#          
+#          M1 <- matrix(0, ncol=N-1, nrow=N)
+#          M2 <- matrix(0, ncol=N-1, nrow=N)
+#          M3 <- matrix(0, ncol=N-1, nrow=N)
+#          M4 <- matrix(0, ncol=N-1, nrow=N)
+#          for (j in 0:(N-1)) { # Test 1:N
+#            M1[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j-(1:(N-1))]
+#            M2[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j+(1:(N-1))]
+#            M3[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j-(1:(N-1))]
+#            M4[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j+(1:(N-1))]
+#          }
+#          
+#          for (r in 1:nrow(lC)) {
+#            jt <- lC[r,]
+#            V1 <- matrix(V[,jt[1],jt[2],jt[5],jt[6]] * V[,jt[3],jt[4],jt[7],jt[8]], ncol=1)
+#            V2 <- matrix(V[,jt[1],jt[2],jt[7],jt[8]] * V[,jt[3],jt[4],jt[5],jt[6]], ncol=1)
+#            
+#            auxRes[r,1,] <- rowSums(M1 %*% V1) + rowSums(M2 %*% V2)
+#            auxRes[r,2,] <- rowSums(M3 %*% V1) + rowSums(M4 %*% V2)
+#          }
+#          
+#          for (i1 in 1:D1) {
+#            for (k1 in 1:K1) {
+#              for (i2 in i1:D2) {
+#                for (k2 in k1:K2) {
+#                  r <- which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i2 & lC[,4] == k2 & lC[,5] == i1 & lC[,6] == k1 & lC[,7] == i2 & lC[,8] == k2)
+#                  if (i1 == i2 && k1 == k2) {
+#                    S <- auxRes[r,1,]
+#                  } else {
+#                    #r2 <- which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i2 & lC[,4] == k2 & lC[,5] == i2 & lC[,6] == k2 & lC[,7] == i1 & lC[,8] == k1)
+#                    S <- (1/2) * complex(real = Re(auxRes[r,1,] + auxRes[r,2,]), imaginary = Re(auxRes[r,1,] - auxRes[r,2,]))
+#                  }
+#                  res[,i1,k1,i2,k2] <- (2*pi/N)^2 * S / (weight@env$Wnj[c(N,1:(N-1))])^2
+#                  res[,i2,k2,i1,k1] <- res[,i1,k1,i2,k2]
+#                }
+#              }
+#            }
+#          }
+#          
+#          sqrt.cw <- function(z) {
+#            return(complex(real=sqrt(max(Re(z),0)), imaginary=sqrt(max(Im(z),0))))
+#          }
+#          res <- array(apply(res,c(1,2,3,4,5),sqrt.cw), dim = c(N, D1, K1, D2, K2))
+#          
+#          #####
+#          ## END Variant 2: more or less vectorized... 
+#          #####
+#          
+#        }
         
-        object@env$sdNaive.done <- TRUE
-        object@env$sdNaive <- res[1:(floor(N/2)+1),,,,, drop=F]
-          resObj <- res[1:(floor(N/2)+1),,,,, drop=F]
+        
+#        if (impl == "C") {     
+#          #####
+#          ## Variant 2: using C++
+#          #####
+#          
+#          WW <- getValues(weight, N=N) 
+#          V <- array(getValues(object, frequencies = 2*pi*(0:(N-1))/N)[,,,,,1], dim=c(N,K1,K2))     
+#          res <- .computeSdNaive(V, WW)
+#     
+#          #####
+#          ## END Variant 2: using C++ (cppFunction)
+#          #####
+#          
+#        }
+        
+        object@env$sdNaive.freq <- union(object@env$sdNaive.freq, J.toCompute)
+        
+        object@env$sdNaive[J.toCompute+1,,,,] <- res
+        
       } # End of 'if (object@env$sdNaive.done == FALSE) {'
-
+      
       resObj <- object@env$sdNaive
       ##############################
       ## (Similar) Code also in Class-FreqRep!!!
       ##############################
-
+      
       # Transform all frequencies to [0,2pi)
       frequencies <- frequencies %% (2*pi)
-
+      
       # Create an aux vector with all available frequencies
       oF <- object@frequencies
       f <- frequencies
-
+      
       # returns TRUE if x c y
       subsetequal.approx <- function(x,y) {
         X <- round(x, .Machine$double.exponent-2)
         Y <- round(y, .Machine$double.exponent-2)
         return(setequal(X,intersect(X,Y)))
       }
-
+      
       C1 <- subsetequal.approx(f[f <= pi], oF)
       C2 <- subsetequal.approx(f[f > pi], 2*pi - oF[which(oF != 0 & oF != pi)])
-
+      
       # Ist dann der Fall wenn die frequencies nicht geeignete FF sind!!
       if (!(C1 & C2)) {
         warning("Not all 'values' for 'frequencies' requested were available. 'values' for the next available Fourier frequencies are returned.")
       }
-
+      
       # Select columns
       c.1.pos <- closest.pos(objLevels1,levels.1)
       c.2.pos <- closest.pos(objLevels2,levels.2)
-
+      
       # Select rows
       r1.pos <- closest.pos(oF,f[f <= pi])
       r2.pos <- closest.pos(-1*(2*pi-oF),-1*f[f > pi])
-
+      
       J <- length(frequencies)
       K1 <- length(levels.1)
       K2 <- length(levels.2)
       res <- array(dim=c(J, D1, K1, D2, K2))
-
+      
       if (length(r1.pos) > 0) {
         res[which(f <= pi),,,,] <- resObj[r1.pos, , c.1.pos, , c.2.pos]
       }
       if (length(r2.pos) > 0) {
         res[which(f > pi),,,,] <- Conj(resObj[r2.pos, , c.1.pos, , c.2.pos])
       }    
-
+      
       if (D1 == 1 && D2 == 1) {
         final.dim.res <- c(J, K1, K2)
       } else {
@@ -1228,11 +1279,11 @@ setMethod(f = "getSdBoot",
         frequencies=2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y),
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2)) {
-
+      
       if (class(getWeight(object)) != "KernelWeight") {
         stop("getSdNaive currently only available for 'KernelWeight'.")
       }
-
+      
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
         frequencies <- 2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y)
@@ -1244,18 +1295,18 @@ setMethod(f = "getSdBoot",
         levels.2 <- object@levels[[2]]
       }
       # end: workaround
-
+      
       if (dim(object@env$sdBoot) == 1) {
-
+        
         complex.var <- function(x) {
           return(complex(real = sd(Re(x)), imaginary = sd(Im(x))))
         }
-
+        
         #N <- length(object@qPG@freqRep@Y)
         #K1 <- length(object@levels[[1]])
         #K2 <- length(object@levels[[2]])
         B <- object@qPG@freqRep@B
-
+        
         # TODO: fix...
         v <- getValues(object, frequencies = frequencies,
             levels.1 = levels.1, levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=F]
@@ -1336,7 +1387,7 @@ setMethod(f = "getPointwiseCIs",
         d1 = 1:(dim(object@values)[2]),
         d2 = 1:(dim(object@values)[4]),
         alpha=.1, type=c("naive.sd", "boot.sd", "boot.full")) {
-
+      
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
         frequencies <- 2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y)
@@ -1360,7 +1411,7 @@ setMethod(f = "getPointwiseCIs",
         type <- "naive.sd"
       }
       # end: workaround
-
+      
       type <- match.arg(type)[1]
       switch(type,
           "naive.sd" = {
@@ -1375,19 +1426,19 @@ setMethod(f = "getPointwiseCIs",
                 levels.1 = levels.1,
                 levels.2 = levels.2)}
       )
-
+      
       J <- length(frequencies)
       K1 <- length(levels.1)
       K2 <- length(levels.2)
       D1 <- length(d1)
       D2 <- length(d2)
-
-
+      
+      
       if (type == "naive.sd" || type == "boot.sd") {
         v <- array(getValues(object,
-            frequencies = frequencies,
-            levels.1 = levels.1,
-            levels.2 = levels.2, d1=d1, d2=d2), dim = c(J, D1, K1, D2, K2))
+                frequencies = frequencies,
+                levels.1 = levels.1,
+                levels.2 = levels.2, d1=d1, d2=d2), dim = c(J, D1, K1, D2, K2))
         sdEstim <- array(sdEstim, dim = c(J, D1, K1, D2, K2))
         upperCIs <- array(v + sdEstim * qnorm(1-alpha/2), dim = c(J, D1, K1, D2, K2))
         lowerCIs <- array(v + sdEstim * qnorm(alpha/2), dim = c(J, D1, K1, D2, K2))
@@ -1403,11 +1454,11 @@ setMethod(f = "getPointwiseCIs",
               imaginary = quantile(Im(x),1-alpha/2))}
         lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
               imaginary = quantile(Im(x),alpha/2))}
-
+        
         upperCIs <- apply(v, c(1,2,3), uQuantile)
         lowerCIs <- apply(v, c(1,2,3), lQuantile)
       }
-
+      
       if (D1 == 1 && D2 == 1) {
         final.dim.res <- c(J, K1, K2)
       } else {
@@ -1828,7 +1879,7 @@ smoothedPG <- function(
     B = 0,
     l = 1,
     weight = kernelWeight()) {
-
+  
   if (class(object) == "numeric" | class(object) == "matrix") {
     versConstr <- 1
     Y <- object
@@ -1840,33 +1891,33 @@ smoothedPG <- function(
     Y <- coredata(object)
   } else if (class(object) == "QuantilePG") {
     versConstr <- 2
-
-
-
+    
+    
+    
     if (!hasArg(frequencies)) {
       Y <- object@freqRep@Y
       frequencies <- 2*pi/lenTS(Y) * 0:(lenTS(Y)-1)
     }
-
+    
     if (!hasArg(levels.1)) {
       levels.1 <- getLevels(object,1)
     }
     if (!hasArg(levels.2)) {
       levels.2 <- getLevels(object,2)
     }
-
+    
   } else {
     stop("object is neither 'numeric', 'matrix', 'ts', 'zoo', nor 'QuantilePG'.")
   }
-
+  
   if (versConstr == 1) {
-
+    
     levels.all <- union(levels.1, levels.2)
     K1 <- length(levels.1)
     K2 <- length(levels.2)
-
+    
     J <- length(frequencies)
-
+    
     qPG <- quantilePG(Y, frequencies = 2*pi/lenTS(Y) * 0:(lenTS(Y)-1),
         levels.1 = levels.1,
         levels.2 = levels.2,
@@ -1875,7 +1926,7 @@ smoothedPG <- function(
   } else if (versConstr == 2) {
     qPG <- object
   }
-
+  
   obj <- new(
       Class = "SmoothedPG",
       qPG = qPG,
@@ -1883,9 +1934,9 @@ smoothedPG <- function(
       frequencies = frequencies,
       levels = list(levels.1, levels.2)
   )
-
+  
   return(obj)
-
+  
 }
 
 
@@ -1961,199 +2012,199 @@ setMethod(f = "plot",
         type.scaling = c("individual", "real-imaginary", "all"),
         frequencies=x@frequencies,
         levels=intersect(x@levels[[1]], x@levels[[2]])) {
-
-    def.par <- par(no.readonly = TRUE) # save default, for resetting...
-
-    # workaround: default values don't seem to work for generic functions?
-    if (!hasArg(frequencies)) {
-      frequencies <- x@frequencies
-    }
-    if (!hasArg(levels)) {
-      levels <- intersect(x@levels[[1]], x@levels[[2]])
-    }
-    if (!hasArg(plotPG)) {
-      plotPG <- FALSE
-    }
-    if (!hasArg(ptw.CIs)) {
-      ptw.CIs <- 0.1
-    }
-    if (!hasArg(type.CIs)) {
-      type.CIs <- "naive.sd"
-    }
-    if (!hasArg(ratio)) {
-      ratio <- 3/2
-    }
-    if (!hasArg(widthlab)) {
-      widthlab <- lcm(1)
-    }
-    if (!hasArg(xlab)) {
-      xlab <- expression(omega/2*pi)
-    }
-    if (!hasArg(ylab)) {
-      ylab <- NULL
-    }
-    if (!hasArg(type.scaling)) {
-      type.scaling <- c("individual", "real-imaginary", "all")
-    }
-    # end: workaround
-
-    if (length(levels) == 0) {
-      stop("There has to be at least one level to plot.")
-    }
-
-tryCatch({
-
-    K <- length(levels)
-    values <- getValues(x, frequencies = frequencies,
-        levels.1=levels, levels.2=levels, d1 = 1, d2 = 1) # TODO ... fix
-    if (plotPG) {
-      PG <- getValues(x@qPG, frequencies = frequencies,
-          levels.1=levels, levels.2=levels, d1 = 1, d2 = 1) # TODO ... fix
-    }
-    if (hasArg(qsd)) {
-      j.min <- round(min(frequencies*2^8/(2*pi)))
-      j.max <- round(max(frequencies*2^8/(2*pi)))
-      freq.csd <- 2*pi*(j.min:j.max)/2^8
-      csd <- getValues(qsd, frequencies = freq.csd,
-          levels.1=levels, levels.2=levels)
-    }
-
-    #text.headline <- x@weight@descr
-    if (ptw.CIs > 0) {
-      CI <- getPointwiseCIs(x, frequencies = frequencies,
-          alpha=ptw.CIs, type=type.CIs,
-          levels.1=levels, levels.2=levels)
-      lowerCIs  <- CI$lowerCIs
-      upperCIs  <- CI$upperCIs
-      #text.headline <- (paste(text.headline, ", includes ",1-ptw.CIs,"-CI (ptw. of type '",type.CIs,"')",sep=""))
-    }
-
-    X <- frequencies/(2*pi)
-
-    allVals <- array(values[,,,1], dim=c(length(X), K, K))
-    if (plotPG)  {
-      allVals <- abind(allVals, array(PG[,,,1], dim=c(length(X), K, K)), along=1)
-    }
-    if (hasArg(qsd)) {
-      allVals <- abind(allVals, csd, along=1)
-    }
-    if (ptw.CIs > 0) {
-      allVals <- abind(allVals, lowerCIs, upperCIs, along=1)
-    }
-    type.scaling <- match.arg(type.scaling)[1]
-
-    p <- K
-    M <- matrix(1:p^2, ncol=p)
-    M.heights <- rep(1,p)
-    M.widths  <- rep(ratio,p)
-
-    # Add places for tau labels
-    M <- cbind((p^2+1):(p^2+p),M)
-    M.widths <- c(widthlab,M.widths)
-    M <- rbind(M,c(0,(p^2+p+1):(p^2+2*p)))
-    M.heights <- c(M.heights, widthlab)
-
-    i <- (p^2+2*p+1)
-    # Add places for labels
-    if (length(xlab)>0) {
-      M.heights <- c(M.heights, widthlab)
-      M <- rbind(M,c(rep(0,length(M.widths)-p),rep(i,p)))
-      i <- i + 1
-    }
-
-    if (length(ylab)>0) {
-      M <- cbind(c(rep(i,p),rep(0,length(M.heights)-p)),M)
-      M.widths <- c(widthlab,M.widths)
-    }
-
-    nf <- layout(M, M.widths, M.heights, TRUE)
-
-    par(mar=c(2,2,1,1))
-
-    for (i1 in 1:K) {
-      for (i2 in 1:K) {
-        if (i2 >= i1) {
-          switch(type.scaling,
-              "individual" = {
-                y.min <- min(Re(allVals[,i1,i2]))
-                y.max <- max(Re(allVals[,i1,i2]))},
-              "real-imaginary" = {
-                y.min <- min(Re(allVals))
-                y.max <- max(Re(allVals))},
-              "all" = {
-                y.min <- min(Re(allVals),Im(allVals))
-                y.max <- max(Re(allVals),Im(allVals))}
-          )
-
-          plot(x=0,y=0, type="n", xlab="", ylab="", #xlab=xl, ylab=yl,
-              xlim=c(min(X), max(X)), ylim=c(y.min, y.max))
-          if (ptw.CIs > 0) {
-            polygon(x=c(X,rev(X)), y=c(Re(lowerCIs[,i1,i2]),rev(Re(upperCIs[,i1,i2]))),
-                    col="lightgray", border=NA)
-          }
-          if (plotPG) {
-            lines(x=X, y=Re(PG[,i1,i2,1]), col=gray(0.5))
-          }
-          if (hasArg(qsd)) {
-            lines(x=freq.csd/(2*pi), y=Re(csd[,i1,i2]), col="red")
-          }
-          lines(x=X, y=Re(values[,i1,i2,1]),
-              ylim=c(min(Re(allVals)), max(Re(allVals))),
-              type="l", col="blue")
-        } else {
-          switch(type.scaling,
-              "individual" = {
-                y.min <- min(Im(allVals[,i1,i2]))
-                y.max <- max(Im(allVals[,i1,i2]))},
-              "real-imaginary" = {
-                y.min <- min(Im(allVals))
-                y.max <- max(Im(allVals))},
-              "all" = {
-                y.min <- min(Re(allVals),Im(allVals))
-                y.max <- max(Re(allVals),Im(allVals))}
-          )
-          plot(x=0,y=0, type="n", xlab="", ylab="", #xlab=xl, ylab=yl,
-              xlim=c(min(X), max(X)), ylim=c(y.min, y.max))
-          if (ptw.CIs > 0) {
-            polygon(x=c(X,rev(X)), y=c(Im(lowerCIs[,i1,i2]),rev(Im(upperCIs[,i1,i2]))),
-                    col="lightgray", border=NA)
-          }
-          if (plotPG) {
-            lines(x=X, y=Im(PG[,i1,i2,1]), col=gray(0.5))
-          }
-          if (hasArg(qsd)) {
-            lines(x=freq.csd/(2*pi), y=Im(csd[,i1,i2]), col="red")
-          }
-          lines(x=X, y=Im(values[,i1,i2,1]),
-              ylim=c(min(Im(allVals)), max(Im(allVals))),
-              type="l", col="blue")
-        }
+      
+      def.par <- par(no.readonly = TRUE) # save default, for resetting...
+      
+      # workaround: default values don't seem to work for generic functions?
+      if (!hasArg(frequencies)) {
+        frequencies <- x@frequencies
       }
+      if (!hasArg(levels)) {
+        levels <- intersect(x@levels[[1]], x@levels[[2]])
+      }
+      if (!hasArg(plotPG)) {
+        plotPG <- FALSE
+      }
+      if (!hasArg(ptw.CIs)) {
+        ptw.CIs <- 0.1
+      }
+      if (!hasArg(type.CIs)) {
+        type.CIs <- "naive.sd"
+      }
+      if (!hasArg(ratio)) {
+        ratio <- 3/2
+      }
+      if (!hasArg(widthlab)) {
+        widthlab <- lcm(1)
+      }
+      if (!hasArg(xlab)) {
+        xlab <- expression(omega/2*pi)
+      }
+      if (!hasArg(ylab)) {
+        ylab <- NULL
+      }
+      if (!hasArg(type.scaling)) {
+        type.scaling <- c("individual", "real-imaginary", "all")
+      }
+      # end: workaround
+      
+      if (length(levels) == 0) {
+        stop("There has to be at least one level to plot.")
+      }
+      
+      tryCatch({
+            
+            K <- length(levels)
+            values <- getValues(x, frequencies = frequencies,
+                levels.1=levels, levels.2=levels, d1 = 1, d2 = 1) # TODO ... fix
+            if (plotPG) {
+              PG <- getValues(x@qPG, frequencies = frequencies,
+                  levels.1=levels, levels.2=levels, d1 = 1, d2 = 1) # TODO ... fix
+            }
+            if (hasArg(qsd)) {
+              j.min <- round(min(frequencies*2^8/(2*pi)))
+              j.max <- round(max(frequencies*2^8/(2*pi)))
+              freq.csd <- 2*pi*(j.min:j.max)/2^8
+              csd <- getValues(qsd, frequencies = freq.csd,
+                  levels.1=levels, levels.2=levels)
+            }
+            
+            #text.headline <- x@weight@descr
+            if (ptw.CIs > 0) {
+              CI <- getPointwiseCIs(x, frequencies = frequencies,
+                  alpha=ptw.CIs, type=type.CIs,
+                  levels.1=levels, levels.2=levels)
+              lowerCIs  <- CI$lowerCIs
+              upperCIs  <- CI$upperCIs
+              #text.headline <- (paste(text.headline, ", includes ",1-ptw.CIs,"-CI (ptw. of type '",type.CIs,"')",sep=""))
+            }
+            
+            X <- frequencies/(2*pi)
+            
+            allVals <- array(values[,,,1], dim=c(length(X), K, K))
+            if (plotPG)  {
+              allVals <- abind(allVals, array(PG[,,,1], dim=c(length(X), K, K)), along=1)
+            }
+            if (hasArg(qsd)) {
+              allVals <- abind(allVals, csd, along=1)
+            }
+            if (ptw.CIs > 0) {
+              allVals <- abind(allVals, lowerCIs, upperCIs, along=1)
+            }
+            type.scaling <- match.arg(type.scaling)[1]
+            
+            p <- K
+            M <- matrix(1:p^2, ncol=p)
+            M.heights <- rep(1,p)
+            M.widths  <- rep(ratio,p)
+            
+            # Add places for tau labels
+            M <- cbind((p^2+1):(p^2+p),M)
+            M.widths <- c(widthlab,M.widths)
+            M <- rbind(M,c(0,(p^2+p+1):(p^2+2*p)))
+            M.heights <- c(M.heights, widthlab)
+            
+            i <- (p^2+2*p+1)
+            # Add places for labels
+            if (length(xlab)>0) {
+              M.heights <- c(M.heights, widthlab)
+              M <- rbind(M,c(rep(0,length(M.widths)-p),rep(i,p)))
+              i <- i + 1
+            }
+            
+            if (length(ylab)>0) {
+              M <- cbind(c(rep(i,p),rep(0,length(M.heights)-p)),M)
+              M.widths <- c(widthlab,M.widths)
+            }
+            
+            nf <- layout(M, M.widths, M.heights, TRUE)
+            
+            par(mar=c(2,2,1,1))
+            
+            for (i1 in 1:K) {
+              for (i2 in 1:K) {
+                if (i2 >= i1) {
+                  switch(type.scaling,
+                      "individual" = {
+                        y.min <- min(Re(allVals[,i1,i2]))
+                        y.max <- max(Re(allVals[,i1,i2]))},
+                      "real-imaginary" = {
+                        y.min <- min(Re(allVals))
+                        y.max <- max(Re(allVals))},
+                      "all" = {
+                        y.min <- min(Re(allVals),Im(allVals))
+                        y.max <- max(Re(allVals),Im(allVals))}
+                  )
+                  
+                  plot(x=0,y=0, type="n", xlab="", ylab="", #xlab=xl, ylab=yl,
+                      xlim=c(min(X), max(X)), ylim=c(y.min, y.max))
+                  if (ptw.CIs > 0) {
+                    polygon(x=c(X,rev(X)), y=c(Re(lowerCIs[,i1,i2]),rev(Re(upperCIs[,i1,i2]))),
+                        col="lightgray", border=NA)
+                  }
+                  if (plotPG) {
+                    lines(x=X, y=Re(PG[,i1,i2,1]), col=gray(0.5))
+                  }
+                  if (hasArg(qsd)) {
+                    lines(x=freq.csd/(2*pi), y=Re(csd[,i1,i2]), col="red")
+                  }
+                  lines(x=X, y=Re(values[,i1,i2,1]),
+                      ylim=c(min(Re(allVals)), max(Re(allVals))),
+                      type="l", col="blue")
+                } else {
+                  switch(type.scaling,
+                      "individual" = {
+                        y.min <- min(Im(allVals[,i1,i2]))
+                        y.max <- max(Im(allVals[,i1,i2]))},
+                      "real-imaginary" = {
+                        y.min <- min(Im(allVals))
+                        y.max <- max(Im(allVals))},
+                      "all" = {
+                        y.min <- min(Re(allVals),Im(allVals))
+                        y.max <- max(Re(allVals),Im(allVals))}
+                  )
+                  plot(x=0,y=0, type="n", xlab="", ylab="", #xlab=xl, ylab=yl,
+                      xlim=c(min(X), max(X)), ylim=c(y.min, y.max))
+                  if (ptw.CIs > 0) {
+                    polygon(x=c(X,rev(X)), y=c(Im(lowerCIs[,i1,i2]),rev(Im(upperCIs[,i1,i2]))),
+                        col="lightgray", border=NA)
+                  }
+                  if (plotPG) {
+                    lines(x=X, y=Im(PG[,i1,i2,1]), col=gray(0.5))
+                  }
+                  if (hasArg(qsd)) {
+                    lines(x=freq.csd/(2*pi), y=Im(csd[,i1,i2]), col="red")
+                  }
+                  lines(x=X, y=Im(values[,i1,i2,1]),
+                      ylim=c(min(Im(allVals)), max(Im(allVals))),
+                      type="l", col="blue")
+                }
+              }
+            }
+            
+            par(mar=c(0,0,0,0))
+            for (i in 1:p) {
+              plot.new()
+              text(0.5,0.5,substitute(paste(tau[1],"=",k),list(k=levels[i])), srt=90)
+            }
+            
+            for (i in 1:p) {
+              plot.new()
+              text(0.5,0.5,substitute(paste(tau[2],"=",k),list(k=levels[i])))
+            }
+            if (length(xlab)>0) {
+              plot.new()
+              text(0.5, 0.5, xlab)
+            }
+            if (length(ylab)>0) {
+              plot.new()
+              text(0.5, 0.5, ylab, srt=90)
+            }
+            
+          },  error = function(e) e,
+          warning = function(w) w,
+          finally = {
+            par(def.par)  #- reset to default
+          })
     }
-
-    par(mar=c(0,0,0,0))
-    for (i in 1:p) {
-      plot.new()
-      text(0.5,0.5,substitute(paste(tau[1],"=",k),list(k=levels[i])), srt=90)
-    }
-
-    for (i in 1:p) {
-      plot.new()
-      text(0.5,0.5,substitute(paste(tau[2],"=",k),list(k=levels[i])))
-    }
-    if (length(xlab)>0) {
-      plot.new()
-      text(0.5, 0.5, xlab)
-    }
-    if (length(ylab)>0) {
-      plot.new()
-      text(0.5, 0.5, ylab, srt=90)
-    }
-
-},  error = function(e) e,
-    warning = function(w) w,
-    finally = {
-      par(def.par)  #- reset to default
-    })
-  }
 )

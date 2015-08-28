@@ -27,6 +27,8 @@ accessable in a call-by-reference manner:
 \describe{
   \item{\code{sdNaive}}{An array used for storage of the naively
       estimated standard deviations of the smoothed periodogram.}
+  \item{\code{sdNaive.freq}}{a vector indicating for which frequencies
+                      \code{sdNaive} has been computed so far.}
   \item{\code{sdNaive.done}}{a flag indicating whether \code{sdNaive}
       has been set yet.}
   \item{\code{sdBoot}}{An array used for storage of the standard
