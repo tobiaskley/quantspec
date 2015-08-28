@@ -2,7 +2,7 @@
 
 % print a pdf with dia, where page setup is:
 %	margins are 1cm all around
-%	scaling, scale is set to 30
+%	scaling, scale is set to 35
 
 % DejaVuSans,Bold and DejaVuSansMono should be installed.
 
