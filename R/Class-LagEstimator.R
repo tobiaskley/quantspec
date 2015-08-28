@@ -359,10 +359,10 @@ setMethod(f = "getSdNaive",
             res <- array(dim=c(J, K1, K2))
             
             if (length(r1.pos) > 0) {
-              res[1:length(r1.pos),,] <- resObj[r1.pos,c.1.pos,c.2.pos]
+              res[which(f <= pi),,] <- resObj[r1.pos,c.1.pos,c.2.pos]
             }
             if (length(r2.pos) > 0) {
-              res[(length(r1.pos)+1):J,,] <- Conj(resObj[r2.pos,c.1.pos,c.2.pos])
+              res[which(f > pi),,] <- Conj(resObj[r2.pos,c.1.pos,c.2.pos])
             }
             
             return(res)
