@@ -14,7 +14,7 @@ periodograms for univariate time series.
    \cr Package: \tab quantspec
    \cr Type:    \tab Package
    \cr Version: \tab 1.1-0
-   \cr Date:    \tab 2015-08-19
+   \cr Date:    \tab 2015-09-25
    \cr License: \tab GPL (>= 2)
  }
 }
@@ -28,7 +28,7 @@ shown. In the first diagram the classes related to periodogram-based
 estimation are displayed:
 
 \if{html}{\figure{main.png}{options: width=960}}
-\if{latex}{\figure{main.pdf}{options: width=15cm}}
+\if{latex}{\figure{main.pdf}{options: width=10cm}}
 
 In the second diagram the classes related to lag window-based
 estimation are displayed:
@@ -108,9 +108,9 @@ Kley, T. (2015). An Object-Oriented Framework for Quantile-Based Spectral
 Analysis and a Reference Implementation in R: The quantspec Package.
 Vignette to this R package.
 
-Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
+Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
-spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 [cf. \url{http://arxiv.org/abs/1111.7205}]
 
 Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).

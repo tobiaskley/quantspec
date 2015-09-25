@@ -22,7 +22,7 @@ containing the values of the operator.}
 
 \item{\code{Y}}{is the time series the operator shall be applied to}
 
-\item{\code{maxLag}}{maximum lag between two Observations}
+\item{\code{maxLag}}{maximum lag between two observations}
 
 \item{\code{levels}}{a vector of numerics that determines the levels of the operator}
 

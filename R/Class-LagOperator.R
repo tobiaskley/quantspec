@@ -19,7 +19,7 @@ NULL
 #' @slot values an array of dimension \code{c(maxLag,length(levels.1),length(levels.2))}
 #' 			 containing the values of the operator.
 #' @slot Y is the time series the operator shall be applied to
-#' @slot maxLag maximum lag between two Observations
+#' @slot maxLag maximum lag between two observations
 #' @slot levels a vector of numerics that determines the levels of the operator
 #' @slot isRankBased A flag that is \code{FALSE} if the determined \code{values}
 #'                     are based on the original time series and \code{TRUE} if it
@@ -214,7 +214,7 @@ setMethod(f = "getBootPos",
 setMethod(f = "show",
     signature = "LagOperator",
     definition = function(object) {
-      
+
       maxLag <- getMaxLag(object)
       K1 <- length(getLevels(object, 1))
       K2 <- length(getLevels(object, 2))
@@ -258,4 +258,26 @@ setMethod(f = "show",
       
       show(res)
     }
+)
+
+################################################################################
+#' Plot the values of the \code{\link{LagOperator}}.
+#'
+#' Not yet implemented.
+#'
+#' @name plot-LagOperator
+#' @aliases plot,LagOperator,ANY-method
+#' @export
+#'
+#' @param x The \code{\link{LagOperator}} to plot.
+#' 
+#' @return Plots the \code{\link{LagOperator}}.
+################################################################################
+setMethod(f = "plot",
+    signature = signature(x = "LagOperator"),
+    definition = function(x) {
+      
+    message("plot-LagOperator not yet implemented.")
+
+  }
 )

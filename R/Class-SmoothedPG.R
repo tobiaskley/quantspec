@@ -7,7 +7,7 @@ NULL
 #'
 #' \code{SmoothedPG} is an S4 class that implements the necessary
 #' calculations to determine a smoothed version of one of the quantile
-#' periodograms defined in Dette et. al (2014) and Kley et. al (2014).
+#' periodograms defined in Dette et. al (2015) and Kley et. al (2014).
 #'
 #' For a \code{\link{QuantilePG}} \eqn{Q_n(\omega, x_1, x_2)}{Qn(w,x1,x2)} and
 #' a \code{\link{Weight}} \eqn{W_n(\cdot)}{Wn(.)} the smoothed version
@@ -317,10 +317,10 @@ setMethod(f = "getValues",
 #' @return Returns the estimate described above.
 #'
 #' @references
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
-#' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \emph{Bernoulli}, \bold{forthcoming}.
-#' [cf. \url{http://arxiv.org/abs/1401.8104}]
+#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
+#' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
+#' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
+#' [cf. \url{http://arxiv.org/abs/1111.7205}]
 ################################################################################
 setMethod(f = "getSdNaive",
     signature = signature(

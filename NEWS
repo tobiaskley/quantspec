@@ -1,3 +1,16 @@
+quantspec 1.1-0
+===============
+
+MAJOR
+
+ o  Added functionality to do lag window estimation.
+
+MINOR 
+
+ o  Fixed a wrong constant in the definition of the W1 kernel.
+ o  Fixed a tiny mistake in getLevels-QSpecQuantity.
+
+
 quantspec 1.0-3
 ===============
 

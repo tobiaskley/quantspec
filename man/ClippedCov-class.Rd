@@ -12,8 +12,8 @@ and for all \eqn{k < \code{maxLag}}{k<maxLag} the copula covariances
 and writes it to \code{values[k]} from its superclass \code{\link{LagOperator}}.
 }
 \details{
-For each lag \eqn{k = 0, ..., maxLag} and combination of levels
-\eqn{(\tau1, \tau2)}{(tau1, tau2)} from \code{levels.1 x levels.2} the
+For each lag \code{k = 0, ..., maxLag} and combination of levels
+\eqn{(\tau_1, \tau_2)}{(tau1, tau2)} from \code{levels.1 x levels.2} the
 statistic
 \deqn{\frac{1}{n} \sum_{t=1}^{n-k} ( I\{\hat F_n(Y_t) \leq \tau_1\} - \tau_1) ( I\{\hat F_n(Y_{t+k}) \leq \tau_2\} - \tau_2)}
 is determined and stored to the array \code{values}.
