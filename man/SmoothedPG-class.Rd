@@ -8,7 +8,7 @@
 \description{
 \code{SmoothedPG} is an S4 class that implements the necessary
 calculations to determine a smoothed version of one of the quantile
-periodograms defined in Dette et. al (2014) and Kley et. al (2014).
+periodograms defined in Dette et. al (2015) and Kley et. al (2014).
 }
 \details{
 For a \code{\link{QuantilePG}} \eqn{Q_n(\omega, x_1, x_2)}{Qn(w,x1,x2)} and

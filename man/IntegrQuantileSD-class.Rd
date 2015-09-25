@@ -31,7 +31,7 @@ Note that, all remarks made in the documentation of the super-class
 ## This script illustrates how to estimate integrated quantile spectral densities
 
 ## Simulate a time series Y1,...,Y128 from the QAR(1) process discussed in
-## Dette et. al (2014).
+## Dette et. al (2015).
 set.seed(2581)
 Y <- ts1(128)
 

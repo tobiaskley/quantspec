@@ -20,7 +20,7 @@ ts3(n)
 Functions to simulate from the time series models in Kley et. al (2014).
 }
 \details{
-\code{ts1} QAR(1) model from Dette et. al (2014+).
+\code{ts1} QAR(1) model from Dette et. al (2015).
 
 \code{ts2} AR(2) model from Li (2012):
 
@@ -33,9 +33,9 @@ plot(ts2(100), type="l")
 plot(ts3(100), type="l")
 }
 \references{
-Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
+Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
-spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 [cf. \url{http://arxiv.org/abs/1111.7205}]
 
 Li, T.-H. (2012). Quantile Periodograms.

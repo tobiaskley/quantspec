@@ -59,10 +59,10 @@ of the real part of the estimator and the imaginary part is the square root
 of the imaginary part of the variance of the estimator.
 }
 \references{
-Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
-Quantile Spectral Processes: Asymptotic Analysis and Inference.
-\emph{Bernoulli}, \bold{forthcoming}.
-[cf. \url{http://arxiv.org/abs/1401.8104}]
+Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
+Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
+spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
+[cf. \url{http://arxiv.org/abs/1111.7205}]
 }
 \keyword{Access-functions}
 

@@ -105,9 +105,9 @@ pdf("QAR1.pdf", width=2*K, height=2*K)
 dev.off()
 }
 \references{
-Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
+Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
-spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 [cf. \url{http://arxiv.org/abs/1111.7205}]
 
 Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).

@@ -153,7 +153,7 @@ ARCH1 <- function(n,a0,a1,overhead=500,innov = rnorm) {
 #' Functions to simulate from the time series models in Kley et. al (2014).
 #'
 #' @details
-#' \code{ts1} QAR(1) model from Dette et. al (2014+).
+#' \code{ts1} QAR(1) model from Dette et. al (2015).
 #'
 #' @name ts-models
 #' @aliases ts1
@@ -164,9 +164,9 @@ ARCH1 <- function(n,a0,a1,overhead=500,innov = rnorm) {
 #' @param n length of the time series to be returned
 #'
 #' @references
-#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
+#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
-#' spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+#' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 #' [cf. \url{http://arxiv.org/abs/1111.7205}]
 #'
 #' @examples

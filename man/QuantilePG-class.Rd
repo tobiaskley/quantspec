@@ -8,7 +8,7 @@
 \description{
 \code{QuantilePG} is an S4 class that implements the necessary
 calculations to determine one of the periodogram-like statistics defined in
-Dette et. al (2014+) and Kley et. al (2015+).
+Dette et. al (2015) and Kley et. al (2015+).
 }
 \details{
 Performs all the calculations to determine a quantile periodogram from a
@@ -37,7 +37,7 @@ be based on.}
 ## This script illustrates how to work with QuantilePG objects
 
 ## Simulate a time series Y1,...,Y128 from the QAR(1) process discussed in
-## Dette et. al (2014).
+## Dette et. al (2015).
 Y <- ts1(64)
 
 ## For a defined set of quantile levels
@@ -45,7 +45,7 @@ levels <- c(0.25,0.5,0.75)
 
 ## the various quantile periodograms can be calculated calling quantilePG:
 
-## For a copula periodogram as in Dette et. al (2014) the option 'type="qr"'
+## For a copula periodogram as in Dette et. al (2015) the option 'type="qr"'
 ## has to be used:
 system.time(
     qPG.qr <- quantilePG(Y, levels.1 = levels, type="qr"))
@@ -96,9 +96,9 @@ plot(x = freq/(2*pi), Im(V.cl[,1,2,1]), type="l",
 lines(x = freq/(2*pi), Im(V.qr[,1,2,1]), col="red")
 }
 \references{
-Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
+Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
-spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 [cf. \url{http://arxiv.org/abs/1111.7205}]
 
 Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
