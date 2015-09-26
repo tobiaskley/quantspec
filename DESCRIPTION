@@ -6,8 +6,7 @@ Title: Quantile-Based Spectral Analysis of Time Series
 Authors@R: c(person("Tobias", "Kley", role=c("aut","cre"),
     email = "t.kley@lse.ac.uk"),
     person("Stefan", "Birr",  role = c("ctb"), 
-	comment = "Contributions to Lag-Window estimation", email =  "stefan.birr@rub.de"))
-Author: Tobias Kley with contributions from Stefan Birr
+	comment = "Contributions to lag window estimation", email = "stefan.birr@rub.de"))
 Depends:
     R (>= 3.0.0),
     stats4
