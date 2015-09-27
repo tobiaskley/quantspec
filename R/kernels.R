@@ -34,7 +34,7 @@ W0 <- function(x){
 #' plot(x=seq(-8,8,0.05), y=W1(seq(-8,8,0.05)), type="l")
 ################################################################################
 W1 <- function(x){
-  W1.simple <- function(x) {if (abs(x) <= pi) {1/pi * .75*(1-(x/pi)^2)/pi } else {0}}
+  W1.simple <- function(x) {if (abs(x) <= pi) {.75*(1-(x/pi)^2)/pi } else {0}}
   return(Vectorize(W1.simple)(x))
 }
 
@@ -92,4 +92,30 @@ WDaniell <- function(x,a=(pi/2)){
     if (abs(x) <= pi) {(1/(pi+a))*(1-(a <= abs(x) & abs(x) <= pi)*(abs(x)-a)/(pi-a))} else {0}
   }
   return(Vectorize(WDaniell.simple)(x))
+}
+################################################################################
+#' @details
+#' Parzen Window for lagEstimators
+#'
+#' @name kernels
+#' @aliases WParzen
+#' @export
+#'
+#' @param u real number
+#'
+#' @examples
+#' plot(x=seq(-2,2,0.05),y=WParzen(seq(-2,2,0.05)),type = "l")
+################################################################################
+WParzen <- function(u){
+  WParzen.simple <- function(u) {
+    if (abs(u) <= 1){
+      if (abs(u) <= .5){
+        (1-6*u^2+6*abs(u)^3)
+      }
+      else{
+        (2*(1-abs(u))^3)
+      }
+    }else {(0)}
+  }
+  return(Vectorize(WParzen.simple)(u))
 }

@@ -41,6 +41,7 @@ setClass(
     contains = "FreqRep"
 )
 
+#' @importFrom stats mvfft
 setMethod(
     f = "initialize",
     signature = "ClippedFT",

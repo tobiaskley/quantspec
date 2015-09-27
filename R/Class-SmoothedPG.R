@@ -7,7 +7,7 @@ NULL
 #'
 #' \code{SmoothedPG} is an S4 class that implements the necessary
 #' calculations to determine a smoothed version of one of the quantile
-#' periodograms defined in Dette et. al (2014) and Kley et. al (2014).
+#' periodograms defined in Dette et. al (2015) and Kley et. al (2014).
 #'
 #' For a \code{\link{QuantilePG}} \eqn{Q_n(\omega, x_1, x_2)}{Qn(w,x1,x2)} and
 #' a \code{\link{Weight}} \eqn{W_n(\cdot)}{Wn(.)} the smoothed version
@@ -50,6 +50,7 @@ setClass(
     contains = "QSpecQuantity"
 )
 
+#' @importFrom stats convolve
 setMethod(
     f = "initialize",
     signature = "SmoothedPG",
@@ -81,7 +82,7 @@ setMethod(
       } else if (class(weight) == "SpecDistrWeight") {
         freq <- frequenciesValidator(frequencies, N, steps=c(1:3,5:6))
       } else {
-        error("Cannot handle this type of Weight object.")
+        stop("Cannot handle this type of Weight object.")
       }
 
       .Object@frequencies <- freq
@@ -316,10 +317,10 @@ setMethod(f = "getValues",
 #' @return Returns the estimate described above.
 #'
 #' @references
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
-#' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \emph{Bernoulli}, \bold{forthcoming}.
-#' [cf. \url{http://arxiv.org/abs/1401.8104}]
+#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
+#' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
+#' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
+#' [cf. \url{http://arxiv.org/abs/1111.7205}]
 ################################################################################
 setMethod(f = "getSdNaive",
     signature = signature(
@@ -328,7 +329,7 @@ setMethod(f = "getSdNaive",
         frequencies=2*pi*(0:(length(object@qPG@freqRep@Y)-1))/length(object@qPG@freqRep@Y),
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2),
-        impl=c("R","C")) {
+        impl=c("C","R")) {
 
       if (class(getWeight(object)) != "KernelWeight") {
         stop("getSdNaive currently only available for 'KernelWeight'.")
@@ -481,10 +482,10 @@ setMethod(f = "getSdNaive",
       res <- array(dim=c(J, K1, K2))
 
       if (length(r1.pos) > 0) {
-        res[1:length(r1.pos),,] <- resObj[r1.pos,c.1.pos,c.2.pos]
+        res[which(f <= pi),,] <- resObj[r1.pos,c.1.pos,c.2.pos]
       }
       if (length(r2.pos) > 0) {
-        res[(length(r1.pos)+1):J,,] <- Conj(resObj[r2.pos,c.1.pos,c.2.pos])
+        res[which(f > pi),,] <- Conj(resObj[r2.pos,c.1.pos,c.2.pos])
       }
 
       return(res)
@@ -525,6 +526,8 @@ setMethod(f = "getSdNaive",
 #'
 #' @name getSdBoot-SmoothedPG
 #' @aliases getSdBoot,SmoothedPG-method
+#' 
+#' @importFrom stats sd
 #'
 #' @keywords Access-functions
 #'
@@ -546,7 +549,7 @@ setMethod(f = "getSdBoot",
         levels.2=getLevels(object,2)) {
 
       if (class(getWeight(object)) != "KernelWeight") {
-        stop("getSdNaive currently only available for 'KernelWeight'.")
+        stop("getSdBoot currently only available for 'KernelWeight'.")
       }
 
       # workaround: default values don't seem to work for generic functions?
@@ -561,7 +564,7 @@ setMethod(f = "getSdBoot",
       }
       # end: workaround
 
-      if (dim(object@env$sdBoot) == 1) {
+      #if (object@env$sdBoot.done) {
 
         complex.var <- function(x) {
           return(complex(real = sd(Re(x)), imaginary = sd(Im(x))))
@@ -575,7 +578,8 @@ setMethod(f = "getSdBoot",
         v <- getValues(object, frequencies = frequencies,
             levels.1 = levels.1, levels.2 = levels.2)[,,,2:(B+1), drop=F]
         object@env$sdBoot <- apply(v, c(1,2,3), complex.var)
-      }
+      #  object@env$sdBoot.done <- TRUE
+      #}
       return(object@env$sdBoot)
     }
 )
@@ -613,6 +617,9 @@ setMethod(f = "getSdBoot",
 #'
 #' @name getPointwiseCIs-SmoothedPG
 #' @aliases getPointwiseCIs,SmoothedPG-method
+#' 
+#' @importFrom stats qnorm
+#' @importFrom stats quantile
 #'
 #' @keywords Access-functions
 #'
@@ -697,7 +704,7 @@ setMethod(f = "getPointwiseCIs",
         v <- getValues(object,
             frequencies = frequencies,
             levels.1 = levels.1,
-            levels.2 = levels.2)[,,,2:(B+1), drop=F]
+            levels.2 = levels.2)[,,,2:(B+1), drop=FALSE]
         uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
               imaginary = quantile(Im(x),1-alpha/2))}
         lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
@@ -923,6 +930,7 @@ smoothedPG <- function(
 #' @export
 #'
 #' @importFrom abind abind
+#' @importFrom grDevices gray
 #'
 #' @param x  The \code{\link{SmoothedPG}} object to plot
 #' @param plotPG a flag indicating weater the \code{QuantilePG} object

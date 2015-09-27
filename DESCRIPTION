@@ -1,10 +1,12 @@
 Package: quantspec
-Version: 1.0-3
+Version: 1.1-0
 Encoding: UTF-8
-Date: 2015-03-25
+Date: 2015-09-25
 Title: Quantile-Based Spectral Analysis of Time Series
-Authors@R: person("Tobias", "Kley", role=c("aut","cre"),
-    email = "tobias.kley@ruhr-uni-bochum.de")
+Authors@R: c(person("Tobias", "Kley", role=c("aut","cre"),
+    email = "t.kley@lse.ac.uk"),
+    person("Stefan", "Birr",  role = c("ctb"), 
+	comment = "Contributions to lag window estimation", email = "stefan.birr@rub.de"))
 Depends:
     R (>= 3.0.0),
     stats4
@@ -28,6 +30,8 @@ LinkingTo: Rcpp
 Collate:
     'Class-BootPos.R'
     'generics.R'
+    'Class-LagOperator.R'
+    'Class-ClippedCov.R'
     'aux-functions.R'
     'Class-QSpecQuantity.R'
     'Class-FreqRep.R'
@@ -36,6 +40,9 @@ Collate:
     'Class-IntegrQuantileSD.R'
     'Class-Weight.R'
     'Class-KernelWeight.R'
+    'Class-LagEstimator.R'
+    'kernels.R'
+    'Class-LagKernelWeight.R'
     'Class-MovingBlocks.R'
     'Class-QRegEstimator.R'
     'Class-QuantilePG.R'
@@ -44,6 +51,5 @@ Collate:
     'RcppExports.R'
     'data.R'
     'deprecated.R'
-    'kernels.R'
     'models.R'
     'quantspec-package.R'

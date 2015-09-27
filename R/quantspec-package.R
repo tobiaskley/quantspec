@@ -11,21 +11,29 @@ NULL
 #'  \tabular{ll}{
 #'    \cr Package: \tab quantspec
 #'    \cr Type:    \tab Package
-#'    \cr Version: \tab 1.0-3
-#'    \cr Date:    \tab 2015-03-25
+#'    \cr Version: \tab 1.1-0
+#'    \cr Date:    \tab 2015-09-25
 #'    \cr License: \tab GPL (>= 2)
 #'  }
 #'
 #' @section Contents:
-#' The \pkg{quantspec} package contains an hierachy of S4 classes with
+#' The \pkg{quantspec} package contains a hierachy of S4 classes with
 #' corresponding methods and functions serving as constructors. The following
 #' class diagrams provide an overview on the structure of the package. In the
-#' first class diagram the classes implementing the estimators are implemented.
+#' first and second class diagram the classes implementing the estimators are
+#' shown. In the first diagram the classes related to periodogram-based
+#' estimation are displayed:  
 #'
 #' \if{html}{\figure{main.png}{options: width=960}}
-#' \if{latex}{\figure{main.pdf}{options: width=15cm}}
+#' \if{latex}{\figure{main.pdf}{options: width=10cm}}
+#' 
+#' In the second diagram the classes related to lag window-based
+#' estimation are displayed:
+#' 
+#' \if{html}{\figure{main2.png}{options: width=960}}
+#' \if{latex}{\figure{main2.pdf}{options: width=10cm}}
 #'
-#' In the second class diagram the classes implementing model quantities are
+#' In the third class diagram the classes implementing model quantities are
 #' displayed. A relation to the ``empirical classes'' is given via the fact that
 #' the quantile spectral densities are computed by simulation of quantile
 #' periodograms and a common abstract superclass \code{QSpecQuantity} which
@@ -101,9 +109,9 @@ NULL
 #' Analysis and a Reference Implementation in R: The quantspec Package.
 #' Vignette to this R package.
 #'
-#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
+#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
-#' spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+#' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 #' [cf. \url{http://arxiv.org/abs/1111.7205}]
 #'
 #' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).

@@ -9,7 +9,7 @@ NULL
 #' \code{QRegEstimator} is an S4 class that implements the necessary
 #' calculations to determine the frequency representation based on the weigthed
 #' \eqn{L_1}{L1}-projection of a time series as described in
-#' Dette et. al (2014+). As a subclass to \code{\link{FreqRep}}
+#' Dette et. al (2015). As a subclass to \code{\link{FreqRep}}
 #' it inherits slots and methods defined there.
 #'
 #' For each frequency \eqn{\omega}{w} from \code{frequencies} and level
@@ -38,9 +38,10 @@ NULL
 #'                 the package \pkg{snowfall} may be used.
 #'
 #' @references
-#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
+#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
-#' spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+#' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
+#' [cf. \url{http://arxiv.org/abs/1111.7205}]
 ################################################################################
 
 setClass(
@@ -53,6 +54,7 @@ setClass(
 )
 
 #' @importFrom quantreg rq
+#' @importFrom snowfall sfLapply
 setMethod(
     f = "initialize",
     signature = "QRegEstimator",

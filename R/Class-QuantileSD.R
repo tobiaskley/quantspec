@@ -62,9 +62,9 @@ NULL
 #' \code{\link{ts-models}}.
 #'
 #' @references
-#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
+#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
-#' spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+#' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 #' [cf. \url{http://arxiv.org/abs/1111.7205}]
 #'
 #' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
@@ -100,6 +100,8 @@ setClass(
 #'
 #' @name increasePrecision-QuantileSD
 #' @aliases increasePrecision,QuantileSD-method
+#' 
+#' @importFrom stats smooth.spline
 #'
 #' @param object The \code{\link{QuantileSD}} of which to increase the precision.
 #' @param R value of which to enlarge R
@@ -548,6 +550,9 @@ setMethod(f = "getQuantilePG",
 #' @name QuantileSD-constructor
 #' @aliases quantileSD
 #' @export
+#' 
+#' @importFrom stats rnorm
+#' @importFrom stats runif
 #'
 #' @keywords Constructors
 #'

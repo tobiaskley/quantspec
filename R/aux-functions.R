@@ -151,7 +151,9 @@ closest.pos <- function(X, Y) {
 #'
 #' @name timeSeriesValidator
 #' @export
+#' 
 #' @importFrom zoo is.zoo coredata
+#' @importFrom stats is.ts
 #'
 #' @keywords Validator-functions
 #'
