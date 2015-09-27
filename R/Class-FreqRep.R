@@ -7,14 +7,15 @@ NULL
 ################################################################################
 #' Class for Frequency Representation.
 #'
-#' \code{FreqRep} is an S4 class that encapsulates, for a time
-#' series \eqn{(Y_t)_{t=0,\ldots,n-1}}{Y_0,\dots,Y_{n-1}}, the data structures
-#' for the storage of a frequency representation. Examples of such frequency
-#' representations include
+#' \code{FreqRep} is an S4 class that encapsulates, for a multivariate time
+#' series \eqn{(Y_{t,j})_{t=0,\ldots,n-1}}{Y_0j,\dots,Y_{n-1,j}},
+#' \eqn{j=1,\ldots,d}{j=1,...,d}
+#' the data structures for the storage of a frequency representation. Examples
+#' of such frequency representations include
 #' \itemize{
 #'   \item the Fourier transformation of the clipped time series
-#'         \eqn{(\{I\{Y_t \leq q\})}{(I{Y_t <= q})}, or
-#'   \item the weighted \eqn{L_1}{L1}-projection of \eqn{(Y_t)} onto an harmonic
+#'         \eqn{(\{I\{Y_{t,j} \leq q\})}{(I{Y_tj <= q})}, or
+#'   \item the weighted \eqn{L_1}{L1}-projection of \eqn{(Y_{t,j})} onto an harmonic
 #'         basis.
 #' }
 #' Examples are realized by implementing a sub-class to
@@ -24,20 +25,21 @@ NULL
 #'     \code{\link{QRegEstimator}}.
 #'
 #' It is always an option to base the calculations on the pseudo data
-#' \eqn{R_{t,n} / n}{R_tn / n} where \eqn{R_{t,n}}{R_tn} denotes the rank of
-#' \eqn{Y_t}{Y_t} among \eqn{(Y_t)_{t=0,\ldots,n-1}}{Y_0,\dots,Y_{n-1}}.
+#' \eqn{R_{t,n,j} / n}{R_tnj / n} where \eqn{R_{t,n,j}}{R_tnj} denotes the rank of
+#' \eqn{Y_{t,j}}{Y_tj} among \eqn{(Y_{t,j})_{t=0,\ldots,n-1}}{Y_0,\dots,Y_{n-1}}.
 #'
 #' To allow for a block bootstrapping procedure a number of \code{B} estimates
 #' determined from bootstrap replications of the time series which are yield by
 #' use of a \code{\link{BootPos}}-object can be stored on initialization.
 #'
 #' The data in the frequency domain is stored in the array \code{values}, which
-#' has dimensions \code{(J,K,B+1)}, where \code{J} is the number of
-#' \code{frequencies}, \code{K} is the number of \code{levels} and \code{B} is
+#' has dimensions \code{(J,P,K,B+1)}, where \code{J} is the number of
+#' \code{frequencies}, \code{P} is the dimension of the time series,
+#' \code{K} is the number of \code{levels} and \code{B} is
 #' the number of bootstrap replications requested on intialization.
-#' In particular, \code{values[j,k,1]} corresponds to the time series' frequency
-#' representation with \code{frequencies[j]} and \code{levels[k]}, while
-#' \code{values[j,k,b+1]} is the for the same, but determined from the
+#' In particular, \code{values[j,p,k,1]} corresponds to the time series' frequency
+#' representation with \code{frequencies[j]} and \code{levels[[d]][k]}, while
+#' \code{values[j,d,k,b+1]} is the for the same, but determined from the
 #' \code{b}th block bootstrapped replicate of the time series.
 #'
 #' @name   FreqRep-class
@@ -76,11 +78,11 @@ NULL
 setClass(
     Class = "FreqRep",
     representation=representation(
-        Y = "numeric",
-        frequencies = "numeric",
-        levels = "numeric",
-        values = "array",
-        isRankBased = "logical",
+        Y = "matrix",							# N x P
+        frequencies = "numeric",	# J
+        levels = "numeric",				# K - currently the same for all dimensions
+        values = "array",					# J x P x K x B
+        isRankBased = "logical",	# currently the same for all dimensions
         positions.boot = "BootPos",
         B = "numeric"
     )
@@ -93,13 +95,16 @@ setClass(
 #' @aliases getY,FreqRep-method
 #'
 #' @param object \code{FreqRep} of which to get the \code{Y}
+#' @param d optional parameter that determine which time series to return;
+#' 					may be a vector of elements 1, ..., D
 #'
 #' @return Returns the attribute \code{Y} that's a slot of \code{object}.
 ################################################################################
 setMethod(f = "getY",
     signature = signature("FreqRep"),
-    definition = function(object) {
-      return(object@Y)
+    definition = function(object, d = 1) {
+      # TODO: Verify if d has the right format.
+      return(object@Y[,d])
     }
 )
 
@@ -173,6 +178,8 @@ setMethod(f = "getLevels",
 #' @param object \code{FreqRep} of which to get the values
 #' @param frequencies a vector of frequencies for which to get the values
 #' @param levels a vector of levels for which to get the values
+#' @param d optional parameter that determine of which component to return the data;
+#' 					may be a vector of elements 1, ..., D
 #'
 #' @return Returns data from the array \code{values} that's a slot of
 #'          \code{object}.
@@ -190,15 +197,19 @@ setMethod(f = "getLevels",
 setMethod("getValues",
     signature(object="FreqRep"),
     function(object,
-        frequencies=2*pi*(0:(length(object@Y)-1))/length(object@Y),
-        levels=object@levels) {
+        frequencies=2*pi*(0:(lenTS(object@Y)-1))/lenTS(object@Y),
+        levels=object@levels,
+        d = 1:(dim(object@values)[2])) {
 
     # workaround: default values don't seem to work for generic functions?
     if (!hasArg(frequencies)) {
-      frequencies <- 2*pi*(0:(length(object@Y)-1))/length(object@Y)
+      frequencies <- 2*pi*(0:(lenTS(object@Y)-1))/lenTS(object@Y)
     }
     if (!hasArg(levels)) {
       levels <- object@levels
+    }
+    if (!hasArg(d)) {
+      d <- 1:(dim(object@values)[2])
     }
     # end: workaround
 
@@ -213,6 +224,8 @@ setMethod("getValues",
     if (object@isRankBased && !(prod(levels >= 0) && prod(levels <=1))) {
       stop("'levels' need to be from [0,1] when isRankBased==TRUE")
     }
+    
+    # TODO: Verify if d has the right format.
 
     ##############################
     ## (Similar) Code also in Class-SmoothedPG!!!
@@ -253,15 +266,19 @@ setMethod("getValues",
 
     J <- length(frequencies)
     K <- length(levels)
-    res <- array(dim=c(J, K, object@B+1))
+    res <- array(dim=c(J, length(d), K, object@B+1))
 
     if (length(r1.pos) > 0) {
-      res[which(f <= pi),,] <- object@values[r1.pos,c.pos,]
+      res[which(f <= pi),,,] <- object@values[r1.pos,,c.pos,]
     }
     if (length(r2.pos) > 0) {
-      res[which(f > pi),,] <- Conj(object@values[r2.pos,c.pos,])
+      res[which(f > pi),,,] <- Conj(object@values[r2.pos,,c.pos,])
     }
 
+    ## drop 'dimension' if D = 1
+    if (length(d) == 1) {
+      res <- array(res, dim=c(J,K,dim(res)[4]))
+    }
     return(res)
   }
 )
@@ -323,7 +340,7 @@ setMethod(f = "getBootPos",
     }
 )
 
-
+# Always shows the frequency representation of the first component
 setMethod(f = "show",
     signature = "FreqRep",
     definition = function(object) {
@@ -331,9 +348,10 @@ setMethod(f = "show",
       values <- getValues(object, frequencies=object@frequencies)
       J <- length(object@frequencies)
       K <- length(object@levels)
-      B <- dim(values)[3]
+      D <- dim(object@Y)[2]
+      B <- dim(values)[4]
 
-      cat(paste("\n",class(object)," (J = ",J,", K = ",K,", B+1 = ",B,")\n", sep=""))
+      cat(paste("\n",class(object)," (J = ",J,", D = ",D,", K = ",K,", B+1 = ",B,")\n", sep=""))
 
       if (J <= 7) {
         cat("Frequencies: ", round(object@frequencies,4),"\n")
@@ -347,9 +365,14 @@ setMethod(f = "show",
         cat("Levels     : ", round(object@levels[1:5],4),"..",round(object@levels[(K-4):K],4),"\n")
       }
 
-      cat("\nValues:\n")
-
-      resultMatr <- matrix(values[,,1], nrow=J, ncol=K)
+      if (D == 1) {
+        cat("\nValues:\n")
+        resultMatr <- matrix(values[,,1], nrow=J, ncol=K)
+      } else {
+        cat("\nValues of first component:\n")
+        resultMatr <- matrix(values[,1,,1], nrow=J, ncol=K)
+      }
+      
       nrowShow <- min(10,nrow(resultMatr))
       ncolShow <- min(4,ncol(resultMatr))
 
@@ -385,6 +408,8 @@ setMethod(f = "show",
 #' @param frequencies a set of frequencies for which the values are to be
 #'                    plotted.
 #' @param levels a set of levels for which the values are to be plotted.
+#' @param d vector indicating which components of a multivariate time series
+#' 					should be in the plot.
 #'
 #' @return Plots the \code{\link{FreqRep}} for all
 #'          \code{frequencies} and \code{levels} specified.
@@ -394,15 +419,19 @@ setMethod(f = "show",
       signature = signature(x = "FreqRep"),
       definition = function(x,
           ratio = 2,
-          frequencies=2*pi*(1:(floor(length(x@Y)/2)))/length(x@Y),
-          levels=x@levels) {
+          frequencies=2*pi*(1:(floor(lenTS(x@Y)/2)))/lenTS(x@Y),
+          levels=x@levels,
+          d=1:(dim(x@Y)[2])) {
 
     # workaround: default values don't seem to work for generic functions?
     if (!hasArg(frequencies)) {
-      frequencies <- 2*pi*(1:(floor(length(x@Y)/2)))/length(x@Y)
+      frequencies <- 2*pi*(1:(floor(lenTS(x@Y)/2)))/lenTS(x@Y)
     }
     if (!hasArg(levels)) {
       levels <- x@levels
+    }
+    if (!hasArg(d)) {
+      d <- 1:(dim(x@Y)[2])
     }
     # end: workaround
 
@@ -415,13 +444,30 @@ tryCatch({
 
     def.par <- par(no.readonly = TRUE) # save default, for resetting...
 
-    # TEST
-    p <- K
-    M1 <- matrix(1:(3*p),ncol=3, byrow=T)
-    M <- rbind(c(0,3*p+1,3*p+2),M1,c(0,rep(3*p+3,2)))
-    nf <- layout(M, c(lcm(1),rep(ratio,2)), c(lcm(1),rep(1,p),lcm(1)), TRUE)
+    D <- length(d)
+    # create a matrix for labels tau = .. and main plots
+    M_main <- matrix(1:((1+2*D)*K),ncol=1+2*D, byrow=T)
+    
+    # create a row for the labeling of components
+    s <- (1+2*D)*K + 1
+    M_lab1 <- c(0)
+    for (i in 1:D) {
+      M_lab1 <- c(M_lab1,s,s)
+      s <- s + 1
+    }
+    
+    # create a row for the labeling of Real / Imaginary part
+    M_lab2 <- c(0,s:(s+2*D-1))
+    s <- s+2*D
+    
+    # create a row for the labeling omega/2pi
+    M_omegas <- c(0, rep(s, 2*D))
+    
+    # put the rows together
+    M <- rbind(M_lab1, M_lab2, M_main, M_omegas)
+    
+    nf <- layout(M, c(lcm(1), rep(ratio,2*D)), c(lcm(1),lcm(1),rep(1,K),lcm(1)), TRUE)
 
-    # END TEST
 
     for (i in 1:K) {
       par(mar=c(0,0,0,0))
@@ -429,20 +475,37 @@ tryCatch({
       text(0.5,0.5,substitute(paste(tau,"=",k),list(k=round(levels[i],4))), srt=90)
 
       par(mar=c(2,2,1,1))
-      plot(x=frequencies/(2*pi), y=Re(values[,i,1]),
-          type="l", xlab="", ylab="")
 
+      for (j in d) {
+        if (dim(x@Y)[2] == 1) {
+          V <- values[,i,1]
+        } else {
+          V <- values[,j,i,1]
+        }
+        plot(x=frequencies/(2*pi), y=Re(V),
+            type="l", xlab="", ylab="")
+        
+        plot(x=frequencies/(2*pi), y=Im(V),
+            type="l", xlab="", ylab="")
+      }
 
-      plot(x=frequencies/(2*pi), y=Im(values[,i,1]),
-          type="l", xlab="", ylab="")
     }
 
 
     par(mar=c(0,0,0,0))
-    plot.new()
-    text(0.5,0.5,"Real part")
-    plot.new()
-    text(0.5,0.5,"Imaginary part")
+    
+    for (j in d) {
+      plot.new()
+      text(0.5,0.5,paste("Component",j))
+    }
+    
+    for (j in d) {
+      plot.new()
+      text(0.5,0.5,"Real part")
+      plot.new()
+      text(0.5,0.5,"Imaginary part")
+    }
+
 
     plot.new()
     text(0.5,0.5,expression(omega/2*pi))

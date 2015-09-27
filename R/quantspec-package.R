@@ -5,7 +5,7 @@ NULL
 #' Quantile-Based Spectral Analysis of Time Series
 #'
 #' Methods to determine, smooth and plot quantile (i. e., Laplace or copula)
-#' periodograms for univariate time series.
+#' periodograms for multivariate time series.
 #'
 #' @details
 #'  \tabular{ll}{

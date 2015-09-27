@@ -6,10 +6,13 @@
 \alias{getY-FreqRep}
 \title{Get \code{Y} from a \code{\link{FreqRep}} object.}
 \usage{
-\S4method{getY}{FreqRep}(object)
+\S4method{getY}{FreqRep}(object, d = 1)
 }
 \arguments{
 \item{object}{\code{FreqRep} of which to get the \code{Y}}
+
+\item{d}{optional parameter that determine which time series to return;
+                    may be a vector of elements 1, ..., D}
 }
 \value{
 Returns the attribute \code{Y} that's a slot of \code{object}.

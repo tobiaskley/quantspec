@@ -21,7 +21,7 @@ Imports:
     snowfall,
     Rcpp (>= 0.11.0)
 Description: Methods to determine, smooth and plot quantile (i. e., Laplace or
-    copula) periodograms for univariate time series.
+    copula) periodograms for multivariate time series.
 License: GPL (>= 2)
 URL: http://github.com/tobiaskley/quantspec
 BugReports: http://github.com/tobiaskley/quantspec/issues

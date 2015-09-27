@@ -7,7 +7,8 @@
 \title{Get values from a frequency representation.}
 \usage{
 \S4method{getValues}{FreqRep}(object, frequencies = 2 * pi *
-  (0:(length(object@Y) - 1))/length(object@Y), levels = object@levels)
+  (0:(lenTS(object@Y) - 1))/lenTS(object@Y), levels = object@levels,
+  d = 1:(dim(object@values)[2]))
 }
 \arguments{
 \item{object}{\code{FreqRep} of which to get the values}
@@ -15,6 +16,9 @@
 \item{frequencies}{a vector of frequencies for which to get the values}
 
 \item{levels}{a vector of levels for which to get the values}
+
+\item{d}{optional parameter that determine of which component to return the data;
+                    may be a vector of elements 1, ..., D}
 }
 \value{
 Returns data from the array \code{values} that's a slot of
