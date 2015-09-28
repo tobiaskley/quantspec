@@ -609,8 +609,8 @@ setMethod(f = "getCoherencySdNaive",
           
           for (r in 1:nrow(lC)) {
             jt <- lC[r,]
-            V1 <- matrix(V[,jt[1],jt[2],jt[5],jt[6]] * V[,jt[3],jt[4],jt[7],jt[8]], ncol=1)
-            V2 <- matrix(V[,jt[1],jt[2],jt[7],jt[8]] * V[,jt[3],jt[4],jt[5],jt[6]], ncol=1)
+            V1 <- matrix(V[,jt[1],jt[2],jt[5],jt[6]] * Conj(V[,jt[3],jt[4],jt[7],jt[8]]), ncol=1)
+            V2 <- matrix(V[,jt[1],jt[2],jt[7],jt[8]] * Conj(V[,jt[3],jt[4],jt[5],jt[6]]), ncol=1)
             
             auxRes[r,] <- rowSums(M1 %*% V1) + rowSums(M2 %*% V2)
           }
@@ -640,7 +640,7 @@ setMethod(f = "getCoherencySdNaive",
                     f11 <- V[,i1,k1,i1,k1]
                     f22 <- V[,i2,k2,i2,k2]
                     
-                    A <- H1212 - Re(f12*H1112/f11) - Re(f12*H1222/f22)
+                    A <- H1212 - Re(f12*H1112/f11) - Re(f12*Conj(H1222)/f22)
                     A <- A + (abs(f12)^2/4) * (H1111/f11^2 + 2*Re(H1122/(f11*f22)) + H2222/f22^2)
                     A <- A/(f11*f22)
                     
@@ -1028,8 +1028,8 @@ setMethod(f = "getSdNaive",
           
           for (r in 1:nrow(lC)) {
             jt <- lC[r,]
-            V1 <- matrix(V[,jt[1],jt[2],jt[5],jt[6]] * V[,jt[3],jt[4],jt[7],jt[8]], ncol=1)
-            V2 <- matrix(V[,jt[1],jt[2],jt[7],jt[8]] * V[,jt[3],jt[4],jt[5],jt[6]], ncol=1)
+            V1 <- matrix(V[,jt[1],jt[2],jt[5],jt[6]] * Conj(V[,jt[3],jt[4],jt[7],jt[8]]), ncol=1)
+            V2 <- matrix(V[,jt[1],jt[2],jt[7],jt[8]] * Conj(V[,jt[3],jt[4],jt[5],jt[6]]), ncol=1)
             
             auxRes[r,] <- rowSums(M1 %*% V1) + rowSums(M2 %*% V2)
             #auxRes[r,2,] <- rowSums(M3 %*% V1) + rowSums(M4 %*% V2)
