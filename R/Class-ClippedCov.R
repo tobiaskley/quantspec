@@ -70,11 +70,11 @@ setMethod(
     pos.1 = match(levels.1,levels.all)
     pos.2 = match(levels.2,levels.all)
     
-    val <- array(dim = c(n, max(ln.1,1), max(ln.2,1), B+1))
+    val <- array(dim = c(maxLag+1, max(ln.1,1), max(ln.2,1), B+1))
     
     for (b in 0:B) {
-      val[,,,b+1] = array(acf(Clipped[,,b+1], type="covariance", lag.max = maxLag, plot = FALSE, demean = FALSE)$acf[,pos.1,pos.2],
-          dim = c(n, max(ln.1,1), max(ln.2,1)))
+      val[,,,b+1] = array(acf(Clipped[,,b+1], type="covariance", lag.max = maxLag, plot = FALSE, demean = FALSE)$acf[1:(maxLag+1),pos.1,pos.2],
+          dim = c(maxLag+1, max(ln.1,1), max(ln.2,1)))
     }
     val <- aperm(val, c(1,3,2,4))
     
@@ -110,10 +110,10 @@ setMethod(
 #' @seealso \code{\link{LagOperator}}
 #'
 #' @examples
-#' ccf <- clippedCov(rnorm(100), maxLag = 10, levels.1 =c(0.1,0.5,0.9))
+#' ccf <- clippedCov(rnorm(200), maxLag = 25, levels.1 =c(0.1,0.5,0.9))
 #' dim(getValues(ccf))
 #' #print values for levels (.5,.5)
-#' print(getValues(ccf)[,2,2,1])
+#' plot(ccf,maxLag = 20)
 
 ################################################################################
 clippedCov <- function( Y,
