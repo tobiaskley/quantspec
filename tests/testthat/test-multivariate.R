@@ -114,3 +114,38 @@ test_that("multivariate functions work as expected",{
       
     }
 )
+
+
+test_that("multivariate functions work as expected (check against ref-results.rdata",{
+
+      source("load-ref.R")
+      
+      set.seed(2581)
+      Y1 <- ts1(16)
+      Y2 <- ts1(16)
+      
+      Y <- matrix(c(Y1, Y2), ncol=2)
+      
+      lev.ok.all <- c(0.25,0.5,0.75)
+      weight = kernelWeight(W=W0, N=64, bw=0.2)
+      
+      sPG.fft <- smoothedPG(Y, levels.1=lev.ok.all, weight = weight, type="clipped")
+      
+      W.fft.ci.mult <- getPointwiseCIs(sPG.fft)
+      W.fft.coh.ci.mult <- getPointwiseCIs(sPG.fft, quantity = "coherency")
+      W.fft.cohsq.ci.mult <- getPointwiseCIs(sPG.fft, quantity = "coherence")
+      
+      W.fft.sd.mult <- getSdNaive(sPG.fft)
+      W.fft.coh.sd.1.mult <- getCoherencySdNaive(sPG.fft, type="1")
+      W.fft.coh.sd.2.mult <- getCoherencySdNaive(sPG.fft, type="2")
+      
+      
+      expect_equal(W.fft.ci.mult, W.fft.ci.mult.ref)
+      expect_equal(W.fft.coh.ci.mult.ref, W.fft.coh.ci.mult)
+      expect_equal(W.fft.cohsq.ci.mult.ref, W.fft.cohsq.ci.mult)
+      expect_equal(W.fft.sd.mult.ref, W.fft.sd.mult.ref)
+      expect_equal(W.fft.coh.sd.1.mult.ref, W.fft.coh.sd.1.mult.ref)
+      expect_equal(W.fft.coh.sd.2.mult.ref, W.fft.coh.sd.2.mult.ref)
+      
+    }
+)
