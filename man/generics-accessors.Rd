@@ -4,9 +4,7 @@
 \alias{generics-accessors}
 \alias{getB}
 \alias{getBw}
-\alias{getCoherencePointwiseCIs}
 \alias{getCoherency}
-\alias{getCoherencyPointwiseCIs}
 \alias{getCoherencySdNaive}
 \alias{getDescr}
 \alias{getFrequencies}
@@ -63,10 +61,6 @@ getType(object, ...)
 getTs(object, ...)
 
 getCoherencySdNaive(object, ...)
-
-getCoherencePointwiseCIs(object, ...)
-
-getCoherencyPointwiseCIs(object, ...)
 
 getSdNaive(object, ...)
 

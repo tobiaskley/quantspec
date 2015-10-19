@@ -393,23 +393,19 @@ setMethod(f = "getCoherency",
         stop("Coherency can only be determined if weight is of type KernelWeight.")
       }
       d <- union(d1,d2)
-      V <- getValues(object, d1 = d, d2 = d, frequencies = frequencies)
+      V <- array(getValues(object, d1 = d, d2 = d, frequencies = frequencies), dim=c(J, D1, K1, D2, K2, object@qPG@freqRep@B+1))
       
       d1.pos <- closest.pos(d, d1)
       d2.pos <- closest.pos(d, d2)
       
       res <- .computeCoherency(V, d1.pos, d2.pos)
       
-      final.dim.res <- c(J)
-      if (D1 > 1) {
-        final.dim.res <- c(final.dim.res,D1)
+      if (D1 == 1 && D2 == 1) {
+        final.dim.res <- c(J, K1, K2, object@qPG@freqRep@B+1)
+      } else {
+        final.dim.res <- c(J, D1, K1, D2, K2, object@qPG@freqRep@B+1)
       }
-      final.dim.res <- c(final.dim.res,K1)
-      if (D2 > 1) {
-        final.dim.res <- c(final.dim.res,D2)
-      }
-      final.dim.res <- c(final.dim.res,K2, object@qPG@freqRep@B+1)
-      
+
       res[is.nan(res)] <- NA
       res <- array(res, dim=final.dim.res)
       
@@ -953,10 +949,13 @@ setMethod(f = "getSdNaive",
       # end: workaround
       
       N <- lenTS(Y)
+      
+      #TODO: modify this code such that only the levels and dimensions
+      # 		 that were not computed before are included in the computation.
       K1 <- length(objLevels1)
       K2 <- length(objLevels2)
-      D1 <- length(d1)
-      D2 <- length(d2)
+      D1 <- ncol(Y)
+      D2 <- ncol(Y)
       
       ## First determine which frequencies still have to be computed:
       #  i. e. for which j is 2*pi*k / N is to be computed.
@@ -1008,7 +1007,7 @@ setMethod(f = "getSdNaive",
           WW3 <- rep(WW,4) 
           
           # TODO: fix to make it work for all d1, d2!!
-          V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N, d1=d1, d2=d2), dim=c(N-1,D1,K1,D2,K2))     
+          V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N), dim=c(N-1,D1,K1,D2,K2))     
           res <- array(0,dim=c(J,D1,K1,D2,K2))
           auxRes <- array(0,dim=c(K1*K2*D1*D2 + K1*D1*(K2*D2-1), J))
           
@@ -1207,19 +1206,19 @@ setMethod(f = "getSdNaive",
       J <- length(frequencies)
       K1 <- length(levels.1)
       K2 <- length(levels.2)
-      res <- array(dim=c(J, D1, K1, D2, K2))
+      res <- array(dim=c(J, length(d1), K1, length(d2), K2))
       
       if (length(r1.pos) > 0) {
-        res[which(f <= pi),,,,] <- resObj[r1.pos, , c.1.pos, , c.2.pos]
+        res[which(f <= pi),,,,] <- resObj[r1.pos, d1, c.1.pos, d2, c.2.pos]
       }
       if (length(r2.pos) > 0) {
-        res[which(f > pi),,,,] <- Conj(resObj[r2.pos, , c.1.pos, , c.2.pos])
+        res[which(f > pi),,,,] <- Conj(resObj[r2.pos, d1, c.1.pos, d2, c.2.pos])
       }    
       
-      if (D1 == 1 && D2 == 1) {
+      if (length(d1) == 1 && length(d2) == 1) {
         final.dim.res <- c(J, K1, K2)
       } else {
-        final.dim.res <- c(J, D1, K1, D2, K2)
+        final.dim.res <- c(J, length(d1), K1, length(d2), K2)
       }
       
       res <- array(res, dim=final.dim.res)
@@ -1321,21 +1320,33 @@ setMethod(f = "getSdBoot",
 )
 
 ################################################################################
-#' Get pointwise confidence intervals for the quantile spectral density kernel
+#' Get pointwise confidence intervals for the quantile spectral density kernel,
+#' quantile coherency or quantile coherence.
 #'
 #' Returns a list of two arrays \code{lowerCIs} and \code{upperCIs} that contain
 #' the upper and lower limits for a level \code{1-alpha} confidence interval of
-#' the copula spectral density kernel. Each array is of dimension \code{[J,K1,K2]},
-#' where \code{J=length(frequencies)}, \code{K1=length(levels.1)}, and
-#' \code{K2=length(levels.2))}.
-#' At position \code{(j,k1,k2)} the real (imaginary) part of the returned values
-#' are the bounds of the confidence interval for the the real (imaginary) part
-#' of the quantile spectrum, which corresponds to
-#' \code{frequencies[j]}, \code{levels.1[k1]} and \code{levels.2[k2]} closest
-#' to the Fourier frequencies, \code{levels.1} and \code{levels.2}
-#' available in \code{object}; \code{\link{closest.pos}} is used to determine
-#' what closest to means.
+#' the quantity of interest. Each array is of dimension \code{[J,K1,K2]} if a
+#' univariate time series is being analysed or of dimension \code{[J,D1,K1,D2,K2]},
+#' where \code{J=length(frequencies)}, \code{D1=length(d1)}, \code{D2=length(d2)},
+#' \code{K1=length(levels.1)}, and \code{K2=length(levels.2))}.
+#' At position \code{(j,k1,k2)} or \code{(j,i1,k1,i2,k2)} the real (imaginary)
+#' part of the returned values are the bounds of the confidence interval for the
+#' the real (imaginary) part of the quantity under anlysis, which corresponds to
+#' \code{frequencies[j]}, \code{d1[i1]}, \code{d2[i2]}, \code{levels.1[k1]} and
+#' \code{levels.2[k2]} closest to the Fourier frequencies, \code{levels.1} and
+#' \code{levels.2} available in \code{object}; \code{\link{closest.pos}} is used
+#' to determine what closest to means.
 #'
+#' Currently, pointwise confidence bands for two different \code{quantity}
+#' are implemented:
+#' \itemize{
+#'   \item \code{"spectral density"}: confidence intervals for the quantile spectral
+#' 					 density as described in Kley et. al (2015+) for the univariate case and
+#' 					 in Barunik and Kley (2015) for the multivariate case.
+#'   \item \code{"coherency"}: confidence intervals for the quantile coherency as
+#' 					 described in Barunik and Kley (2015).
+#' }
+#' 
 #' Currently, three different \code{type}s of confidence intervals are
 #' available:
 #' \itemize{
@@ -1360,6 +1371,9 @@ setMethod(f = "getSdBoot",
 #' @keywords Access-functions
 #'
 #' @param object \code{SmoothedPG} of which to get the confidence intervals
+#' @param quantity a flag indicating for which the pointwise confidence bands
+#' 								 will be determined. Can take one of the possible values
+#' 								 discussed above. 
 #' @param frequencies a vector of frequencies for which to get the result
 #' @param levels.1 the first vector of levels for which to get the result
 #' @param levels.2 the second vector of levels for which to get the result
@@ -1388,6 +1402,7 @@ setMethod(f = "getPointwiseCIs",
     signature = signature(
         object = "SmoothedPG"),
     definition = function(object,
+        quantity = c("spectral density", "coherency", "coherence"),
         frequencies=2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y),
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2),
@@ -1420,18 +1435,42 @@ setMethod(f = "getPointwiseCIs",
       # end: workaround
       
       type <- match.arg(type)[1]
+      quantity <- match.arg(quantity)[1]
       switch(type,
           "naive.sd" = {
-            sdEstim <- getSdNaive(object,
-                frequencies = frequencies,
-                levels.1 = levels.1,
-                levels.2 = levels.2,
-                d1 = d1, d2 = d2)},
+            switch(quantity,
+                "spectral density" = {
+                    sdEstim <- getSdNaive(object,
+                        frequencies = frequencies,
+                        levels.1 = levels.1,
+                        levels.2 = levels.2,
+                        d1 = d1, d2 = d2)
+                  },
+                "coherency" = {
+                    sdEstim <- getCoherencySdNaive(object,
+                        frequencies = frequencies,
+                        levels.1 = levels.1,
+                        levels.2 = levels.2,
+                        d1 = d1, d2 = d2, type="1")
+                },
+                "coherence" = {
+                    sdEstim <- getCoherencySdNaive(object,
+                        frequencies = frequencies,
+                        levels.1 = levels.1,
+                        levels.2 = levels.2,
+                        d1 = d1, d2 = d2, type="2")
+                })
+            },
           "boot.sd" = {
-            sdEstim <- getSdBoot(object,
-                frequencies = frequencies,
-                levels.1 = levels.1,
-                levels.2 = levels.2)}
+            if (quantity == "spectral density") {
+              sdEstim <- getSdBoot(object,
+                  frequencies = frequencies,
+                  levels.1 = levels.1,
+                  levels.2 = levels.2)
+            } else {
+              stop("boot.sd is so far only implemented for quantity = 'spectral density'.")
+            }
+        }
       )
       
       J <- length(frequencies)
@@ -1442,28 +1481,78 @@ setMethod(f = "getPointwiseCIs",
       
       
       if (type == "naive.sd" || type == "boot.sd") {
-        v <- array(getValues(object,
-                frequencies = frequencies,
-                levels.1 = levels.1,
-                levels.2 = levels.2, d1=d1, d2=d2), dim = c(J, D1, K1, D2, K2))
-        sdEstim <- array(sdEstim, dim = c(J, D1, K1, D2, K2))
-        upperCIs <- array(v + sdEstim * qnorm(1-alpha/2), dim = c(J, D1, K1, D2, K2))
-        lowerCIs <- array(v + sdEstim * qnorm(alpha/2), dim = c(J, D1, K1, D2, K2))
-      } else if (type == "boot.full") {
-        # TODO: Error Msg ausgeben falls B == 0
-        B <- object@qPG@freqRep@B
-        # TODO: fix...
-        v <- getValues(object,
-            frequencies = frequencies,
-            levels.1 = levels.1,
-            levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=FALSE]
-        uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
-              imaginary = quantile(Im(x),1-alpha/2))}
-        lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
-              imaginary = quantile(Im(x),alpha/2))}
         
-        upperCIs <- apply(v, c(1,2,3), uQuantile)
-        lowerCIs <- apply(v, c(1,2,3), lQuantile)
+        switch(quantity,
+            "spectral density" = {
+              v <- array(getValues(object,
+                      frequencies = frequencies,
+                      levels.1 = levels.1,
+                      levels.2 = levels.2, d1=d1, d2=d2), dim = c(J, D1, K1, D2, K2))
+              sdEstim <- array(sdEstim, dim = c(J, D1, K1, D2, K2))
+              upperCIs <- array(v + sdEstim * qnorm(1-alpha/2), dim = c(J, D1, K1, D2, K2))
+              lowerCIs <- array(v + sdEstim * qnorm(alpha/2), dim = c(J, D1, K1, D2, K2))
+            },
+            "coherency" = {
+              v <- array(getCoherency(object,
+                      frequencies = frequencies,
+                      levels.1 = levels.1,
+                      levels.2 = levels.2, d1=d1, d2=d2), dim = c(J, D1, K1, D2, K2))
+              upperCIs <- array(v + sdEstim * qnorm(1-alpha/2), dim = c(J, D1, K1, D2, K2))
+              lowerCIs <- array(v + sdEstim * qnorm(alpha/2), dim = c(J, D1, K1, D2, K2))
+            },
+            "coherence" = {
+              v <- array(getCoherency(object,
+                      frequencies = frequencies,
+                      levels.1 = levels.1,
+                      levels.2 = levels.2, d1=d1, d2=d2), dim = c(J, D1, K1, D2, K2))
+              
+              upperCIs <- array(abs(v)^2 + Re(sdEstim) * qnorm(1-alpha/2), dim = c(J, D1, K1, D2, K2))
+              lowerCIs <- array(abs(v)^2 + Re(sdEstim) * qnorm(alpha/2), dim = c(J, D1, K1, D2, K2))
+            })
+
+      } else if (type == "boot.full") {
+        
+        if (quantity == "spectral density") {
+          
+          # TODO: Error Msg ausgeben falls B == 0
+          B <- object@qPG@freqRep@B
+          # TODO: fix...
+    
+    switch(quantity,
+        "spectral density" = {
+          v <- getValues(object,
+              frequencies = frequencies,
+              levels.1 = levels.1,
+              levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=FALSE]
+
+        },
+        "coherency" = {
+          v <- getCoherency(object,
+              frequencies = frequencies,
+              levels.1 = levels.1,
+              levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=FALSE]
+        },
+        "coherence" = {
+          v <- getCoherency(object,
+              frequencies = frequencies,
+              levels.1 = levels.1,
+              levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=FALSE]
+          v <- abs(v)^2
+        })
+    
+          v <- getValues(object,
+              frequencies = frequencies,
+              levels.1 = levels.1,
+              levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=FALSE]
+          uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
+                imaginary = quantile(Im(x),1-alpha/2))}
+          lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
+                imaginary = quantile(Im(x),alpha/2))}
+          
+          upperCIs <- apply(v, c(1,2,3), uQuantile)
+          lowerCIs <- apply(v, c(1,2,3), lQuantile)
+          
+        }
       }
       
       if (D1 == 1 && D2 == 1) {
@@ -1477,286 +1566,7 @@ setMethod(f = "getPointwiseCIs",
       
       res <- list(lowerCIs = lowerCIs, upperCIs = upperCIs)
       return(res)
-    }
-)
 
-################################################################################
-#' Get pointwise confidence intervals for the quantile coherence
-#'
-#' TODO
-#'
-#' @name getCoherencePointwiseCIs-SmoothedPG
-#' @aliases getCoherencePointwiseCIs,SmoothedPG-method
-#'
-#' @keywords Access-functions
-#'
-#' @param object \code{SmoothedPG} of which to get the confidence intervals
-#' @param frequencies a vector of frequencies for which to get the result
-#' @param levels.1 the first vector of levels for which to get the result
-#' @param levels.2 the second vector of levels for which to get the result
-#' @param d1 optional parameter that determine for which j1 to return the
-#' 					 data; may be a vector of elements 1, ..., D
-#' @param d2 same as d1, but for j2
-#' @param alpha the level of the confidence interval; must be from \eqn{(0,1)}
-#' @param type a flag indicating which type of confidence interval should be
-#'         returned; can take one of the three values discussed above.
-#'
-#' @return Returns a named list of two arrays \code{lowerCIS} and \code{upperCIs}
-#'          containing the lower and upper bounds for the confidence intervals.
-#'
-################################################################################
-# TODO: Update documentation.
-setMethod(f = "getCoherencePointwiseCIs",
-    signature = signature(
-        object = "SmoothedPG"),
-    definition = function(object,
-        frequencies=2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y),
-        levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2),
-        d1 = 1:(dim(object@values)[2]),
-        d2 = 1:(dim(object@values)[4]),
-        alpha=.1, type=c("naive.sd", "variance stabilized", "boot.sd", "boot.full")) {
-      
-      # workaround: default values don't seem to work for generic functions?
-      if (!hasArg(frequencies)) {
-        frequencies <- 2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y)
-      }
-      if (!hasArg(levels.1)) {
-        levels.1 <- object@levels[[1]]
-      }
-      if (!hasArg(levels.2)) {
-        levels.2 <- object@levels[[2]]
-      }
-      if (!hasArg(alpha)) {
-        alpha <- 0.1
-      }
-      if (!hasArg(d1)) {
-        d1 <- 1:(dim(object@values)[2])
-      }
-      if (!hasArg(d2)) {
-        d2 <- 1:(dim(object@values)[4])
-      }
-      if (!hasArg(type)) {
-        type <- "naive.sd"
-      }
-      # end: workaround
-      
-      type <- match.arg(type)[1]
-      switch(type,
-          "naive.sd" = {
-            sdEstim <- getCoherencySdNaive(object,
-                frequencies = frequencies,
-                levels.1 = levels.1,
-                levels.2 = levels.2,
-                d1 = d1, d2 = d2, type="2")
-            sdEstim <- Re(sdEstim)},
-          "boot.sd" = {
-            sdEstim <- getSdBoot(object,
-                frequencies = frequencies,
-                levels.1 = levels.1,
-                levels.2 = levels.2)}
-      )
-      
-      J <- length(frequencies)
-      K1 <- length(levels.1)
-      K2 <- length(levels.2)
-      D1 <- length(d1)
-      D2 <- length(d2)
-      
-      
-      if (type == "naive.sd" || type == "boot.sd") {
-        v <- array(getCoherency(object,
-                frequencies = frequencies,
-                levels.1 = levels.1,
-                levels.2 = levels.2, d1=d1, d2=d2), dim = c(J, D1, K1, D2, K2))
-        
-        upperCIs <- array(abs(v)^2 + Re(sdEstim) * qnorm(1-alpha/2), dim = c(J, D1, K1, D2, K2))
-        lowerCIs <- array(abs(v)^2 + Re(sdEstim) * qnorm(alpha/2), dim = c(J, D1, K1, D2, K2))
-        
-        #upperCIs <- array(0.5 * sdEstim^2 * qchisq(1-alpha/2, 2, ncp = abs(v)^2), dim = c(J, D1, K1, D2, K2))
-        #lowerCIs <- array(0.5 * sdEstim^2 * qchisq(alpha/2, 2, ncp = abs(v)^2), dim = c(J, D1, K1, D2, K2))
-      } else if (type == "variance stabilized") {
-        v <- array(getCoherency(object,
-                frequencies = frequencies,
-                levels.1 = levels.1,
-                levels.2 = levels.2, d1=d1, d2=d2), dim = c(J, D1, K1, D2, K2))
-        sigma <- array(1, dim = c(J, D1, K1, D2, K2))
-        sigma[which((frequencies %% pi == 0)),,,,] <- 2
-        W <- getW(getWeight(object))
-        Wsq <- function(x) {W(x)^2}
-        intWsq <- integrate(Wsq, lower=-pi, upper=pi)$value
-        bw <- getBw(getWeight(object))
-        n <- lenTS(object@qPG@freqRep@Y)
-        sigma <- sigma/(pi*bw*n*intWsq)
-        upperCIs <- array(tanh(atanh(abs(v)) + sigma * qnorm(1-alpha/2))^2, dim = c(J, D1, K1, D2, K2))
-        lowerCIs <- array(tanh(atanh(abs(v)) - sigma * qnorm(1-alpha/2))^2, dim = c(J, D1, K1, D2, K2))        
-      } else if (type == "boot.full") {
-        # TODO: Error Msg ausgeben falls B == 0
-        B <- object@qPG@freqRep@B
-        # TODO: fix...
-        v <- getValues(object,
-            frequencies = frequencies,
-            levels.1 = levels.1,
-            levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=F]
-        uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
-              imaginary = quantile(Im(x),1-alpha/2))}
-        lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
-              imaginary = quantile(Im(x),alpha/2))}
-        
-        upperCIs <- apply(v, c(1,2,3), uQuantile)
-        lowerCIs <- apply(v, c(1,2,3), lQuantile)
-      }
-      
-      res <- list(lowerCIs = lowerCIs, upperCIs = upperCIs)
-      return(res)
-    }
-)
-
-################################################################################
-#' Get pointwise confidence intervals for the quantile coherency
-#'
-#' Returns a list of two arrays \code{lowerCIs} and \code{upperCIs} that contain
-#' the upper and lower limits for a level \code{1-alpha} confidence interval of
-#' the copula spectral density kernel. Each array is of dimension \code{[J,K1,K2]},
-#' where \code{J=length(frequencies)}, \code{K1=length(levels.1)}, and
-#' \code{K2=length(levels.2))}.
-#' At position \code{(j,k1,k2)} the real (imaginary) part of the returned values
-#' are the bounds of the confidence interval for the the real (imaginary) part
-#' of the quantile spectrum, which corresponds to
-#' \code{frequencies[j]}, \code{levels.1[k1]} and \code{levels.2[k2]} closest
-#' to the Fourier frequencies, \code{levels.1} and \code{levels.2}
-#' available in \code{object}; \code{\link{closest.pos}} is used to determine
-#' what closest to means.
-#'
-#' Currently, three different \code{type}s of confidence intervals are
-#' available:
-#' \itemize{
-#'   \item \code{"naive.sd"}: confidence intervals based on the asymptotic
-#'           normality of the smoothed quantile periodogram; standard deviations
-#'           are estimated using \code{\link{getSdNaive}}.
-#'   \item \code{"boot.sd"}: confidence intervals based on the asymptotic
-#'           normality of the smoothed quantile periodogram; standard deviations
-#'           are estimated using \code{\link{getSdBoot}}.
-#'   \item \code{"boot.full"}: confidence intervals determined by estimating the
-#'           quantiles of he distribution of the smoothed quantile periodogram,
-#'           by the empirical quantiles of the sample of bootstrapped
-#'           replications.
-#' }
-#'
-#' @name getCoherencyPointwiseCIs-SmoothedPG
-#' @aliases getCoherencyPointwiseCIs,SmoothedPG-method
-#'
-#' @keywords Access-functions
-#'
-#' @param object \code{SmoothedPG} of which to get the confidence intervals
-#' @param frequencies a vector of frequencies for which to get the result
-#' @param levels.1 the first vector of levels for which to get the result
-#' @param levels.2 the second vector of levels for which to get the result
-#' @param d1 optional parameter that determine for which j1 to return the
-#' 					 data; may be a vector of elements 1, ..., D
-#' @param d2 same as d1, but for j2
-#' @param alpha the level of the confidence interval; must be from \eqn{(0,1)}
-#' @param type a flag indicating which type of confidence interval should be
-#'         returned; can take one of the three values discussed above.
-#'
-#' @return Returns a named list of two arrays \code{lowerCIS} and \code{upperCIs}
-#'          containing the lower and upper bounds for the confidence intervals.
-#'
-#' @examples
-#' sPG <- smoothedPG(rnorm(2^10), levels.1=0.5)
-#' CI.upper <- Re(getPointwiseCIs(sPG)$upperCIs[,1,1])
-#' CI.lower <- Re(getPointwiseCIs(sPG)$lowerCIs[,1,1])
-#' freq = 2*pi*(0:1023)/1024
-#' plot(x = freq, y = rep(0.25/(2*pi),1024),
-#'    ylim=c(min(CI.lower), max(CI.upper)),
-#'    type="l", col="red") # true spectrum
-#' lines(x = freq, y = CI.upper)
-#' lines(x = freq, y = CI.lower)
-################################################################################
-# TODO: Update documentation.
-setMethod(f = "getCoherencyPointwiseCIs",
-    signature = signature(
-        object = "SmoothedPG"),
-    definition = function(object,
-        frequencies=2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y),
-        levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2),
-        d1 = 1:(dim(object@values)[2]),
-        d2 = 1:(dim(object@values)[4]),
-        alpha=.1, type=c("naive.sd", "boot.sd", "boot.full")) {
-      
-      # workaround: default values don't seem to work for generic functions?
-      if (!hasArg(frequencies)) {
-        frequencies <- 2*pi*(0:(lenTS(object@qPG@freqRep@Y)-1))/lenTS(object@qPG@freqRep@Y)
-      }
-      if (!hasArg(levels.1)) {
-        levels.1 <- object@levels[[1]]
-      }
-      if (!hasArg(levels.2)) {
-        levels.2 <- object@levels[[2]]
-      }
-      if (!hasArg(alpha)) {
-        alpha <- 0.1
-      }
-      if (!hasArg(d1)) {
-        d1 <- 1:(dim(object@values)[2])
-      }
-      if (!hasArg(d2)) {
-        d2 <- 1:(dim(object@values)[4])
-      }
-      if (!hasArg(type)) {
-        type <- "naive.sd"
-      }
-      # end: workaround
-      
-      type <- match.arg(type)[1]
-      switch(type,
-          "naive.sd" = {
-            sdEstim <- getCoherencySdNaive(object,
-                frequencies = frequencies,
-                levels.1 = levels.1,
-                levels.2 = levels.2,
-                d1 = d1, d2 = d2, type="1")},
-          "boot.sd" = {
-            sdEstim <- getSdBoot(object,
-                frequencies = frequencies,
-                levels.1 = levels.1,
-                levels.2 = levels.2)}
-      )
-      
-      J <- length(frequencies)
-      K1 <- length(levels.1)
-      K2 <- length(levels.2)
-      D1 <- length(d1)
-      D2 <- length(d2)
-      
-      
-      if (type == "naive.sd" || type == "boot.sd") {
-        v <- array(getCoherency(object,
-                frequencies = frequencies,
-                levels.1 = levels.1,
-                levels.2 = levels.2, d1=d1, d2=d2), dim = c(J, D1, K1, D2, K2))
-        upperCIs <- array(v + sdEstim * qnorm(1-alpha/2), dim = c(J, D1, K1, D2, K2))
-        lowerCIs <- array(v + sdEstim * qnorm(alpha/2), dim = c(J, D1, K1, D2, K2))
-      } else if (type == "boot.full") {
-        # TODO: Error Msg ausgeben falls B == 0
-        B <- object@qPG@freqRep@B
-        # TODO: fix...
-        v <- getValues(object,
-            frequencies = frequencies,
-            levels.1 = levels.1,
-            levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=F]
-        uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
-              imaginary = quantile(Im(x),1-alpha/2))}
-        lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
-              imaginary = quantile(Im(x),alpha/2))}
-        
-        upperCIs <- apply(v, c(1,2,3), uQuantile)
-        lowerCIs <- apply(v, c(1,2,3), lQuantile)
-      }
-      
-      res <- list(lowerCIs = lowerCIs, upperCIs = upperCIs)
-      return(res)
     }
 )
 
@@ -2081,7 +1891,7 @@ setMethod(f = "plot",
             if (ptw.CIs > 0) {
               CI <- getPointwiseCIs(x, frequencies = frequencies,
                   alpha=ptw.CIs, type=type.CIs,
-                  levels.1=levels, levels.2=levels)
+                  levels.1=levels, levels.2=levels, d1 = 1, d2 = 1)
               lowerCIs  <- CI$lowerCIs
               upperCIs  <- CI$upperCIs
               #text.headline <- (paste(text.headline, ", includes ",1-ptw.CIs,"-CI (ptw. of type '",type.CIs,"')",sep=""))

@@ -110,6 +110,6 @@ test_that("smoothedPG works as expected for various levels",{
 
       W.fft.sd <- getSdNaive(sPG.fft)
       expect_that(dim(W.fft.sd),equals(c(64,3,3)))
-      #expect_that(W.fft.sd,equals(W.fft.sd.ref))
+      expect_that(W.fft.sd,equals(W.fft.sd.ref))
       
     })

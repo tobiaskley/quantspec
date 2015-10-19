@@ -104,6 +104,9 @@ setMethod(
 #' @param frequencies a vector of frequencies for which to get the values
 #' @param levels.1 the first vector of levels for which to get the values
 #' @param levels.2 the second vector of levels for which to get the values
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 data; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
 #'
 #' @return Returns data from the array \code{values} that's a slot of
 #'          \code{object}.
@@ -126,7 +129,9 @@ setMethod(
     definition = function(object,
         frequencies=2*pi*(0:(lenTS(object@freqRep@Y)-1))/lenTS(object@freqRep@Y),
         levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2)) {
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@freqRep@Y)[2]),
+        d2 = 1:(dim(object@freqRep@Y)[2])) {
 
     # workaround: default values don't seem to work for generic functions?
     if (!hasArg(frequencies)) {
@@ -138,12 +143,21 @@ setMethod(
     if (!hasArg(levels.2)) {
       levels.2 <- object@levels[[2]]
     }
+    if (!hasArg(d1)) {
+      d1 <- 1:(dim(object@freqRep@Y)[2])
+    }
+    if (!hasArg(d2)) {
+      d2 <- 1:(dim(object@freqRep@Y)[2])
+    }
     # end: workaround
 
     fR <- object@freqRep
 
     N <- dim(fR@Y)[1]
     D <- dim(fR@Y)[2]
+    D1 <- length(d1)
+    D2 <- length(d2)
+      
     J <- length(frequencies)
     B <- fR@B
     K1 <- length(levels.1)
@@ -163,6 +177,14 @@ setMethod(
       A <- apply(x, c(1,4), function(x){outer(x[,P1],Conj(x[,P2]),"*")})
       values <- aperm(array(A, dim=c(D,K1,D,K2,J,B+1)), perm=c(5,1,2,3,4,6))  
     }
+    
+    if (D1 == 1 && D2 == 1) {
+      final.dim.res <- c(J, K1, K2, object@freqRep@B+1)
+    } else {
+      final.dim.res <- c(J, D1, K1, D2, K2, object@freqRep@B+1)
+    }
+    
+    values <- array(values, dim=final.dim.res)
     
 
     return(1/(2*pi*N) * values)
@@ -377,14 +399,17 @@ setMethod(f = "plot",
 tryCatch({
     N <- length(x@freqRep@Y)
     K <- length(levels)
+    # TODO: make a choice of dimensions possible.
     values <- getValues(x, frequencies = frequencies,
-        levels.1=levels, levels.2=levels)
+        levels.1=levels, levels.2=levels, d1=1, d2=1)
+
     if (hasArg(qsd)) {
       j.min <- round(min(frequencies*2^8/(2*pi)))
       j.max <- round(max(frequencies*2^8/(2*pi)))
       freq.csd <- 2*pi*(j.min:j.max)/2^8
+      # TODO: make a choice of dimensions possible.
       csd <- getValues(qsd, frequencies = freq.csd,
-          levels.1=levels, levels.2=levels)
+          levels.1=levels, levels.2=levels, d1=1, d2=1)
     }
 
     X <- frequencies/(2*pi)

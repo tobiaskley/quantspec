@@ -379,21 +379,18 @@ setMethod(f = "getValues",
       res <- array(dim=c(J, D1, K1, D2, K2))
 
       if (length(r1.pos) > 0) {
-        res[which(f <= pi),,,,] <- object@values[r1.pos,,c.1.pos,,c.2.pos]
+        res[which(f <= pi),,,,] <- object@values[r1.pos,d1,c.1.pos,d2,c.2.pos]
       }
       if (length(r2.pos) > 0) {
-        res[which(f > pi),,,,] <- Conj(object@values[r2.pos,,c.1.pos,,c.2.pos])
+        res[which(f > pi),,,,] <- Conj(object@values[r2.pos,d1,c.1.pos,d2,c.2.pos])
       }
       
-      final.dim.res <- c(J)
-      if (D1 > 1) {
-        final.dim.res <- c(final.dim.res,D1)
+
+      if (D1 == 1 && D2 == 1) {
+        final.dim.res <- c(J, K1, K2)
+      } else {
+        final.dim.res <- c(J, D1, K1, D2, K2)
       }
-      final.dim.res <- c(final.dim.res,K1)
-      if (D2 > 1) {
-        final.dim.res <- c(final.dim.res,D2)
-      }
-      final.dim.res <- c(final.dim.res,K2)
       
       res <- array(res, dim=final.dim.res)
 
@@ -533,17 +530,12 @@ setMethod(f = "getCoherency",
     
     res <- .computeCoherency(V, d1.pos, d2.pos)
 
+      if (D1 == 1 && D2 == 1) {
+        final.dim.res <- c(J, K1, K2)
+      } else {
+        final.dim.res <- c(J, D1, K1, D2, K2)
+      }
 
-      final.dim.res <- c(J)
-      if (D1 > 1) {
-        final.dim.res <- c(final.dim.res,D1)
-      }
-      final.dim.res <- c(final.dim.res,K1)
-      if (D2 > 1) {
-        final.dim.res <- c(final.dim.res,D2)
-      }
-      final.dim.res <- c(final.dim.res,K2)
-      
       res <- array(res, dim=final.dim.res)
       
       return(res)
@@ -930,9 +922,9 @@ tryCatch({
     N <- x@N
     K <- length(levels)
     values <- getValues(x, frequencies = frequencies,
-                        levels.1=levels, levels.2=levels)
+                        levels.1=levels, levels.2=levels, d1=1, d2=1)
     meanPG <- getMeanPG(x, frequencies = frequencies,
-        levels.1=levels, levels.2=levels)
+        levels.1=levels, levels.2=levels, d1=1, d2=1)
 
     p <- K
     M <- matrix(1:p^2, ncol=p)
