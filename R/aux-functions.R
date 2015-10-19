@@ -154,6 +154,7 @@ closest.pos <- function(X, Y) {
 #' 
 #' @importFrom zoo is.zoo coredata
 #' @importFrom stats is.ts
+#' @importFrom utils head
 #'
 #' @keywords Validator-functions
 #'
