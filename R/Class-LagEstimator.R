@@ -12,6 +12,8 @@ NULL
 #' by the slot \code{weight} and the \code{LagOperator} \eqn{\Gamma(Y_0,Y_k)} is defined 
 #' by the slot lagOp.
 #' 
+#' Currently, the implementation of this class allows only for the analysis of
+#' univariate time series. 
 #'
 #' @name LagEstimator-class
 #' @aliases LagEstimator

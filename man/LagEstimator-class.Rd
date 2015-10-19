@@ -12,6 +12,10 @@ will be calculated on initalization. The \code{LagKernelWeight} K_n is determine
 by the slot \code{weight} and the \code{LagOperator} \eqn{\Gamma(Y_0,Y_k)} is defined
 by the slot lagOp.
 }
+\details{
+Currently, the implementation of this class allows only for the analysis of
+univariate time series.
+}
 \section{Slots}{
 
 \describe{

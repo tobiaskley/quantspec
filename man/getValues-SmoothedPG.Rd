@@ -43,6 +43,11 @@ available in \code{object}; \code{\link{closest.pos}} is used to determine
 what closest to means. \code{b==1} corresponds to the estimate without
 bootstrapping; \code{b>1} corresponds to the \code{b-1}st bootstrap estimate.
 }
+\details{
+If not only one, but multiple time series are under study, the dimension of
+the returned vector is of dimension \code{[J,P,K1,P,K2,B+1]}, where \code{P}
+denotes the dimension of the time series.
+}
 \seealso{
 An example on how to use this function is analogously to the example given in
 \code{\link{getValues-QuantilePG}}.

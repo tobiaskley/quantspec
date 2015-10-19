@@ -65,4 +65,7 @@ i. e., \eqn{\tau_1 \leq \tau_2}{tau1 <= tau2}) or the imaginary parts
 for the combination of levels \eqn{\tau_1}{tau1} and \eqn{\tau_2}{tau2}
 denoted on the left and bottom margin of the plot are displayed.
 }
+\details{
+Currently, only the plot for the first component is shown.
+}
 

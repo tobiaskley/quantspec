@@ -8,14 +8,14 @@ NULL
 #' Class for Frequency Representation.
 #'
 #' \code{FreqRep} is an S4 class that encapsulates, for a multivariate time
-#' series \eqn{(Y_{t,j})_{t=0,\ldots,n-1}}{Y_0j,\dots,Y_{n-1,j}},
-#' \eqn{j=1,\ldots,d}{j=1,...,d}
+#' series \eqn{(Y_{t,i})_{t=0,\ldots,n-1}}{Y_0i,\dots,Y_{n-1,i}},
+#' \eqn{i=1,\ldots,d}{i=1,...,d}
 #' the data structures for the storage of a frequency representation. Examples
 #' of such frequency representations include
 #' \itemize{
 #'   \item the Fourier transformation of the clipped time series
-#'         \eqn{(\{I\{Y_{t,j} \leq q\})}{(I{Y_tj <= q})}, or
-#'   \item the weighted \eqn{L_1}{L1}-projection of \eqn{(Y_{t,j})} onto an harmonic
+#'         \eqn{(\{I\{Y_{t,i} \leq q\})}{(I{Y_ti <= q})}, or
+#'   \item the weighted \eqn{L_1}{L1}-projection of \eqn{(Y_{t,i})} onto an harmonic
 #'         basis.
 #' }
 #' Examples are realized by implementing a sub-class to
@@ -25,8 +25,8 @@ NULL
 #'     \code{\link{QRegEstimator}}.
 #'
 #' It is always an option to base the calculations on the pseudo data
-#' \eqn{R_{t,n,j} / n}{R_tnj / n} where \eqn{R_{t,n,j}}{R_tnj} denotes the rank of
-#' \eqn{Y_{t,j}}{Y_tj} among \eqn{(Y_{t,j})_{t=0,\ldots,n-1}}{Y_0,\dots,Y_{n-1}}.
+#' \eqn{R_{t,n,i} / n}{R_tni / n} where \eqn{R_{t,n,i}}{R_tnj} denotes the rank of
+#' \eqn{Y_{t,i}}{Y_ti} among \eqn{(Y_{t,i})_{t=0,\ldots,n-1}}{Y_0,\dots,Y_{n-1}}.
 #'
 #' To allow for a block bootstrapping procedure a number of \code{B} estimates
 #' determined from bootstrap replications of the time series which are yield by
@@ -37,9 +37,9 @@ NULL
 #' \code{frequencies}, \code{P} is the dimension of the time series,
 #' \code{K} is the number of \code{levels} and \code{B} is
 #' the number of bootstrap replications requested on intialization.
-#' In particular, \code{values[j,p,k,1]} corresponds to the time series' frequency
-#' representation with \code{frequencies[j]} and \code{levels[[d]][k]}, while
-#' \code{values[j,d,k,b+1]} is the for the same, but determined from the
+#' In particular, \code{values[j,i,k,1]} corresponds to the time series' frequency
+#' representation with \code{frequencies[j]}, dimension \code{i} and \code{levels[k]}, while
+#' \code{values[j,i,k,b+1]} is the for the same, but determined from the
 #' \code{b}th block bootstrapped replicate of the time series.
 #'
 #' @name   FreqRep-class
@@ -448,12 +448,18 @@ tryCatch({
     # create a matrix for labels tau = .. and main plots
     M_main <- matrix(1:((1+2*D)*K),ncol=1+2*D, byrow=T)
     
-    # create a row for the labeling of components
     s <- (1+2*D)*K + 1
-    M_lab1 <- c(0)
-    for (i in 1:D) {
-      M_lab1 <- c(M_lab1,s,s)
-      s <- s + 1
+    # create a row for the labeling of components
+    if (dim(x@Y)[2] == 1) {
+      ## if univariate
+      M_lab1 <- c()
+    } else {
+      ## if multivariate
+      M_lab1 <- c(0)
+      for (i in 1:D) {
+        M_lab1 <- c(M_lab1,s,s)
+        s <- s + 1
+      }
     }
     
     # create a row for the labeling of Real / Imaginary part
@@ -464,9 +470,17 @@ tryCatch({
     M_omegas <- c(0, rep(s, 2*D))
     
     # put the rows together
-    M <- rbind(M_lab1, M_lab2, M_main, M_omegas)
+    if (dim(x@Y)[2] == 1) {
+      ## if univariate
+      M <- rbind(M_lab2, M_main, M_omegas)
+      nf <- layout(M, c(lcm(1), rep(ratio,2*D)), c(lcm(1),rep(1,K),lcm(1)), TRUE)
+    } else {
+      ## if multivariate
+      M <- rbind(M_lab1, M_lab2, M_main, M_omegas)
+      nf <- layout(M, c(lcm(1), rep(ratio,2*D)), c(lcm(1),lcm(1),rep(1,K),lcm(1)), TRUE)
+    }
     
-    nf <- layout(M, c(lcm(1), rep(ratio,2*D)), c(lcm(1),lcm(1),rep(1,K),lcm(1)), TRUE)
+    
 
 
     for (i in 1:K) {
@@ -494,9 +508,11 @@ tryCatch({
 
     par(mar=c(0,0,0,0))
     
-    for (j in d) {
-      plot.new()
-      text(0.5,0.5,paste("Component",j))
+    if (dim(x@Y)[2] > 1) {
+      for (j in d) {
+        plot.new()
+        text(0.5,0.5,paste("Component",j))
+      }
     }
     
     for (j in d) {

@@ -4,7 +4,7 @@
 \name{getCoherency-SmoothedPG}
 \alias{getCoherency,SmoothedPG-method}
 \alias{getCoherency-SmoothedPG}
-\title{Get coherency from a smoothed quantile periodogram.}
+\title{Compute quantile coherency from a smoothed quantile periodogram.}
 \usage{
 \S4method{getCoherency}{SmoothedPG}(object, frequencies = 2 * pi *
   (0:(lenTS(object@qPG@freqRep@Y) - 1))/lenTS(object@qPG@freqRep@Y),
@@ -30,18 +30,14 @@ Returns data from the array \code{values} that's a slot of
          \code{object}.
 }
 \description{
-The returned array of \code{values} is of dimension \code{[J,K1,K2,B+1]},
-where \code{J=length(frequencies)}, \code{K1=length(levels.1)},
-\code{K2=length(levels.2))}, and \code{B} denotes the
-value stored in slot \code{B} of \code{freqRep} [that is the number of
-boostrap repetitions performed on initialization].
-At position \code{(j,k1,k2,b)}
-the returned value is the one corresponding to \code{frequencies[j]},
-\code{levels.1[k1]} and \code{levels.2[k2]} that are closest to the
-\code{frequencies}, \code{levels.1} and \code{levels.2}
-available in \code{object}; \code{\link{closest.pos}} is used to determine
-what closest to means. \code{b==1} corresponds to the estimate without
-bootstrapping; \code{b>1} corresponds to the \code{b-1}st bootstrap estimate.
+Returns quantile coherency defined as
+\deqn{\frac{G^{j_1, j_2}(\omega; \tau_1, \tau_2)}{(G^{j_1, j_1}(\omega; \tau_1, \tau_1) G^{j_2, j_2}(\omega; \tau_2, \tau_2))^{1/2}}}
+where \eqn{G^{j_1, j_2}(\omega; \tau_1, \tau_2)} is the smoothed quantile
+periodogram.
+}
+\details{
+For the mechanism of selecting frequencies, dimensions and/or levels see,
+for example, \code{\link{getValues-SmoothedPG}}.
 }
 \seealso{
 An example on how to use this function is analogously to the example given in

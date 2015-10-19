@@ -9,11 +9,12 @@ NULL
 #' calculations to determine the Fourier transform of the clipped time
 #' series. As a subclass to \code{\link{FreqRep}} it inherits
 #' slots and methods defined there; it servers as a frequency representation of
-#' a time series as described in Kley et. al (2015+).
+#' a time series as described in Kley et. al (2015+) for univariate time series
+#' and in Barunik & Kley (2015) for multivariate time series.
 #'
 #' For each frequency \eqn{\omega} from \code{frequencies} and level \code{q}
 #' from \code{levels} the statistic
-#' \deqn{\sum_{t=0}^{n-1} I\{Y_t \leq q\} \mbox{e}^{-\mbox{i} \omega t}}
+#' \deqn{\sum_{t=0}^{n-1} I\{Y_{t,i} \leq q\} \mbox{e}^{-\mbox{i} \omega t}}
 #' is determined and stored to the array \code{values}. Internally the methods
 #' \code{\link[stats]{mvfft}} and \code{\link[stats]{fft}} are used to achieve
 #' good performance.
@@ -32,6 +33,10 @@ NULL
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
 #' \emph{Bernoulli}, \bold{forthcoming}.
 #' [cf. \url{http://arxiv.org/abs/1401.8104}]
+#' 
+#' Barunik, J. & Kley, T. (2015).
+#' Quantile Cross-Spectral Measures of Dependence between Economic Variables.
+#' [preprint available from the authors]
 #'
 #' @seealso
 #' For an example see \code{\link{FreqRep}}.

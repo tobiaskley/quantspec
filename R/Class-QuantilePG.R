@@ -317,6 +317,8 @@ quantilePG <- function( Y,
 #' }
 #' for the combination of levels \eqn{\tau_1}{tau1} and \eqn{\tau_2}{tau2}
 #' denoted on the left and bottom margin of the plot are displayed.
+#' 
+#' Currently, only the plot for the first component is shown.
 #'
 #' @name plot-QuantilePG
 #' @aliases plot,QuantilePG,ANY-method

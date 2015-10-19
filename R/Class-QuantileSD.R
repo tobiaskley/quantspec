@@ -71,6 +71,10 @@ NULL
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
 #' \emph{Bernoulli}, \bold{forthcoming}.
 #' [cf. \url{http://arxiv.org/abs/1401.8104}]
+#' 
+#' Barunik, J. & Kley, T. (2015).
+#' Quantile Cross-Spectral Measures of Dependence between Economic Variables.
+#' [preprint available from the authors]
 #'
 #' @example
 #' inst/examples/QuantileSD.R
@@ -279,9 +283,7 @@ setMethod(
 #' \code{levels.1[k1]} and \code{levels.2[k2]} that are closest to the
 #' \code{frequencies}, \code{levels.1} and \code{levels.2}
 #' available in \code{object}; \code{\link{closest.pos}} is used to determine
-#' what closest to means. \code{b==1} corresponds to the estimator, while
-#' \code{b>1} corresponds to the estimator determiend from the \code{b-1}th
-#' boothstrap replicate.
+#' what closest to means.
 #'
 #' @name getValues-QuantileSD
 #' @aliases getValues,QuantileSD-method
@@ -400,20 +402,15 @@ setMethod(f = "getValues",
 
 
 ################################################################################
-#' Get values from a quantile spectral density kernel
+#' Compute quantile coherency from a quantile spectral density kernel
 #'
-#' If none of the optional parameters is specified then the values are returned
-#' for all Fourier frequencies in \eqn{[0,2\pi)}{[0,2pi)} (base given by slot
-#' \code{N}) and all levels available. The frequencies and levels can be freely
-#' specified. The returned array then has, at position \code{(j,k1,k2,b)},
-#' the value corresponding to the \code{frequencies[j]},
-#' \code{levels.1[k1]} and \code{levels.2[k2]} that are closest to the
-#' \code{frequencies}, \code{levels.1} and \code{levels.2}
-#' available in \code{object}; \code{\link{closest.pos}} is used to determine
-#' what closest to means. \code{b==1} corresponds to the estimator, while
-#' \code{b>1} corresponds to the estimator determiend from the \code{b-1}th
-#' boothstrap replicate.
-#'
+#' Returns quantile coherency defined as
+#' \deqn{\frac{f^{j_1, j_2}(\omega; \tau_1, \tau_2)}{(f^{j_1, j_1}(\omega; \tau_1, \tau_1) f^{j_2, j_2}(\omega; \tau_2, \tau_2))^{1/2}}}
+#' where \eqn{f^{j_1, j_2}(\omega; \tau_1, \tau_2)} is the quantile spectral density.
+#' 
+#' For the mechanism of selecting frequencies, dimensions and/or levels see,
+#' for example, \code{\link{getValues-QuantileSD}}.
+#' 
 #' @name getCoherency-QuantileSD
 #' @aliases getCoherency,QuantileSD-method
 #'
@@ -427,13 +424,11 @@ setMethod(f = "getValues",
 #' 					 data; may be a vector of elements 1, ..., D
 #' @param d2 same as d1, but for j2
 #'
-#' @return Returns data from the array \code{values} that's a slot of
-#'          \code{object}.
+#' @return Returns data from the coherency as defined in the details.
 #'
 #' @seealso
 #' For examples on how to use this function go to \code{\link{QuantileSD}}.
 ################################################################################
-# TODO: Update documentation!
 setMethod(f = "getCoherency",
     signature = signature("QuantileSD"),
     definition = function(object,
@@ -871,6 +866,8 @@ quantileSD <- function(N=2^8,
 #' }
 #' for the combination of levels \eqn{\tau_1}{tau1} and \eqn{\tau_2}{tau2}
 #' denoted on the left and bottom margin of the plot are displayed.
+#' 
+#' Currently, only the plot for the first component is shown.
 #'
 #' @name plot-QuantileSD
 #' @aliases plot,QuantileSD,ANY-method

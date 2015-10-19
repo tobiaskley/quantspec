@@ -11,7 +11,7 @@ periodogram.}
   (0:(lenTS(object@qPG@freqRep@Y) - 1))/lenTS(object@qPG@freqRep@Y),
   levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2),
   d1 = 1:(dim(object@values)[2]), d2 = 1:(dim(object@values)[4]),
-  impl = c("R", "R2", "C"))
+  impl = c("R", "C"))
 }
 \arguments{
 \item{object}{\code{\link{SmoothedPG}} of which to get the estimates for the
@@ -47,6 +47,10 @@ available in \code{object}; \code{\link{closest.pos}} is used to determine
 what closest to means.
 }
 \details{
+If not only one, but multiple time series are under study, the dimension of
+the returned vector is of dimension \code{[J,P,K1,P,K2,B+1]}, where \code{P}
+denotes the dimension of the time series.
+
 Requires that the \code{\link{SmoothedPG}} is available at all Fourier
 frequencies from \eqn{(0,\pi]}{(0,pi]}. If this is not the case the missing
 values are imputed by taking one that is available and has a frequency
@@ -54,10 +58,7 @@ that is closest to the missing Fourier frequency; \code{closest.pos} is used
 to determine which one this is.
 
 A precise definition on how the standard deviations of the smoothed quantile
-periodogram are estimated is given in Kley et. al (2015+). The estimate
-returned is denoted by
-\eqn{\sigma(\tau_1, \tau_2; \omega)}{sigma(tau1, tau2; omega)} on p. 26 of
-the arXiv preprint.
+periodogram are estimated is given in Barunik&Kley (2015).
 
 Note the ``standard deviation'' estimated here is not the square root of the
 complex-valued variance. It's real part is the square root of the variance

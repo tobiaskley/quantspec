@@ -50,6 +50,10 @@ available in \code{object}; \code{\link{closest.pos}} is used to determine
 what closest to means.
 }
 \details{
+If not only one, but multiple time series are under study, the dimension of
+the returned vector is of dimension \code{[J,P,K1,P,K2]}, where \code{P}
+denotes the dimension of the time series.
+
 Requires that the \code{\link{SmoothedPG}} is available at all Fourier
 frequencies from \eqn{(0,\pi]}{(0,pi]}. If this is not the case the missing
 values are imputed by taking one that is available and has a frequency
@@ -71,6 +75,10 @@ of the imaginary part of the variance of the estimator.
 Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
 Quantile Spectral Processes: Asymptotic Analysis and Inference.
 \url{http://arxiv.org/abs/1401.8104}.
+
+Barunik, J. & Kley, T. (2015).
+Quantile Cross-Spectral Measures of Dependence between Economic Variables.
+[preprint available from the authors]
 }
 \keyword{Access-functions}
 

@@ -4,7 +4,7 @@
 \name{getCoherency-QuantileSD}
 \alias{getCoherency,QuantileSD-method}
 \alias{getCoherency-QuantileSD}
-\title{Get values from a quantile spectral density kernel}
+\title{Compute quantile coherency from a quantile spectral density kernel}
 \usage{
 \S4method{getCoherency}{QuantileSD}(object, frequencies = 2 * pi *
   (0:(object@N - 1))/object@N, levels.1 = getLevels(object, 1),
@@ -26,21 +26,16 @@ data; may be a vector of elements 1, ..., D}
 \item{d2}{same as d1, but for j2}
 }
 \value{
-Returns data from the array \code{values} that's a slot of
-         \code{object}.
+Returns data from the coherency as defined in the details.
 }
 \description{
-If none of the optional parameters is specified then the values are returned
-for all Fourier frequencies in \eqn{[0,2\pi)}{[0,2pi)} (base given by slot
-\code{N}) and all levels available. The frequencies and levels can be freely
-specified. The returned array then has, at position \code{(j,k1,k2,b)},
-the value corresponding to the \code{frequencies[j]},
-\code{levels.1[k1]} and \code{levels.2[k2]} that are closest to the
-\code{frequencies}, \code{levels.1} and \code{levels.2}
-available in \code{object}; \code{\link{closest.pos}} is used to determine
-what closest to means. \code{b==1} corresponds to the estimator, while
-\code{b>1} corresponds to the estimator determiend from the \code{b-1}th
-boothstrap replicate.
+Returns quantile coherency defined as
+\deqn{\frac{f^{j_1, j_2}(\omega; \tau_1, \tau_2)}{(f^{j_1, j_1}(\omega; \tau_1, \tau_1) f^{j_2, j_2}(\omega; \tau_2, \tau_2))^{1/2}}}
+where \eqn{f^{j_1, j_2}(\omega; \tau_1, \tau_2)} is the quantile spectral density.
+}
+\details{
+For the mechanism of selecting frequencies, dimensions and/or levels see,
+for example, \code{\link{getValues-QuantileSD}}.
 }
 \seealso{
 For examples on how to use this function go to \code{\link{QuantileSD}}.

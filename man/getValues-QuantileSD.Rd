@@ -38,9 +38,7 @@ the value corresponding to the \code{frequencies[j]},
 \code{levels.1[k1]} and \code{levels.2[k2]} that are closest to the
 \code{frequencies}, \code{levels.1} and \code{levels.2}
 available in \code{object}; \code{\link{closest.pos}} is used to determine
-what closest to means. \code{b==1} corresponds to the estimator, while
-\code{b>1} corresponds to the estimator determiend from the \code{b-1}th
-boothstrap replicate.
+what closest to means.
 }
 \seealso{
 For examples on how to use this function go to \code{\link{QuantileSD}}.

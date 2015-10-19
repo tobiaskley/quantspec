@@ -7,11 +7,12 @@ NULL
 #'
 #' \code{SmoothedPG} is an S4 class that implements the necessary
 #' calculations to determine a smoothed version of one of the quantile
-#' periodograms defined in Dette et. al (2015) and Kley et. al (2015+).
+#' periodograms defined in Dette et. al (2015), Kley et. al (2015+) and
+#' Barunik&Kley (2015).
 #'
-#' For a \code{\link{QuantilePG}} \eqn{Q_n(\omega, x_1, x_2)}{Qn(w,x1,x2)} and
+#' For a \code{\link{QuantilePG}} \eqn{Q^{j_1, j_2}_n(\omega, x_1, x_2)}{Qn(w,x1,x2)} and
 #' a \code{\link{Weight}} \eqn{W_n(\cdot)}{Wn(.)} the smoothed version
-#' \deqn{\frac{2\pi}{n} \sum_{s=1}^{n-1} W_n(\omega-2\pi s / n) Q_n(2\pi s / n, x_1, x_2)}
+#' \deqn{\frac{2\pi}{n} \sum_{s=1}^{n-1} W_n(\omega-2\pi s / n) Q^{j_1, j_2}_n(2\pi s / n, x_1, x_2)}
 #' is determined.
 #'
 #' The convolution required to determine the smoothed periodogram is implemented
@@ -187,6 +188,10 @@ setMethod(
 #' available in \code{object}; \code{\link{closest.pos}} is used to determine
 #' what closest to means. \code{b==1} corresponds to the estimate without
 #' bootstrapping; \code{b>1} corresponds to the \code{b-1}st bootstrap estimate.
+#' 
+#' If not only one, but multiple time series are under study, the dimension of
+#' the returned vector is of dimension \code{[J,P,K1,P,K2,B+1]}, where \code{P}
+#' denotes the dimension of the time series. 
 #'
 #' @name getValues-SmoothedPG
 #' @aliases getValues,SmoothedPG-method
@@ -316,20 +321,15 @@ setMethod(f = "getValues",
 )
 
 ################################################################################
-#' Get coherency from a smoothed quantile periodogram.
+#' Compute quantile coherency from a smoothed quantile periodogram.
 #'
-#' The returned array of \code{values} is of dimension \code{[J,K1,K2,B+1]},
-#' where \code{J=length(frequencies)}, \code{K1=length(levels.1)},
-#' \code{K2=length(levels.2))}, and \code{B} denotes the
-#' value stored in slot \code{B} of \code{freqRep} [that is the number of
-#' boostrap repetitions performed on initialization].
-#' At position \code{(j,k1,k2,b)}
-#' the returned value is the one corresponding to \code{frequencies[j]},
-#' \code{levels.1[k1]} and \code{levels.2[k2]} that are closest to the
-#' \code{frequencies}, \code{levels.1} and \code{levels.2}
-#' available in \code{object}; \code{\link{closest.pos}} is used to determine
-#' what closest to means. \code{b==1} corresponds to the estimate without
-#' bootstrapping; \code{b>1} corresponds to the \code{b-1}st bootstrap estimate.
+#' Returns quantile coherency defined as
+#' \deqn{\frac{G^{j_1, j_2}(\omega; \tau_1, \tau_2)}{(G^{j_1, j_1}(\omega; \tau_1, \tau_1) G^{j_2, j_2}(\omega; \tau_2, \tau_2))^{1/2}}}
+#' where \eqn{G^{j_1, j_2}(\omega; \tau_1, \tau_2)} is the smoothed quantile
+#' periodogram.
+#' 
+#' For the mechanism of selecting frequencies, dimensions and/or levels see,
+#' for example, \code{\link{getValues-SmoothedPG}}.
 #'
 #' @name getCoherency-SmoothedPG
 #' @aliases getCoherency,SmoothedPG-method
@@ -351,7 +351,6 @@ setMethod(f = "getValues",
 #' An example on how to use this function is analogously to the example given in
 #' \code{\link{getValues-QuantilePG}}.
 ################################################################################
-# TODO: Update documentation!
 setMethod(f = "getCoherency",
     signature = signature(
         "SmoothedPG"),
@@ -413,7 +412,6 @@ setMethod(f = "getCoherency",
     }
 )
 
-# TODO: Finish documentation: cite preprint, etc.
 ################################################################################
 #' Get estimates for the standard deviation of the coherency computed from
 #' smoothed quantile periodogram.
@@ -429,6 +427,10 @@ setMethod(f = "getCoherency",
 #' \code{frequencies}, \code{levels.1} and \code{levels.2}
 #' available in \code{object}; \code{\link{closest.pos}} is used to determine
 #' what closest to means.
+#' 
+#' If not only one, but multiple time series are under study, the dimension of
+#' the returned vector is of dimension \code{[J,P,K1,P,K2]}, where \code{P}
+#' denotes the dimension of the time series.
 #'
 #' Requires that the \code{\link{SmoothedPG}} is available at all Fourier
 #' frequencies from \eqn{(0,\pi]}{(0,pi]}. If this is not the case the missing
@@ -441,7 +443,6 @@ setMethod(f = "getCoherency",
 #' returned is denoted by
 #' \eqn{\sigma(\tau_1, \tau_2; \omega)}{sigma(tau1, tau2; omega)} on p. 26 of
 #' the arXiv preprint.
-#'
 #'
 #' Note the ``standard deviation'' estimated here is not the square root of the
 #' complex-valued variance. It's real part is the square root of the variance
@@ -471,8 +472,11 @@ setMethod(f = "getCoherency",
 #' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
 #' \url{http://arxiv.org/abs/1401.8104}.
+#' 
+#' Barunik, J. & Kley, T. (2015).
+#' Quantile Cross-Spectral Measures of Dependence between Economic Variables.
+#' [preprint available from the authors]
 ################################################################################
-# TODO: Update documentation!
 setMethod(f = "getCoherencySdNaive",
     signature = signature(
         object = "SmoothedPG"),
@@ -583,7 +587,7 @@ setMethod(f = "getCoherencySdNaive",
           WW <- getValues(weight, N = N)[c(2:N,1)] # WW[j] corresponds to W_n(2 pi j/n)
           WW3 <- rep(WW,4) 
           
-          # TODO: fix to make it work for all d1, d2!!
+          # TODO: check whether it works for all d1, d2!!
           V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N, d1=d1, d2=d2), dim=c(N-1,D1,K1,D2,K2))     
           res_coh <- array(0,dim=c(J,D1,K1,D2,K2))
           res_cohSq <- array(0,dim=c(J,D1,K1,D2,K2))
@@ -687,107 +691,7 @@ setMethod(f = "getCoherencySdNaive",
           
         }
         
-#        
-#        if (impl == "R2") {
-#          
-#          lC <- matrix(ncol = 8, nrow = K1*K2*D1*D2) # + K1*D1*(K2-1)*(D2-1))
-#          
-#          i <- 1
-#          for (k1 in 1:K1) {
-#            for (i1 in 1:D1) {
-#              for (k2 in 1:K2) {
-#                for (i2 in 1:D2) {
-#                  lC[i,] <- rep(c(i1,k1,i2,k2),2)
-#                  i <- i + 1
-#                  #if (i1 != i2 || k1 != k2) {
-#                  #  lC[i,] <- c(i1,k1,i2,k2,i2,k2,i1,k1)
-#                  #  i <- i + 1 
-#                  #}
-#                }
-#              }
-#            }
-#          }
-#          
-#          #####
-#          ## Variant 2: more or less vectorized... 
-#          #####
-#          WW <- getValues(weight, N = N)[c(2:N,1)] # WW[j] corresponds to W_n(2 pi j/n)
-#          WW3 <- rep(WW,4) 
-#          
-#          # TODO: fix to make it work for all d1, d2!!
-#          V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N, d1=d1, d2=d2), dim=c(N-1,D1,K1,D2,K2))     
-#          res <- array(0,dim=c(N,D1,K1,D2,K2))
-#          auxRes <- array(0,dim=c(D1*K1*D2*K2, 2, N))
-#          
-#          M1 <- matrix(0, ncol=N-1, nrow=N)
-#          M2 <- matrix(0, ncol=N-1, nrow=N)
-#          M3 <- matrix(0, ncol=N-1, nrow=N)
-#          M4 <- matrix(0, ncol=N-1, nrow=N)
-#          for (j in 0:(N-1)) { # Test 1:N
-#            M1[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j-(1:(N-1))]
-#            M2[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j+(1:(N-1))]
-#            M3[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j-(1:(N-1))]
-#            M4[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j+(1:(N-1))]
-#          }
-#          
-#          for (r in 1:nrow(lC)) {
-#            jt <- lC[r,]
-#            V1 <- matrix(V[,jt[1],jt[2],jt[5],jt[6]] * V[,jt[3],jt[4],jt[7],jt[8]], ncol=1)
-#            V2 <- matrix(V[,jt[1],jt[2],jt[7],jt[8]] * V[,jt[3],jt[4],jt[5],jt[6]], ncol=1)
-#            
-#            auxRes[r,1,] <- rowSums(M1 %*% V1) + rowSums(M2 %*% V2)
-#            auxRes[r,2,] <- rowSums(M3 %*% V1) + rowSums(M4 %*% V2)
-#          }
-#          
-#          for (i1 in 1:D1) {
-#            for (k1 in 1:K1) {
-#              for (i2 in i1:D2) {
-#                for (k2 in k1:K2) {
-#                  r <- which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i2 & lC[,4] == k2 & lC[,5] == i1 & lC[,6] == k1 & lC[,7] == i2 & lC[,8] == k2)
-#                  if (i1 == i2 && k1 == k2) {
-#                    S <- auxRes[r,1,]
-#                  } else {
-#                    #r2 <- which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i2 & lC[,4] == k2 & lC[,5] == i2 & lC[,6] == k2 & lC[,7] == i1 & lC[,8] == k1)
-#                    S <- (1/2) * complex(real = Re(auxRes[r,1,] + auxRes[r,2,]), imaginary = Re(auxRes[r,1,] - auxRes[r,2,]))
-#                  }
-#                  res[,i1,k1,i2,k2] <- (2*pi/N)^2 * S / (weight@env$Wnj[c(N,1:(N-1))])^2
-#                  res[,i2,k2,i1,k1] <- res[,i1,k1,i2,k2]
-#                }
-#              }
-#            }
-#          }
-#          
-#          sqrt.cw <- function(z) {
-#            return(complex(real=sqrt(max(Re(z),0)), imaginary=sqrt(max(Im(z),0))))
-#          }
-#          res <- array(apply(res,c(1,2,3,4,5),sqrt.cw), dim = c(N, D1, K1, D2, K2))
-#          
-#          #####
-#          ## END Variant 2: more or less vectorized... 
-#          #####
-#          
-#        }
-#        
-#        
-#        if (impl == "C") {     
-#          #####
-#          ## Variant 2: using C++
-#          #####
-#          
-#          WW <- getValues(weight, N=N) 
-#          V <- array(getValues(object, frequencies = 2*pi*(0:(N-1))/N)[,,,,,1], dim=c(N,K1,K2))     
-#          res <- .computeSdNaive(V, WW)
-#          
-#          #####
-#          ## END Variant 2: using C++ (cppFunction)
-#          #####
-#          
-#        }
-        
-        #object@env$sdCohNaive.done <- TRUE
-        #object@env$sdCohNaive <- res[1:(floor(N/2)+1),,,,, drop=F]
-        #resObj <- res[1:(floor(N/2)+1),,,,, drop=F]
-        
+       
         object@env$sdCohNaive.freq <- union(object@env$sdCohNaive.freq, J.toCompute)
         object@env$sdCohNaive[J.toCompute+1,,,,] <- res_coh
         object@env$sdCohSqNaive[J.toCompute+1,,,,] <- res_cohSq
@@ -866,6 +770,10 @@ setMethod(f = "getCoherencySdNaive",
 #' \code{frequencies}, \code{levels.1} and \code{levels.2}
 #' available in \code{object}; \code{\link{closest.pos}} is used to determine
 #' what closest to means.
+#' 
+#' If not only one, but multiple time series are under study, the dimension of
+#' the returned vector is of dimension \code{[J,P,K1,P,K2,B+1]}, where \code{P}
+#' denotes the dimension of the time series. 
 #'
 #' Requires that the \code{\link{SmoothedPG}} is available at all Fourier
 #' frequencies from \eqn{(0,\pi]}{(0,pi]}. If this is not the case the missing
@@ -874,11 +782,7 @@ setMethod(f = "getCoherencySdNaive",
 #' to determine which one this is.
 #'
 #' A precise definition on how the standard deviations of the smoothed quantile
-#' periodogram are estimated is given in Kley et. al (2015+). The estimate
-#' returned is denoted by
-#' \eqn{\sigma(\tau_1, \tau_2; \omega)}{sigma(tau1, tau2; omega)} on p. 26 of
-#' the arXiv preprint.
-#'
+#' periodogram are estimated is given in Barunik&Kley (2015).
 #'
 #' Note the ``standard deviation'' estimated here is not the square root of the
 #' complex-valued variance. It's real part is the square root of the variance
@@ -917,7 +821,7 @@ setMethod(f = "getSdNaive",
         levels.2=getLevels(object,2),
         d1 = 1:(dim(object@values)[2]),
         d2 = 1:(dim(object@values)[4]),
-        impl=c("R","R2","C")) {
+        impl=c("R","C")) {
       
       if (class(getWeight(object)) != "KernelWeight") {
         stop("getSdNaive currently only available for 'KernelWeight'.")
@@ -1064,88 +968,6 @@ setMethod(f = "getSdNaive",
           #####
           
         }
-        
-        
-#        if (impl == "R2") {
-#
-#          lC <- matrix(ncol = 8, nrow = K1*K2*D1*D2) # + K1*D1*(K2-1)*(D2-1))
-#          
-#          i <- 1
-#          for (k1 in 1:K1) {
-#            for (i1 in 1:D1) {
-#              for (k2 in 1:K2) {
-#                for (i2 in 1:D2) {
-#                  lC[i,] <- rep(c(i1,k1,i2,k2),2)
-#                  i <- i + 1
-#                  #if (i1 != i2 || k1 != k2) {
-#                  #  lC[i,] <- c(i1,k1,i2,k2,i2,k2,i1,k1)
-#                  #  i <- i + 1 
-#                  #}
-#                }
-#              }
-#            }
-#          }
-#          
-#          #####
-#          ## Variant 2: more or less vectorized... 
-#          #####
-#          WW <- getValues(weight, N = N)[c(2:N,1)] # WW[j] corresponds to W_n(2 pi j/n)
-#          WW3 <- rep(WW,4) 
-#          
-#          # TODO: fix to make it work for all d1, d2!!
-#          V <- array(getValues(object, frequencies = 2*pi*(1:(N-1))/N, d1=d1, d2=d2), dim=c(N-1,D1,K1,D2,K2))     
-#          res <- array(0,dim=c(N,D1,K1,D2,K2))
-#          auxRes <- array(0,dim=c(D1*K1*D2*K2, 2, N))
-#          
-#          M1 <- matrix(0, ncol=N-1, nrow=N)
-#          M2 <- matrix(0, ncol=N-1, nrow=N)
-#          M3 <- matrix(0, ncol=N-1, nrow=N)
-#          M4 <- matrix(0, ncol=N-1, nrow=N)
-#          for (j in 0:(N-1)) { # Test 1:N
-#            M1[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j-(1:(N-1))]
-#            M2[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N+j+(1:(N-1))]
-#            M3[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j-(1:(N-1))]
-#            M4[j+1,] <- WW3[2*N+j-(1:(N-1))]*WW3[2*N-j+(1:(N-1))]
-#          }
-#          
-#          for (r in 1:nrow(lC)) {
-#            jt <- lC[r,]
-#            V1 <- matrix(V[,jt[1],jt[2],jt[5],jt[6]] * V[,jt[3],jt[4],jt[7],jt[8]], ncol=1)
-#            V2 <- matrix(V[,jt[1],jt[2],jt[7],jt[8]] * V[,jt[3],jt[4],jt[5],jt[6]], ncol=1)
-#            
-#            auxRes[r,1,] <- rowSums(M1 %*% V1) + rowSums(M2 %*% V2)
-#            auxRes[r,2,] <- rowSums(M3 %*% V1) + rowSums(M4 %*% V2)
-#          }
-#          
-#          for (i1 in 1:D1) {
-#            for (k1 in 1:K1) {
-#              for (i2 in i1:D2) {
-#                for (k2 in k1:K2) {
-#                  r <- which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i2 & lC[,4] == k2 & lC[,5] == i1 & lC[,6] == k1 & lC[,7] == i2 & lC[,8] == k2)
-#                  if (i1 == i2 && k1 == k2) {
-#                    S <- auxRes[r,1,]
-#                  } else {
-#                    #r2 <- which(lC[,1] == i1 & lC[,2] == k1 & lC[,3] == i2 & lC[,4] == k2 & lC[,5] == i2 & lC[,6] == k2 & lC[,7] == i1 & lC[,8] == k1)
-#                    S <- (1/2) * complex(real = Re(auxRes[r,1,] + auxRes[r,2,]), imaginary = Re(auxRes[r,1,] - auxRes[r,2,]))
-#                  }
-#                  res[,i1,k1,i2,k2] <- (2*pi/N)^2 * S / (weight@env$Wnj[c(N,1:(N-1))])^2
-#                  res[,i2,k2,i1,k1] <- res[,i1,k1,i2,k2]
-#                }
-#              }
-#            }
-#          }
-#          
-#          sqrt.cw <- function(z) {
-#            return(complex(real=sqrt(max(Re(z),0)), imaginary=sqrt(max(Im(z),0))))
-#          }
-#          res <- array(apply(res,c(1,2,3,4,5),sqrt.cw), dim = c(N, D1, K1, D2, K2))
-#          
-#          #####
-#          ## END Variant 2: more or less vectorized... 
-#          #####
-#          
-#        }
-        
         
 #        if (impl == "C") {     
 #          #####
@@ -1775,6 +1597,8 @@ smoothedPG <- function(
 #' }
 #' for the combination of levels \eqn{\tau_1}{tau1} and \eqn{\tau_2}{tau2}
 #' denoted on the left and bottom margin of the plot are displayed.
+#' 
+#' Currently, only the plot for the first component is shown.
 #'
 #' @name plot-SmoothedPG
 #' @aliases plot,SmoothedPG,ANY-method

@@ -10,6 +10,9 @@ NULL
 #'
 #' Currently one implementation is available:
 #'     (1) \code{\link{ClippedCov}}.
+#' 
+#' Currently, the implementation of this class allows only for the analysis of
+#' univariate time series.  
 #'
 #' @name LagOperator-class
 #' @aliases LagOperator

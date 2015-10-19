@@ -37,10 +37,10 @@ Returns an instance of \code{ClippedCov}.
 Create an instance of the \code{\link{ClippedCov}} class.
 }
 \examples{
-ccf <- clippedCov(rnorm(200), maxLag = 25, levels.1 =c(0.1,0.5,0.9))
+ccf <- clippedCov(rnorm(200), maxLag = 25, levels.1 = c(0.1,0.5,0.9))
 dim(getValues(ccf))
 #print values for levels (.5,.5)
-plot(ccf,maxLag = 20)
+plot(ccf, maxLag = 20)
 }
 \seealso{
 \code{\link{LagOperator}}

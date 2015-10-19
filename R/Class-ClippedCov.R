@@ -17,6 +17,9 @@ NULL
 #' \deqn{\frac{1}{n} \sum_{t=1}^{n-k} ( I\{\hat F_n(Y_t) \leq \tau_1\} - \tau_1) ( I\{\hat F_n(Y_{t+k}) \leq \tau_2\} - \tau_2)}
 #' is determined and stored to the array \code{values}.
 #' 
+#' Currently, the implementation of this class allows only for the analysis of
+#' univariate time series.
+#' 
 #' @name ClippedCov-class
 #' @aliases ClippedCov
 #'
@@ -110,10 +113,10 @@ setMethod(
 #' @seealso \code{\link{LagOperator}}
 #'
 #' @examples
-#' ccf <- clippedCov(rnorm(200), maxLag = 25, levels.1 =c(0.1,0.5,0.9))
+#' ccf <- clippedCov(rnorm(200), maxLag = 25, levels.1 = c(0.1,0.5,0.9))
 #' dim(getValues(ccf))
 #' #print values for levels (.5,.5)
-#' plot(ccf,maxLag = 20)
+#' plot(ccf, maxLag = 20)
 
 ################################################################################
 clippedCov <- function( Y,
