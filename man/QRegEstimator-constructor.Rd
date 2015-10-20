@@ -5,7 +5,7 @@
 \alias{qRegEstimator}
 \title{Create an instance of the \code{QRegEstimator} class.}
 \usage{
-qRegEstimator(Y, frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
+qRegEstimator(Y, frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1),
   levels = 0.5, isRankBased = TRUE, B = 0, l = 0,
   type.boot = c("none", "mbb"), method = c("br", "fn", "pfn", "fnc",
   "lasso", "scad"), parallel = FALSE)

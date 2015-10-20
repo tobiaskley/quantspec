@@ -4,21 +4,34 @@
 \name{getPointwiseCIs-SmoothedPG}
 \alias{getPointwiseCIs,SmoothedPG-method}
 \alias{getPointwiseCIs-SmoothedPG}
-\title{Get pointwise confidence intervals for the quantile spectral density kernel}
+\title{Get pointwise confidence intervals for the quantile spectral density kernel,
+quantile coherency or quantile coherence.}
 \usage{
-\S4method{getPointwiseCIs}{SmoothedPG}(object, frequencies = 2 * pi *
-  (0:(length(object@qPG@freqRep@Y) - 1))/length(object@qPG@freqRep@Y),
-  levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2),
-  alpha = 0.1, type = c("naive.sd", "boot.sd", "boot.full"))
+\S4method{getPointwiseCIs}{SmoothedPG}(object,
+  quantity = c("spectral density", "coherency", "coherence"),
+  frequencies = 2 * pi * (0:(lenTS(object@qPG@freqRep@Y) -
+  1))/lenTS(object@qPG@freqRep@Y), levels.1 = getLevels(object, 1),
+  levels.2 = getLevels(object, 2), d1 = 1:(dim(object@values)[2]),
+  d2 = 1:(dim(object@values)[4]), alpha = 0.1, type = c("naive.sd",
+  "boot.sd", "boot.full"))
 }
 \arguments{
 \item{object}{\code{SmoothedPG} of which to get the confidence intervals}
+
+\item{quantity}{a flag indicating for which the pointwise confidence bands
+will be determined. Can take one of the possible values
+discussed above.}
 
 \item{frequencies}{a vector of frequencies for which to get the result}
 
 \item{levels.1}{the first vector of levels for which to get the result}
 
 \item{levels.2}{the second vector of levels for which to get the result}
+
+\item{d1}{optional parameter that determine for which j1 to return the
+data; may be a vector of elements 1, ..., D}
+
+\item{d2}{same as d1, but for j2}
 
 \item{alpha}{the level of the confidence interval; must be from \eqn{(0,1)}}
 
@@ -32,18 +45,29 @@ Returns a named list of two arrays \code{lowerCIS} and \code{upperCIs}
 \description{
 Returns a list of two arrays \code{lowerCIs} and \code{upperCIs} that contain
 the upper and lower limits for a level \code{1-alpha} confidence interval of
-the copula spectral density kernel. Each array is of dimension \code{[J,K1,K2]},
-where \code{J=length(frequencies)}, \code{K1=length(levels.1)}, and
-\code{K2=length(levels.2))}.
-At position \code{(j,k1,k2)} the real (imaginary) part of the returned values
-are the bounds of the confidence interval for the the real (imaginary) part
-of the quantile spectrum, which corresponds to
-\code{frequencies[j]}, \code{levels.1[k1]} and \code{levels.2[k2]} closest
-to the Fourier frequencies, \code{levels.1} and \code{levels.2}
-available in \code{object}; \code{\link{closest.pos}} is used to determine
-what closest to means.
+the quantity of interest. Each array is of dimension \code{[J,K1,K2]} if a
+univariate time series is being analysed or of dimension \code{[J,D1,K1,D2,K2]},
+where \code{J=length(frequencies)}, \code{D1=length(d1)}, \code{D2=length(d2)},
+\code{K1=length(levels.1)}, and \code{K2=length(levels.2))}.
+At position \code{(j,k1,k2)} or \code{(j,i1,k1,i2,k2)} the real (imaginary)
+part of the returned values are the bounds of the confidence interval for the
+the real (imaginary) part of the quantity under anlysis, which corresponds to
+\code{frequencies[j]}, \code{d1[i1]}, \code{d2[i2]}, \code{levels.1[k1]} and
+\code{levels.2[k2]} closest to the Fourier frequencies, \code{levels.1} and
+\code{levels.2} available in \code{object}; \code{\link{closest.pos}} is used
+to determine what closest to means.
 }
 \details{
+Currently, pointwise confidence bands for two different \code{quantity}
+are implemented:
+\itemize{
+  \item \code{"spectral density"}: confidence intervals for the quantile spectral
+					 density as described in Kley et. al (2015+) for the univariate case and
+					 in Barunik and Kley (2015) for the multivariate case.
+  \item \code{"coherency"}: confidence intervals for the quantile coherency as
+					 described in Barunik and Kley (2015).
+}
+
 Currently, three different \code{type}s of confidence intervals are
 available:
 \itemize{

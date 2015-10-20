@@ -8,7 +8,8 @@
 \usage{
 \S4method{getMeanPG}{QuantileSD}(object, frequencies = 2 * pi *
   (0:(getN(object) - 1))/getN(object), levels.1 = getLevels(object, 1),
-  levels.2 = getLevels(object, 2))
+  levels.2 = getLevels(object, 2), d1 = 1:(dim(object@values)[2]),
+  d2 = 1:(dim(object@values)[4]))
 }
 \arguments{
 \item{object}{\code{QuantileSD} of which to get the \code{meanPG}}
@@ -18,6 +19,11 @@
 \item{levels.1}{the first vector of levels for which to get the \code{meanPG}}
 
 \item{levels.2}{the second vector of levels for which to get the \code{meanPG}}
+
+\item{d1}{optional parameter that determine for which j1 to return the
+\code{meanPG}; may be a vector of elements 1, ..., D}
+
+\item{d2}{same as d1, but for j2}
 }
 \value{
 Returns the array \code{meanPG} that's a slot of \code{object}.

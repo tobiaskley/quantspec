@@ -36,3 +36,21 @@ K <- length(levels)
 pdf("QAR1.pdf", width=2*K, height=2*K)
   plot(qsd)
 dev.off()
+
+## Now we analyse the multivariate process (eps_t, eps_{t-1}) from the
+## introduction of Barunik&Kley (2015). It can be defined as
+ts_mult <- function(n) {
+  eps <- rnorm(n+1)
+  return(matrix(c(eps[2:(n+1)], eps[1:n]), ncol=2))
+}
+
+## now we determine the quantile cross-spectral densities
+qsd <- quantileSD(N=N, seed.init = 2581, type = type,
+    ts = ts_mult, levels.1=levels, R = R)
+
+## from which we can for example extract the quantile coherency
+Coh <- getCoherency(qsd, freq = 2*pi*(0:64)/128)
+
+## We now plot the real part of the quantile coherency for j1 = 1, j2 = 2,
+## tau1 = 0.3 and tau2 = 0.6
+plot(x = 2*pi*(0:64)/128, Re(Coh[,1,3,2,6]), type="l")

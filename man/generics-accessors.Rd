@@ -4,6 +4,8 @@
 \alias{generics-accessors}
 \alias{getB}
 \alias{getBw}
+\alias{getCoherency}
+\alias{getCoherencySdNaive}
 \alias{getDescr}
 \alias{getFrequencies}
 \alias{getIsRankBased}
@@ -30,6 +32,8 @@ getY(object, ...)
 
 getValues(object, ...)
 
+getCoherency(object, ...)
+
 getIsRankBased(object, ...)
 
 getB(object, ...)
@@ -55,6 +59,8 @@ getR(object, ...)
 getType(object, ...)
 
 getTs(object, ...)
+
+getCoherencySdNaive(object, ...)
 
 getSdNaive(object, ...)
 

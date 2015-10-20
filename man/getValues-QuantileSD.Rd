@@ -8,7 +8,8 @@
 \usage{
 \S4method{getValues}{QuantileSD}(object, frequencies = 2 * pi * (0:(object@N -
   1))/object@N, levels.1 = getLevels(object, 1),
-  levels.2 = getLevels(object, 2))
+  levels.2 = getLevels(object, 2), d1 = 1:(dim(object@values)[2]),
+  d2 = 1:(dim(object@values)[4]))
 }
 \arguments{
 \item{object}{\code{QuantileSD} of which to get the values}
@@ -18,6 +19,11 @@
 \item{levels.1}{the first vector of levels for which to get the values}
 
 \item{levels.2}{the second vector of levels for which to get the values}
+
+\item{d1}{optional parameter that determine for which j1 to return the
+data; may be a vector of elements 1, ..., D}
+
+\item{d2}{same as d1, but for j2}
 }
 \value{
 Returns data from the array \code{values} that's a slot of
@@ -32,9 +38,7 @@ the value corresponding to the \code{frequencies[j]},
 \code{levels.1[k1]} and \code{levels.2[k2]} that are closest to the
 \code{frequencies}, \code{levels.1} and \code{levels.2}
 available in \code{object}; \code{\link{closest.pos}} is used to determine
-what closest to means. \code{b==1} corresponds to the estimator, while
-\code{b>1} corresponds to the estimator determiend from the \code{b-1}th
-boothstrap replicate.
+what closest to means.
 }
 \seealso{
 For examples on how to use this function go to \code{\link{QuantileSD}}.

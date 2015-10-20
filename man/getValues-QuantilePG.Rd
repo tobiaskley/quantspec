@@ -7,8 +7,9 @@
 \title{Get values from a quantile periodogram.}
 \usage{
 \S4method{getValues}{QuantilePG}(object, frequencies = 2 * pi *
-  (0:(length(object@freqRep@Y) - 1))/length(object@freqRep@Y),
-  levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2))
+  (0:(lenTS(object@freqRep@Y) - 1))/lenTS(object@freqRep@Y),
+  levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2),
+  d1 = 1:(dim(object@freqRep@Y)[2]), d2 = 1:(dim(object@freqRep@Y)[2]))
 }
 \arguments{
 \item{object}{\code{QuantilePG} of which to get the values}
@@ -18,6 +19,11 @@
 \item{levels.1}{the first vector of levels for which to get the values}
 
 \item{levels.2}{the second vector of levels for which to get the values}
+
+\item{d1}{optional parameter that determine for which j1 to return the
+data; may be a vector of elements 1, ..., D}
+
+\item{d2}{same as d1, but for j2}
 }
 \value{
 Returns data from the array \code{values} that's a slot of

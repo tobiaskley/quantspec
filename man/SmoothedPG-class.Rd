@@ -8,12 +8,13 @@
 \description{
 \code{SmoothedPG} is an S4 class that implements the necessary
 calculations to determine a smoothed version of one of the quantile
-periodograms defined in Dette et. al (2015) and Kley et. al (2014).
+periodograms defined in Dette et. al (2015), Kley et. al (2015+) and
+Barunik&Kley (2015).
 }
 \details{
-For a \code{\link{QuantilePG}} \eqn{Q_n(\omega, x_1, x_2)}{Qn(w,x1,x2)} and
+For a \code{\link{QuantilePG}} \eqn{Q^{j_1, j_2}_n(\omega, x_1, x_2)}{Qn(w,x1,x2)} and
 a \code{\link{Weight}} \eqn{W_n(\cdot)}{Wn(.)} the smoothed version
-\deqn{\frac{2\pi}{n} \sum_{s=1}^{n-1} W_n(\omega-2\pi s / n) Q_n(2\pi s / n, x_1, x_2)}
+\deqn{\frac{2\pi}{n} \sum_{s=1}^{n-1} W_n(\omega-2\pi s / n) Q^{j_1, j_2}_n(2\pi s / n, x_1, x_2)}
 is determined.
 
 The convolution required to determine the smoothed periodogram is implemented
@@ -27,6 +28,8 @@ accessable in a call-by-reference manner:
 \describe{
   \item{\code{sdNaive}}{An array used for storage of the naively
       estimated standard deviations of the smoothed periodogram.}
+  \item{\code{sdNaive.freq}}{a vector indicating for which frequencies
+                      \code{sdNaive} has been computed so far.}
   \item{\code{sdNaive.done}}{a flag indicating whether \code{sdNaive}
       has been set yet.}
   \item{\code{sdBoot}}{An array used for storage of the standard

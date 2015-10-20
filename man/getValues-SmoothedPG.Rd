@@ -7,8 +7,9 @@
 \title{Get values from a smoothed quantile periodogram.}
 \usage{
 \S4method{getValues}{SmoothedPG}(object, frequencies = 2 * pi *
-  (0:(length(object@qPG@freqRep@Y) - 1))/length(object@qPG@freqRep@Y),
-  levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2))
+  (0:(lenTS(object@qPG@freqRep@Y) - 1))/lenTS(object@qPG@freqRep@Y),
+  levels.1 = getLevels(object, 1), levels.2 = getLevels(object, 2),
+  d1 = 1:(dim(object@values)[2]), d2 = 1:(dim(object@values)[4]))
 }
 \arguments{
 \item{object}{\code{SmoothedPG} of which to get the values}
@@ -18,6 +19,11 @@
 \item{levels.1}{the first vector of levels for which to get the values}
 
 \item{levels.2}{the second vector of levels for which to get the values}
+
+\item{d1}{optional parameter that determine for which j1 to return the
+data; may be a vector of elements 1, ..., D}
+
+\item{d2}{same as d1, but for j2}
 }
 \value{
 Returns data from the array \code{values} that's a slot of
@@ -36,6 +42,11 @@ the returned value is the one corresponding to \code{frequencies[j]},
 available in \code{object}; \code{\link{closest.pos}} is used to determine
 what closest to means. \code{b==1} corresponds to the estimate without
 bootstrapping; \code{b>1} corresponds to the \code{b-1}st bootstrap estimate.
+}
+\details{
+If not only one, but multiple time series are under study, the dimension of
+the returned vector is of dimension \code{[J,P,K1,P,K2,B+1]}, where \code{P}
+denotes the dimension of the time series.
 }
 \seealso{
 An example on how to use this function is analogously to the example given in

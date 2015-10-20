@@ -13,6 +13,9 @@ all pairs of observations \eqn{(Y_0,Y_k)}{(Y0,Yk)} with lag smaller than maxLag
 \details{
 Currently one implementation is available:
     (1) \code{\link{ClippedCov}}.
+
+Currently, the implementation of this class allows only for the analysis of
+univariate time series.
 }
 \section{Slots}{
 

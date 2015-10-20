@@ -10,7 +10,7 @@ timeSeriesValidator(Y)
 \item{Y}{the time series to be validated.}
 }
 \value{
-Returns the time series as a numeric.
+Returns the time series as a matrix.
 }
 \description{
 Checks whether \code{Y} is either

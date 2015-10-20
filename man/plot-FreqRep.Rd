@@ -7,7 +7,8 @@
 \title{Plot the values of the \code{\link{FreqRep}}.}
 \usage{
 \S4method{plot}{FreqRep,ANY}(x, ratio = 2, frequencies = 2 * pi *
-  (1:(floor(length(x@Y)/2)))/length(x@Y), levels = x@levels)
+  (1:(floor(lenTS(x@Y)/2)))/lenTS(x@Y), levels = x@levels,
+  d = 1:(dim(x@Y)[2]))
 }
 \arguments{
 \item{x}{The \code{\link{FreqRep}} to plot.}
@@ -19,6 +20,9 @@ parameter to produce landscape or portrait shaped plots.}
 plotted.}
 
 \item{levels}{a set of levels for which the values are to be plotted.}
+
+\item{d}{vector indicating which components of a multivariate time series
+                    should be in the plot.}
 }
 \value{
 Plots the \code{\link{FreqRep}} for all

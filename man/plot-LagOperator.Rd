@@ -6,15 +6,36 @@
 \alias{plot-LagOperator}
 \title{Plot the values of the \code{\link{LagOperator}}.}
 \usage{
-\S4method{plot}{LagOperator,ANY}(x)
+\S4method{plot}{LagOperator,ANY}(x, levels = intersect(x@levels.1,
+  x@levels.2), maxLag = maxLag, widthlab = lcm(1), ratio = 3/2,
+  xlab = expression(omega/2 * pi), ylab = NULL)
 }
 \arguments{
 \item{x}{The \code{\link{LagOperator}} to plot.}
-}
-\value{
-Plots the \code{\link{LagOperator}}.
+
+\item{levels}{a set of levels for which the values are to be plotted.}
+
+\item{maxLag}{maximum Lag that should be displayed. It defaults to the
+maximum number of Lags available but usually a smaller number
+yields a more informative result.}
+
+\item{widthlab}{width for the labels (left and bottom); default is
+\code{lcm(1)}, cf. \code{\link[graphics]{layout}}.}
+
+\item{ratio}{quotient of width over height of the subplots; use this
+parameter to produce landscape or portrait shaped plots.}
+
+\item{xlab}{label that will be shown on the bottom of the plots; can be
+an expression (for formulas), characters or \code{NULL} to
+force omission (to save space).}
+
+\item{ylab}{label that will be shown on the left side of the plots;
+can be an expression (for formulas), characters or
+\code{NULL} to force omission (to save space).}
 }
 \description{
-Not yet implemented.
+Creates a \code{K} x \code{K} plot (where \code{K} is the length of the \code{levels} parameter)
+showing the values of the \code{\link{LagOperator}}. The plots below the diagonal show the positive
+Lags and the plots above display the negative ones.
 }
 

@@ -10,6 +10,9 @@ NULL
 #'
 #' Currently one implementation is available:
 #'     (1) \code{\link{ClippedCov}}.
+#' 
+#' Currently, the implementation of this class allows only for the analysis of
+#' univariate time series.  
 #'
 #' @name LagOperator-class
 #' @aliases LagOperator
@@ -263,21 +266,131 @@ setMethod(f = "show",
 ################################################################################
 #' Plot the values of the \code{\link{LagOperator}}.
 #'
-#' Not yet implemented.
+#' Creates a \code{K} x \code{K} plot (where \code{K} is the length of the \code{levels} parameter)
+#' showing the values of the \code{\link{LagOperator}}. The plots below the diagonal show the positive
+#' Lags and the plots above display the negative ones. 
 #'
 #' @name plot-LagOperator
 #' @aliases plot,LagOperator,ANY-method
 #' @export
 #'
 #' @param x The \code{\link{LagOperator}} to plot.
-#' 
-#' @return Plots the \code{\link{LagOperator}}.
+#' @param maxLag maximum Lag that should be displayed. It defaults to the
+#'               maximum number of Lags available but usually a smaller number
+#'               yields a more informative result.
+#' @param ratio quotient of width over height of the subplots; use this
+#'               parameter to produce landscape or portrait shaped plots.
+#' @param widthlab width for the labels (left and bottom); default is
+#'                  \code{lcm(1)}, cf. \code{\link[graphics]{layout}}.
+#' @param xlab label that will be shown on the bottom of the plots; can be
+#'              an expression (for formulas), characters or \code{NULL} to
+#'              force omission (to save space).
+#' @param ylab label that will be shown on the left side of the plots;
+#'              can be an expression (for formulas), characters or
+#'              \code{NULL} to force omission (to save space).
+#' @param levels a set of levels for which the values are to be plotted.
+#'
 ################################################################################
 setMethod(f = "plot",
     signature = signature(x = "LagOperator"),
-    definition = function(x) {
+    definition = function(x, levels=intersect(x@levels.1, x@levels.2), maxLag = maxLag, widthlab = lcm(1),ratio = 3/2, xlab = expression(omega/2*pi), ylab = NULL) {
+      def.par <- par(no.readonly = TRUE) # save default, for resetting...
       
-    message("plot-LagOperator not yet implemented.")
-
+      # workaround: default values don't seem to work for generic functions?
+      if (!hasArg(maxLag)) {
+        maxLag = x@maxLag
+      }
+      if (!hasArg(levels)) {
+        levels <- intersect(x@levels.1, x@levels.1)
+      }
+      if (!hasArg(widthlab)){
+        widthlab = lcm(1)
+      }
+      if (!hasArg(xlab)) {
+        xlab <- "Lag"
+      }
+      if (!hasArg(ylab)) {
+        ylab <- NULL
+      }
+      if (!hasArg(ratio)) {
+        ratio <- 3/2
+      }
+      # end: workaround
+      
+      if (length(levels) == 0) {
+        stop("There has to be at least one level to plot.")
+      }
+      if (maxLag <= 0){
+        stop("maxLag has to be a positive integer.")
+      }
+      if(maxLag > x@maxLag){
+        maxLag = x@maxLag
+        warning("maxLag too large, set to maximum")
+      }
+      
+        K <- length(levels)
+        values <- getValues(x, levels.1=levels, levels.2=levels)
+      
+        p <- K
+        M <- matrix(1:p^2, ncol=p)
+        M.heights <- rep(1,p)
+        M.widths  <- rep(ratio,p)
+        
+        # Add places for tau labels
+        M <- cbind((p^2+1):(p^2+p),M)
+        M.widths <- c(widthlab,M.widths)
+        M <- rbind(M,c(0,(p^2+p+1):(p^2+2*p)))
+        M.heights <- c(M.heights, widthlab)
+        
+        i <- (p^2+2*p+1)
+        # Add places for labels
+        if (length(xlab)>0) {
+          M.heights <- c(M.heights, widthlab)
+          M <- rbind(M,c(rep(0,length(M.widths)-p),rep(i,p)))
+          i <- i + 1
+        }
+        
+        if (length(ylab)>0) {
+          M <- cbind(c(rep(i,p),rep(0,length(M.heights)-p)),M)
+          M.widths <- c(widthlab,M.widths)
+        }
+        
+        nf <- layout(M, M.widths, M.heights, TRUE)
+        
+        par(mar=c(2,2,1,1))
+        
+      
+      for(i in 1:K){
+        for(j in 1:K){
+          if (i <= j){
+          plot(values[1:maxLag,i,j,1],type = "h",xlab = "",ylab = "")
+          abline(h=0)
+          }else{
+            plot((-(maxLag-1):0),values[maxLag:1,i,j,1],type = "h",xlab = "",ylab = "")
+            abline(h=0)
+          }
+        }
+      }
+      p = K
+      par(mar=c(0,0,0,0))
+      for (i in 1:p) {
+        plot.new()
+        text(0.5,0.5,substitute(paste(tau[1],"=",k),list(k=levels[i])), srt=90)
+      }
+      
+      for (i in 1:p) {
+        plot.new()
+        text(0.5,0.5,substitute(paste(tau[2],"=",k),list(k=levels[i])))
+      }
+      if (length(xlab)>0) {
+        plot.new()
+        text(0.5, 0.5, xlab)
+      }
+      if (length(ylab)>0) {
+        plot.new()
+        text(0.5, 0.5, ylab, srt=90)
+      }
+      
+   par(def.par)
   }
 )

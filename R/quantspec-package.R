@@ -4,15 +4,15 @@ NULL
 ################################################################################
 #' Quantile-Based Spectral Analysis of Time Series
 #'
-#' Methods to determine, smooth and plot quantile (i. e., Laplace or copula)
-#' periodograms for univariate time series.
+#' Methods to determine, smooth and plot quantile
+#' periodograms for univariate and (since v1.2-0) multivariate time series.
 #'
 #' @details
 #'  \tabular{ll}{
 #'    \cr Package: \tab quantspec
 #'    \cr Type:    \tab Package
-#'    \cr Version: \tab 1.1-0
-#'    \cr Date:    \tab 2015-09-25
+#'    \cr Version: \tab 1.2-0
+#'    \cr Date:    \tab 2015-10-19
 #'    \cr License: \tab GPL (>= 2)
 #'  }
 #'
@@ -24,14 +24,14 @@ NULL
 #' shown. In the first diagram the classes related to periodogram-based
 #' estimation are displayed:  
 #'
-#' \if{html}{\figure{main.png}{options: width=960}}
-#' \if{latex}{\figure{main.pdf}{options: width=10cm}}
+#' \if{html}{\figure{main-mv.png}{options: width=960}}
+#' \if{latex}{\figure{main-mv.pdf}{options: width=12cm}}
 #' 
 #' In the second diagram the classes related to lag window-based
 #' estimation are displayed:
 #' 
-#' \if{html}{\figure{main2.png}{options: width=960}}
-#' \if{latex}{\figure{main2.pdf}{options: width=10cm}}
+#' \if{html}{\figure{main2-mv.png}{options: width=768}}
+#' \if{latex}{\figure{main2-mv.pdf}{options: width=8cm}}
 #'
 #' In the third class diagram the classes implementing model quantities are
 #' displayed. A relation to the ``empirical classes'' is given via the fact that
@@ -39,8 +39,8 @@ NULL
 #' periodograms and a common abstract superclass \code{QSpecQuantity} which
 #' is used to provide a common interface to quantile spectral quantities.
 #'
-#' \if{html}{\figure{csd.png}{options: width=768}}
-#' \if{latex}{\figure{csd.pdf}{options: width=12cm}}
+#' \if{html}{\figure{csd-mv.png}{options: width=768}}
+#' \if{latex}{\figure{csd-mv.pdf}{options: width=12cm}}
 #'
 #' Besides the object-oriented design a few
 #' auxiliary functions exists. They serve as parameters or are mostly for
@@ -118,6 +118,10 @@ NULL
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
 #' \emph{Bernoulli}, \bold{forthcoming}.
 #' [cf. \url{http://arxiv.org/abs/1401.8104}]
+#' 
+#' Barunik, J. & Kley, T. (2015).
+#' Quantile Cross-Spectral Measures of Dependence between Economic Variables.
+#' [preprint available from the authors]
 #'
 #' Oracle (2015). Coding conventions of the Java Programming Language.
 #' \url{http://www.oracle.com/technetwork/java/codeconvtoc-136057.html}.
