@@ -1,7 +1,7 @@
 Package: quantspec
-Version: 1.2-0.99
+Version: 1.2-1
 Encoding: UTF-8
-Date: 2015-10-20
+Date: 2016-03-27
 Title: Quantile-Based Spectral Analysis of Time Series
 Authors@R: c(person("Tobias", "Kley", role=c("aut","cre"),
     email = "t.kley@lse.ac.uk"),
@@ -32,8 +32,8 @@ Collate:
     'generics.R'
     'Class-LagOperator.R'
     'Class-ClippedCov.R'
-    'aux-functions.R'
     'Class-QSpecQuantity.R'
+    'aux-functions.R'
     'Class-FreqRep.R'
     'Class-ClippedFT.R'
     'Class-QuantileSD.R'
@@ -53,3 +53,4 @@ Collate:
     'deprecated.R'
     'models.R'
     'quantspec-package.R'
+RoxygenNote: 5.0.1

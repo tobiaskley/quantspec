@@ -40,7 +40,7 @@ using namespace Rcpp;
 //'
 //' @return Returns an array with complex numbers
 //'         \eqn{\sigma(\tau_1, \tau_2, \omega_j} as defined in
-//'         Kley et. al (2014), p. 26.
+//'         Kley et. al (2016), p. 26.
 //'
 //' @references
 //' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).

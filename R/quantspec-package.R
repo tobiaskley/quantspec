@@ -11,8 +11,8 @@ NULL
 #'  \tabular{ll}{
 #'    \cr Package: \tab quantspec
 #'    \cr Type:    \tab Package
-#'    \cr Version: \tab 1.2-0.99
-#'    \cr Date:    \tab 2015-10-20
+#'    \cr Version: \tab 1.2-1
+#'    \cr Date:    \tab 2016-03-27
 #'    \cr License: \tab GPL (>= 2)
 #'  }
 #'
@@ -45,7 +45,7 @@ NULL
 #' Besides the object-oriented design a few
 #' auxiliary functions exists. They serve as parameters or are mostly for
 #' internal use. A more detailed description of the framework can be found in
-#' the paper on the package (Kley, 2015).
+#' the paper on the package (Kley, 2016).
 #'
 #' @section Organization of the source code / files in the \code{/R} folder:
 #' All of the source code related to the specification of a certain class is
@@ -105,23 +105,23 @@ NULL
 #' Computation. Ph.D. Dissertation, Ruhr University Bochum.
 #' \url{http://www-brs.ub.ruhr-uni-bochum.de/netahtml/HSS/Diss/KleyTobias/}.
 #'
-#' Kley, T. (2015). An Object-Oriented Framework for Quantile-Based Spectral
-#' Analysis and a Reference Implementation in R: The quantspec Package.
-#' Vignette to this R package.
+#' Kley, T. (2016). Quantile-Based Spectral Analysis in an Object-Oriented
+#' Framework and a Reference Implementation in R: The quantspec Package.
+#' Journal of Statistical Software, \bold{70}(3), 1--27.
 #'
 #' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
 #' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 #' [cf. \url{http://arxiv.org/abs/1111.7205}]
 #'
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
+#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2016).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \emph{Bernoulli}, \bold{forthcoming}.
+#' \emph{Bernoulli}, \bold{22}(3), 1770--1807.
 #' [cf. \url{http://arxiv.org/abs/1401.8104}]
 #' 
 #' Barunik, J. & Kley, T. (2015).
 #' Quantile Cross-Spectral Measures of Dependence between Economic Variables.
-#' [preprint available from the authors]
+#' [cf. \url{http://arxiv.org/abs/1510.06946}]
 #'
 #' Oracle (2015). Coding conventions of the Java Programming Language.
 #' \url{http://www.oracle.com/technetwork/java/codeconvtoc-136057.html}.

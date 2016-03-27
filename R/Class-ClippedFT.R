@@ -9,7 +9,7 @@ NULL
 #' calculations to determine the Fourier transform of the clipped time
 #' series. As a subclass to \code{\link{FreqRep}} it inherits
 #' slots and methods defined there; it servers as a frequency representation of
-#' a time series as described in Kley et. al (2015+) for univariate time series
+#' a time series as described in Kley et. al (2016) for univariate time series
 #' and in Barunik & Kley (2015) for multivariate time series.
 #'
 #' For each frequency \eqn{\omega} from \code{frequencies} and level \code{q}
@@ -29,9 +29,9 @@ NULL
 #' @keywords S4-classes
 #'
 #' @references
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
+#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2016).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \emph{Bernoulli}, \bold{forthcoming}.
+#' \emph{Bernoulli}, \bold{22}(3), 1770--1807.
 #' [cf. \url{http://arxiv.org/abs/1401.8104}]
 #' 
 #' Barunik, J. & Kley, T. (2015).

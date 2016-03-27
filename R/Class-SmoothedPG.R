@@ -7,7 +7,7 @@ NULL
 #'
 #' \code{SmoothedPG} is an S4 class that implements the necessary
 #' calculations to determine a smoothed version of one of the quantile
-#' periodograms defined in Dette et. al (2015), Kley et. al (2015+) and
+#' periodograms defined in Dette et. al (2015), Kley et. al (2016) and
 #' Barunik&Kley (2015).
 #'
 #' For a \code{\link{QuantilePG}} \eqn{Q^{j_1, j_2}_n(\omega, x_1, x_2)}{Qn(w,x1,x2)} and
@@ -469,9 +469,10 @@ setMethod(f = "getCoherency",
 #' @return Returns the estimate described above.
 #'
 #' @references
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
+#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2016).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \url{http://arxiv.org/abs/1401.8104}.
+#' \emph{Bernoulli}, \bold{22}(3), 1770--1807.
+#' [cf. \url{http://arxiv.org/abs/1401.8104}]
 #' 
 #' Barunik, J. & Kley, T. (2015).
 #' Quantile Cross-Spectral Measures of Dependence between Economic Variables.
@@ -1163,7 +1164,7 @@ setMethod(f = "getSdBoot",
 #' are implemented:
 #' \itemize{
 #'   \item \code{"spectral density"}: confidence intervals for the quantile spectral
-#' 					 density as described in Kley et. al (2015+) for the univariate case and
+#' 					 density as described in Kley et. al (2016) for the univariate case and
 #' 					 in Barunik and Kley (2015) for the multivariate case.
 #'   \item \code{"coherency"}: confidence intervals for the quantile coherency as
 #' 					 described in Barunik and Kley (2015).

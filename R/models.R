@@ -150,7 +150,7 @@ ARCH1 <- function(n,a0,a1,overhead=500,innov = rnorm) {
 
 
 ################################################################################
-#' Functions to simulate from the time series models in Kley et. al (2014).
+#' Functions to simulate from the time series models in Kley et. al (2016).
 #'
 #' @details
 #' \code{ts1} QAR(1) model from Dette et. al (2015).

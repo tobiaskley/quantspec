@@ -52,7 +52,7 @@ int idx (int n, int d1, int k1, int d2, int k2, int b, int N, int D1, int K1, in
 //'
 //' @return Returns an array with complex numbers
 //'         \eqn{\sigma(\tau_1, \tau_2, \omega_j} as defined in
-//'         Kley et. al (2014), p. 26.
+//'         Kley et. al (2016), p. 26.
 //'
 //' @references
 //' Barunik, J. & Kley, T. (2015+).
