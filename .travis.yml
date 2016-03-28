@@ -13,7 +13,7 @@ warnings_are_errors: true
 env:
  global:
    - CRAN: http://cran.rstudio.com
-   - R_BUILD_ARGS="--compact-vignettes=gs+qpdf"
+   - R_BUILD_ARGS="--resave-data --compact-vignettes=gs+qpdf"
    - R_CHECK_ARGS="--as-cran"
 
 r_github_packages:
