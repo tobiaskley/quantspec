@@ -3,8 +3,7 @@ r:
   - release
   - devel
 
-sudo: false
-cran: http://cran.at.r-project.org
+sudo: required
 
 cache: packages
 
