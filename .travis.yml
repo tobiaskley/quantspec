@@ -10,8 +10,8 @@ cache: packages
 warnings_are_errors: true
 
 before_install:
-	- sudo apt-get update -qq
-	- sudo apt-get install -qq qpdf
+   - sudo apt-get update -qq
+   - sudo apt-get install -qq qpdf
 
 env:
  global:
