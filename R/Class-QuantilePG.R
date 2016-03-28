@@ -8,7 +8,7 @@ NULL
 #'
 #' \code{QuantilePG} is an S4 class that implements the necessary
 #' calculations to determine one of the periodogram-like statistics defined in
-#' Dette et. al (2015) and Kley et. al (2015+).
+#' Dette et. al (2015) and Kley et. al (2016).
 #'
 #' Performs all the calculations to determine a quantile periodogram from a
 #' \code{FreqRep} object upon initizalization (and on request
@@ -39,9 +39,9 @@ NULL
 #' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 #' [cf. \url{http://arxiv.org/abs/1111.7205}]
 #'
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
+#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2016).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \emph{Bernoulli}, \bold{forthcoming}.
+#' \emph{Bernoulli}, \bold{22}(3), 1770--1807.
 #' [cf. \url{http://arxiv.org/abs/1401.8104}]
 #'
 #' @example

@@ -1,14 +1,26 @@
-# Sample .travis.yml for R projects from https://github.com/craigcitro/r-travis
 language: r
+r:
+  - release
+  - devel
+
 sudo: required
-warnings_are_errors: true
+
+cache: packages
+
+warnings_are_errors: false
+
+before_install:
+   - sudo apt-get update
+   - sudo apt-get install qpdf
 
 env:
  global:
    - CRAN: http://cran.rstudio.com
+   - R_BUILD_ARGS="--resave-data --compact-vignettes=gs+qpdf"
+   - R_CHECK_ARGS="--as-cran"
 
-r_packages:
-  - covr
+r_github_packages:
+  - jimhester/covr
 
 after_success:
   - Rscript -e 'covr::codecov()'

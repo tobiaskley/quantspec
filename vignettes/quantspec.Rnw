@@ -7,7 +7,7 @@
 
 \usepackage{booktabs}
 \usepackage{graphicx}
-\usepackage{amsmath,amssymb}
+\usepackage{amsmath,amssymb,thumbpdf,lmodern}
 
 \newtheorem{defi}{Definition}
 \DeclareMathOperator{\argmin}{argmin}
@@ -36,24 +36,27 @@ a Reference Implementation in R: The quantspec Package} %% without formatting
 \Shorttitle{\pkg{quantspec}: Quantile-Based Spectral Analysis in \proglang{R}} %% a short title (if necessary)
 
 %% an abstract and keywords
-\Abstract{Quantile-based approaches to the spectral analysis of time series have
-recently attracted a lot of attention. Despite a growing literature that
-contains various estimation proposals, no systematic methods for computing
-the new estimators are available to date. This paper contains two main
-contributions. First, an extensible framework for quantile-based spectral
-analysis of time series is developed and documented using object-oriented
-models. A comprehensive, open source, reference implementation of this
-framework, the \proglang{R} package \pkg{quantspec}, was recently contributed to
-CRAN by the author of this paper. The second contribution of the present paper
-is to provide a detailed tutorial, with worked examples, to this \proglang{R}
-package.
-A reader who is already familiar with quantile-based spectral analysis and whose
-primary interest is not the design of the \pkg{quantspec} package, but how to
-use it, can read the tutorial and worked examples (Sections~\ref{sec:3}
-and~\ref{sec:4}) independently.
+\Abstract{Quantile-based approaches to the spectral analysis of time
+  series have recently attracted a lot of attention. Several methods
+  for estimation have been proposed in the literature and their statistical
+  properties were analyzed. Yet, so far, neither a systematic method for
+  computation nor a comprehensive software implementation are available
+  to date. This paper contains two main contributions. First, an extensible
+  framework for quantile-based spectral analysis of time series is
+  developed and documented using object-oriented models. A
+  comprehensive, open source reference implementation of this
+  framework is provided in the \proglang{R} package \pkg{quantspec},
+  which is available from the Comprehensive \proglang{R} Archive
+  Network. The second contribution of the present paper is to
+  provide a detailed tutorial, with worked examples, for this
+  \proglang{R} package.  A reader who is already familiar with
+  quantile-based spectral analysis and whose primary interest is not
+  the design of the \pkg{quantspec} package, but how to use it, can
+  read the tutorial and worked examples (Sections~\ref{sec:3}
+  and~\ref{sec:4}) independently.
 
 This introduction to the \proglang{R} package \pkg{quantspec} is
-a (slightly) modified version of a paper submitted to the \emph{Journal
+a (slightly) modified version of~\cite{Kley2016}, published in the \emph{Journal
 of Statistical Software}.}
 
 \Keywords{time series, spectral analysis, periodogram, quantile regression, copulas, ranks, \proglang{R}, \pkg{quantspec}, framework, object-oriented design}
@@ -112,44 +115,52 @@ has been investigated many times and is well understood. In the analysis of
 centered Gaussian time series this approach is particularly attractive, because
 the autocovariance function completely characterizes the distribution of the
 underlying process. If that process is not Gaussian, ordinary spectral
-analysis suffers from typical weaknesses of $L_2$-methods: it is lacking
+analysis suffers from typical weaknesses of $L_2$-methods: It is lacking
 robustness against outliers and heavy tails, and is unable  to capture important
 dynamic features such as changes in the conditional shape (skewness, kurtosis),
-time-irreversibility, or dependence in the extremes. In addition to this, only time
+time-irreversibility, or dependence in the extremes. In addition, only time
 series with an existing second moment can be analyzed at all. All of this was
 previously realized by many researchers, and various extensions and
 modifications of the $L^2$-periodogram have been proposed to remedy those drawbacks.
 
 Approaches to robustifying the traditional spectral methods against
-outliers and deviations from the distributional assumptions were taken, among
-others, by
+outliers and deviations from the distributional assumptions were
+taken, among others, by
 \cite{KleinerEtAl1979,KluppelbergMikosch1994,Mikosch1998,Katkovnik1998,
-HillMcCloskey2013}. To account for more general dynamic features
-alternative spectral concepts and tools were recently proposed.
-A first step in that direction was taken by \citet{Hong1999}. In order to obtain
-a complete description of the two-dimensional distributions at lag~$k$, he
-introduced a  {\it generalized spectrum} where covariances ${\rm Cov}(X_t,
-X_{t-k})$ are replaced by covariances ${\rm Cov} ({\rm e}^{{\rm i}x_1 X_t}, {\rm
-e}^{{\rm i}x_2 X_{t-k}})$ yielding a spectrum closely related to the joint
-characteristic functions of the pairs $(X_t, X_{t-k})$.
-In the quantile-based approach to spectral analysis the objects of interest are
-the \emph{Laplace cross-covariance kernel} \[\gamma_k(q_1, q_2) :=
-\text{Cov}\Big(I\{ X_t \leq q_1\}, I\{ X_{t-k} \leq q_2\}\Big), \quad  q_1, q_2 \in \bar{\IR}, \ k \in \IZ,\] and the \emph{copula cross-covariance kernel} \[\gamma^{U}_k(\tau_1, \tau_2) := \Big(I\{ F(X_t) \leq \tau_1\}, I\{ F(X_{t-k}) \leq \tau_2\}\Big), \quad  \tau_1, \tau_2 \in [0,1], \ k \in \IZ,\]
-where $I\{A\}$ denotes the indicator function of the event $\{A\}$ and $F$ the
-marginal distribution function (the distribution function of any $X_t$, strict
-stationarity will be assumed).
-Obviously these measures exist without the
-necessity to make assumptions about moments. Also, when the underlying process
-is not Gaussian, and the quantile-based measures of serial dependence are
-considered as functions with arguments $q_1, q_2$, or $\tau_1, \tau_2$
-respectively, they provide a much richer picture about the pairwise dependence
-than would the autocovariances. As in the approach of \cite{Hong1999}, a
-complete description of the joint distributions (or copulas) of the pairs $(X_t, X_{t-k})$
-is available. A particular advantage of the copula cross-covariance kernel is
-its invariance to monotone transformations. This allows to disentangle the
-serial features from the marginal features.
-For a full list of the properties and advantages of those dependence
-measures the interested reader be refered to
+  HillMcCloskey2013}. To account for more general dynamic features
+alternative spectral concepts and tools were recently proposed.  A
+first step in that direction was taken by \citet{Hong1999}. In order
+to obtain a complete description of the two-dimensional distributions
+at lag~$k$, he introduced a {\it generalized spectrum} where
+the covariances $\COV(X_t, X_{t-k})$ are replaced by the covariances
+$\COV ({\rm e}^{{\rm i}x_1 X_t}, {\rm e}^{{\rm i}x_2 X_{t-k}})$
+yielding a spectrum closely related to the joint characteristic
+functions of the pairs $(X_t, X_{t-k})$.  In the quantile-based
+approach to spectral analysis the objects of interest are the
+\emph{Laplace cross-covariance kernel}
+\[\gamma_k(q_1, q_2) := \COV\Big(I\{ X_t \leq q_1\}, I\{ X_{t-k}
+\leq q_2\}\Big), \quad q_1, q_2 \in \bar{\IR}, \ k \in \IZ,\]
+and the \emph{copula cross-covariance kernel}
+\[\gamma^{U}_k(\tau_1, \tau_2) := \Big(I\{ F(X_t) \leq \tau_1\}, I\{
+F(X_{t-k}) \leq \tau_2\}\Big), \quad \tau_1, \tau_2 \in [0,1], \ k \in
+\IZ,\]
+where $I\{A\}$ denotes the indicator function of the event $\{A\}$,
+$\bar{\IR} := \IR \cup \{-\infty, \infty\}$ the extended real line and
+$F$ the marginal distribution function (i.e.,~the distribution
+function of any $X_t$ with strict stationarity being assumed).
+Obviously these measures exist without the necessity to make
+assumptions about moments. Also, when the underlying process is not
+Gaussian, and the quantile-based measures of serial dependence are
+considered to be functions with arguments $q_1, q_2$, or $\tau_1, \tau_2$
+respectively, they provide a much richer picture about the pairwise
+dependence than would the autocovariances. As in the approach of
+\cite{Hong1999}, a complete description of the joint distributions (or
+copulas) of the pairs $(X_t, X_{t-k})$ is available. A particular
+advantage of the copula cross-covariance kernel is its invariance to
+monotone transformations. This allows to disentangle the serial
+features from the marginal features.  For a full list of the
+properties and advantages of these dependence measures the interested
+reader is referred to
 \cite{Hong2000,Li2008,Li2012,Li2013,Li2014,Hagemann2011,LeeRao2012,Kley2014a,DetteEtAl2013}
 and \cite{KleyEtAl2014}.
 
@@ -185,11 +196,11 @@ and
 \end{equation}
 is more convenient.
 
-Quantities as $\gamma_k$ and $\gamma^{U}_k$, and their spectral
+The quantities such as $\gamma_k$ and $\gamma^{U}_k$, and their spectral
 representations~\eqref{def:LapSD}--\eqref{def:cumCopSD} naturally come into the
 picture when the {\it clipped processes} $(I\{X_t \leq q\})_{t \in \IZ}$ and
 $(I\{F(X_t) \leq \tau\})_{t \in \IZ}$ are investigated. Such binary processes
-have been considered earlier in the literature by e.\,g.~\citet{Kedem1980}.
+have been considered earlier in the literature by, e.g., \citet{Kedem1980}.
 Observe that the quantile-based spectral quantities can be interpreted in terms
 of an orthogonal increment process of a spectral representation of the clipped
 process which exists for every strictly stationary process (more
@@ -202,19 +213,18 @@ with the introduction, under the names of \textit{Lap\-lace-, quantile-} and
 \textit{copula} spectral density and spectral density {\it kernels}, of various
 quantile-related spectral concepts, along with the corresponding sample-based
 periodograms and smoothed periodograms
-[cf.
-\cite{Li2008,Li2012,Li2013,Li2014,Hagemann2011,LeeRao2012,Kley2014a,DetteEtAl2013,KleyEtAl2014}].
+\citep[cf.][]{Li2008,Li2012,Li2013,Li2014,Hagemann2011,LeeRao2012,Kley2014a,DetteEtAl2013,KleyEtAl2014}.
 
-Despite the vast amount of theoretical work, a public software solution was so
-far not available.
+Despite the vast amount of theoretical work, a software solution was
+so far not publicly available.
 
 \subsection{Estimators for the quantile-based spectral analysis of time series}
 
-In this section of the introduction, various estimators (the so-called quantile
+In this section, various estimators (the so-called quantile
 periodograms) for the Laplace and copula spectra defined in
-Section~\ref{sec:Lcck} are briefly considered.
-For the upcoming definitions denote by $X_0, \ldots, X_{n-1}$ an observed time
-series of the process $(X_t)_{t \in \IZ}$, by
+Section~\ref{sec:Lcck} are briefly considered.  For the upcoming
+definitions denote by $X_0, \ldots, X_{n-1}$ an observed time series
+of the process $(X_t)_{t \in \IZ}$, by
 \[\hat F_n(x) := \frac{1}{n} \sum_{t=0}^{n-1} I\{X_t \leq x\}\]
 the \emph{empirical distribution function} of $X_0, \ldots, X_{n-1}$, and by
 $\Re z$ and $\Im z$ the real and imaginary part of $z = \Re z + \text{i} \Im z
@@ -222,11 +232,11 @@ $\Re z$ and $\Im z$ the real and imaginary part of $z = \Re z + \text{i} \Im z
 Further,
 \[\rho_\tau (x):= x(\tau - I\{  x \leq 0\}) = (1-\tau ) \vert x\vert I\{ x\leq
 0\} + \tau   \vert x\vert I\{ x > 0\},\]
-denotes the so-called \emph{check function} [cf.~\citet{Koenker2005}].
+denotes the so-called \emph{check function} \citep[cf.][]{Koenker2005}.
 
 \begin{defi}[Quantile-regression based periodograms]
   \label{def:qregPG} ~\\
-  For $\omega \in \IR$ and $\tau_1, \tau_2 \in (0,1)$ the
+  For $\omega \neq 0 \mod 2\pi$ and $\tau_1, \tau_2 \in (0,1)$ the
   \emph{Laplace periodogram} $\hat L_{n}^{\tau_1, \tau_2}(\omega)$, and the
   \emph{rank-based Laplace periodogram} $\hat L_{n,R}^{\tau_1,\tau_2}(\omega)$ are defined as
   \begin{equation*}
@@ -239,27 +249,28 @@ denotes the so-called \emph{check function} [cf.~\citet{Koenker2005}].
   (\hat a_{n}^{\tau}(\omega), \hat b_{n}^{\tau}(\omega)) & := \argmin_{a \in \IR, b \in \IC} \sum_{t=0}^{n-1} \rho_{\tau}(n X_{t} - a - 2 \cos(\omega t) \Re b + 2 \sin(\omega t) \Im b), \label{L1regre} \\
   (\hat a_{n,R}^{\tau}(\omega), \hat b_{n,R}^{\tau}(\omega)) & := \argmin_{a \in \IR, b \in \IC} \sum_{t=0}^{n-1} \rho_{\tau}(n \hat F_n(X_t) - a - 2 \cos(\omega t) \Re b + 2 \sin(\omega t) \Im b).\nonumber
   \end{align}
-  If $\omega = 0 \mod \pi$, when the regressor that yields the imaginary part of the estimate vanishes, the estimates need to be adapted as follows: for $\omega_{\pi} = 2\pi (j+1/2)$, $j \in \IZ$, let
+   and for $\omega_{\pi} = 2\pi (j+1/2)$, $j \in \IZ$, and $\tau\in (0,1)$,
   \begin{align}
   (\hat a_{n}^{\tau}(\omega_{\pi}), \hat b_{n}^{\tau}(\omega_{\pi})) & := \argmin_{a \in \IR, b \in \IR} \sum_{t=0}^{n-1} \rho_{\tau}(n X_t - a - \cos(\omega_{\pi} t) b), \nonumber \\
   (\hat a_{n,R}^{\tau}(\omega_{\pi}), \hat b_{n,R}^{\tau}(\omega_{\pi})) & := \argmin_{a \in \IR, b \in \IR} \sum_{t=0}^{n-1} \rho_{\tau}(n \hat F_n(X_t) - a - \cos(\omega_{\pi} t) b).\nonumber
   \end{align}
 \end{defi}
 
-For $\omega \in 2\pi \IZ$ an adaptation is also possible [cf.~\cite{Kley2014a}],
-but since it is not required for the definition of the smoothed estimates it is
-omitted for the sake of brevity. Observe that the rank-based periodograms
+Note that, for $\omega = 0 \mod \pi$, the estimates need to be adapted, because the regressor that yields the imaginary part of the estimate vanishes. For $\omega \in 2\pi \IZ$ an adaptation is also possible \citep[cf.][]{Kley2014a},
+but since it is not required for the definition of the smoothed estimates this is
+omitted here, for the sake of brevity. Observe that the rank-based periodograms
 obtained their name due to the fact that $n \hat F_n(X_t)$ is the rank of $X_t$
 among $X_0, \ldots, X_{n-1}$
 
-The Laplace periodograms trace back to \cite{Katkovnik1998} who, in the field of
-signal processing, suggested $L_p$ estimators in a harmonic linear model.
-\cite{Li2008} proved asymptotic normality of the Laplace periodograms for
-$\tau_1 = \tau_2 = 0.5$ and later extended the approach to arbitrary
-quantiles with $0 < \tau_1 = \tau_2 < 1$ \citep{Li2012}.
-\cite{DetteEtAl2013} introduced the estimator with distinct quantile levels
-$\tau_1$ and $\tau_2$ (not necessarily equal), and also considered the
-rank-based version.
+The Laplace periodograms can be traced back to \cite{Katkovnik1998},
+who, in the field of signal processing, suggested $L_p$ estimators in
+a harmonic linear model.  \cite{Li2008} proved asymptotic normality of
+the Laplace periodograms for $\tau_1 = \tau_2 = 0.5$ and later
+extended the approach to arbitrary quantiles with
+$0 < \tau_1 = \tau_2 < 1$ \citep{Li2012}.  \cite{DetteEtAl2013}
+introduced the estimator with distinct quantile levels $\tau_1$ and
+$\tau_2$ (not necessarily equal), and also considered the rank-based
+version.
 
 Another estimator is based on the discrete Fourier transform of clipped
 processes and can be defined as follows:
@@ -282,7 +293,10 @@ processes and can be defined as follows:
 \end{defi}
 
 Note the similarity between all the quantile periodograms and the
-cross-perio\-do\-grams in multivariate time series analysis [cf., e.\,g., \cite{Brillinger1975}, p.\,235]: each periodogram is a product of two frequency representation objects computed at frequencies ($\omega$ and $-\omega$) that sum to zero.
+cross-perio\-do\-grams in multivariate time series analysis \cite[cf.,
+e.g.,~][p.~235]{Brillinger1975}: Each periodogram is a product of
+two frequency representation objects computed at frequencies ($\omega$
+and $-\omega$) that sum to zero.
 
 The estimator based on the discrete
 Fourier transformation of clipped time series was introduced by \cite{Hong2000},
@@ -295,8 +309,8 @@ Gaussian process was established.
 statistics, based on empirical joint distributions.
 
 As in the traditional case the new periodograms are not consistent estimators
-[cf. the positive variances of the limit distributions in Theorems~3.2 and~3.4
-in \cite{DetteEtAl2013} or Proposition~3.4 in \cite{KleyEtAl2014}].
+(cf.~the positive variances of the limit distributions in Theorems~3.2 and~3.4
+in \citealt{DetteEtAl2013} or Proposition~3.4 in \citealt{KleyEtAl2014}).
 
 \subsection{Smoothing the quantile periodograms}
 \label{sec:SmEstrs}
@@ -334,14 +348,15 @@ series]\label{def:SmclippedPG} ~\\
   \end{equation*}
 \end{defi}
 
-When
-the weight functions are such that with $n \rightarrow \infty$ only the weights
-in a shrinking neighborhood of zero will be positive, the estimators will be
-consistent [cf. Theorem~3.7 in \cite{Kley2014a}]. Under suitable assumptions,
-scaled versions of $\hat G_n(\cdot, \cdot; \omega)$ and $\hat
-G_{n,R}(\cdot, \cdot; \omega)$ converge weakly to complex-valued
-Gaussian processes [cf. Theorem 3.5 and 3.6 in \cite{KleyEtAl2014}]. A comprehensive description of all estimators and their
-asymptotic properties is available in \cite{Kley2014a}.
+When the weight functions are such that with $n \rightarrow \infty$
+only the weights in a shrinking neighborhood of zero will be positive,
+the estimators will be consistent \citep[cf.~Theorem~3.7
+in][]{Kley2014a}. Under suitable assumptions, scaled versions of
+$\hat G_n(\cdot, \cdot; \omega)$ and
+$\hat G_{n,R}(\cdot, \cdot; \omega)$ converge weakly to complex-valued
+Gaussian processes \citep[cf.~Theorem 3.5 and 3.6
+in][]{KleyEtAl2014}. A comprehensive description of all estimators and
+their asymptotic properties is available in \cite{Kley2014a}.
 
 \newpage
 \section{Conceptual design of the framework}
@@ -349,51 +364,77 @@ asymptotic properties is available in \cite{Kley2014a}.
 
 \subsection{An analysis of functional requirements}
 
-The \pkg{quantspec} software project was triggered by the development of the quantile-based methods for spectral analysis [cf.~Section~\ref{sec:1}, \cite{DetteEtAl2013} and \cite{KleyEtAl2014}]. The primary aim has been to make these new methods accessible to a wide range of users.
+The \pkg{quantspec} software project was triggered by the development
+of the quantile-based methods for spectral analysis
+(cf.~Section~\ref{sec:1}, \citealt{DetteEtAl2013} and
+\citealt{KleyEtAl2014}). The primary aim has been to make these new
+methods accessible to a wide range of users.
 
-Before going into the programming-specific details of the project, a conceptual design, non-specific to any programming language was developed. By this procedure, additional insight and a thorough documentation of the computational characteristics of quantile-based spectral analysis could be gained. The conceptual design serves as a blueprint for implementations in (possibly) various environments and can easily be transformed into an implementation plan including the details specific to the respective programming environment.
+Before going into the programming-specific details of the project, a
+conceptual design, non-specific to any programming language, was
+developed. By this procedure, additional insight and a thorough
+documentation of the computational characteristics of quantile-based
+spectral analysis could be gained. The conceptual design serves as a
+blueprint for implementations in (possibly) various environments and
+can easily be transformed into an implementation plan including the
+details specific to the respective programming environment.
 
-Aiming for a software system that is most flexible in the ways in which it can be used, that can easily be extended in functionality and also for the ease of its maintenance an object-oriented design was chosen. This type of design also contributes to a structure of the system that can be better understood, both by users and developers. The general structure of the system for performing quantile-based spectral analysis is described using class diagrams of the unified modeling language (UML). In these diagrams, all necessary components and their interrelations are described in a formal manner.
+Aiming for a software system that is most flexible in the ways in
+which it can be used, that can easily be extended in functionality and
+also for the ease of its maintenance an object-oriented design was
+chosen. This type of design also contributes to a structure of the
+system that can be better understood, both by users and
+developers. The general structure of the system for performing
+quantile-based spectral analysis is described using class diagrams of
+the unified modeling language (UML). In these diagrams, all necessary
+components and their interrelations are described in a formal manner.
 
-To understand the specification of the framework, the essential elements of
-the UML are described very briefly. Readers familiar with the UML can skip this
-paragraph. Recall that in an object-oriented design the components of the system are objects
-encapsulating both data and behavior of a specific ``real-world'' entity. The
-structure of each object can thus be described by a meaningful name (the
-\emph{class name}), a collection of data fields (in \proglang{R} these are
-called \emph{slots}) and implementations of the behavior (in \proglang{R} these
-implementations are called \emph{methods}). In a class diagram each class
-(i.\,e., the composite of class name, data files and implemented behavior) is
-represented as a rectangle subdivided into three blocks. The name of the class
-is given in the top block, the data fields in the middle block and the methods
-in the bottom block. Note that in the unified modeling language the data fields
-and methods are specified in a standardized format. In this format the first
-symbol is an abbreviation used to specify the visibility of the class member.
-Here ``+'' for public and ``--'' for private members are used, meaning that the
-member is intended to be seen (and used) from outside the object or from inside
-the object only, respectively. For a data field the name is then followed by a
-colon and the type of the field. For a method the parameters are given in
-parenthesis; optional parameters are denoted by two dots. In the class diagram,
-relationships between classes are marked as lines connecting them. Currently two
-different types of relationships are modeled. A line with a triangular shaped
-tip at one end is used to declare a \emph{generalization} relationship
-(sometimes also coined inheritance or ``is a'' relationship). The class at the
-end of the line with the triangle is called the \emph{superclass} or the parent,
-while the class on the other side is called the \emph{subclass} or the child. In
-particular this type of relationship implies that an object that is an instance
-to the subclass and therefore provides all the subclasses' data fields and
-methods will also provide the data fields and methods of the superclass (and the
-superclasses' superclass it there are such, etc.). The second type of
-relationships used in this framework is that of an \emph{aggregation} (sometimes
-called ``has a'' relationship). A line with a hollow diamond at one end is used
-to denote this kind of relationship, where objects to the class at the end of
-the line with the diamond are the ones having objects of the class at the other
-end of the line as a part of them. At each end of the line the so-called
-cardinalities are denoted in the form of two numbers with dots in between them.
-The left number is the minimum number of objects of that type in the
-relationship that need to exist, the right number is the maximum number. A star
-is used to denote an unknown positive integer. If min and max cardinality
-coincide they are displayed as one number without the dots.
+To understand the specification of the framework, the essential
+elements of the UML are described very briefly. Readers familiar with
+UML can skip this paragraph. Recall that in an object-oriented design
+the components of the system are objects encapsulating both data and
+behavior of a specific ``real-world'' entity. The structure of each
+object can thus be described by a meaningful name (the \emph{class
+  name}), a collection of data fields (in \proglang{R} these are
+called \emph{slots}) and implementations of the behavior (in
+\proglang{R} these implementations are called \emph{methods}). In a
+class diagram each class (i.e., the composite of class name, data
+files and implemented behavior) is represented as a rectangle
+subdivided into three blocks. The name of the class is given in the
+top block, the data fields in the middle block and the methods in the
+bottom block. Note that in the unified modeling language the data
+fields and methods are specified in a standardized format. In this
+format the first symbol is an abbreviation used to specify the
+visibility of the class member.  Here the symbols ``+'' for public and
+``--'' for private members are used, indicating that the member is
+intended to be seen (and used) from outside the object or from inside
+the object only, respectively. For a data field the name is then
+followed by a colon and the type of the field. For a method the
+parameters are given in parenthesis; optional parameters are denoted
+by two dots. In the class diagram, relationships between classes are
+marked as lines connecting them. Currently two different types of
+relationships are modeled. A line with a triangular shaped tip at one
+end is used to declare a \emph{generalization} relationship (sometimes
+also coined inheritance or ``is a'' relationship). The class at the
+end of the line with the triangle is called the \emph{superclass} or
+the parent, while the class on the other end is called the
+\emph{subclass} or the child. In particular this type of relationship
+implies that an object that is an instance to the subclass and
+therefore provides all the subclasses' data fields and methods will
+also provide the data fields and methods of the superclass (and the
+superclasses' superclass if there are such, etc.). The second type of
+relationship used in this framework is that of an \emph{aggregation}
+(sometimes called ``has a'' relationship). A line with a hollow
+diamond at one end is used to denote this kind of relationship, where
+objects to the class at the end of the line with the diamond are the
+ones having objects of the class at the other end of the line as a
+part of them. At each end of the line the so-called cardinalities are
+denoted in the form of two numbers with dots in between them.  The
+left number is the minimum number of objects of that type in the
+relationship that need to exist, the right number is the maximum
+number. A star is used to denote an unknown positive integer. If min
+and max cardinality coincide they are displayed as one number without
+the dots.
 
 For the class diagrams in this manuscript the classes are arranged in a way such that (whenever possible) generalization relationships are displayed with the superclass on top and the subclasses in the bottom. Aggregations are shown with aggregated classes to the left and/or the right of the class representing ``the whole''.
 
@@ -403,11 +444,23 @@ display in Figures~\ref{fig:classdiagram1} and~\ref{fig:classdiagram2}. The stru
 
 In the next sections, all classes of the framework and their relations are going to be thoroughly described and motivated.
 
-\subsection[The base class QSpecQuantity and its successors]{The base class \code{QSpecQuantity} and its successors}
-
-Many of the quantities important for the quantile-based spectral analysis of a stationary time series [i.\,e., the estimators of Definitions~\ref{def:qregPG}--\ref{def:SmclippedPG} and the model quantities~\eqref{def:LapSD}--\eqref{def:cumCopSD}] are of the functional form,
-\[Q_b: F \times T_1 \times T_2 \rightarrow \mathbb{C}, \quad b=1,\ldots,B,\]
-where $F \subset \mathbb{R}$ is a set of frequencies [e.\,g, $F = [0,2\pi)$] and $T_1, T_2 \subset \bar{\mathbb{R}}$ are sets of levels. To provide a common interface to these objects the abstract class \code{QSpecQuantity} was introduced. Its data fields (i.\,e., the array \code{values}, a vector of reals \code{frequencies} and a list with two vectors of reals \code{levels}), are designed to store the sets
+\subsection[The base class `QSpecQuantity' and its successors]{The
+  base class `\code{QSpecQuantity}' and its successors}
+  
+Many of the quantities important for the quantile-based spectral
+analysis of a stationary time series (i.e., the estimators of
+Definitions~\ref{def:qregPG}--\ref{def:SmclippedPG} and the model
+quantities~\eqref{def:LapSD}--\eqref{def:cumCopSD}) are of the
+functional form,
+\[Q_b: F \times T_1 \times T_2 \rightarrow \mathbb{C}, \quad
+b=1,\ldots,B,\]
+where $F \subset \mathbb{R}$ is a set of frequencies (e.g.,
+$F = [0,2\pi)$) and $T_1, T_2 \subset \bar{\mathbb{R}}$ are sets of
+levels. To provide a common interface to these objects the abstract
+class `\code{QSpecQuantity}' was introduced. Its data fields (i.e.,
+an array \code{values}, a vector of reals \code{frequencies} and a
+list with two vectors of reals \code{levels}), are designed to store
+the sets
 \begin{equation*}
 \begin{split}
   \text{\code{frequencies}} & := \{\omega_1, \ldots, \omega_J\} \subset F, \\
@@ -419,12 +472,27 @@ and the family
 \begin{equation*}
   \text{\code{values}} := \big( Q_b(\omega_j, q_{1,k_1}, q_{2,k_2})\big)_{j=1,\ldots,J; k_1=1,\ldots, K_1; k_2=1,\ldots, K_2; b=1,\ldots,B}.
 \end{equation*}
-
+%
 Note that the handling of a family of $B$ quantile spectral quantities is necessary when bootstrapping replicates are present. The special case of only one function $Q$ can easily be handled by setting $B=1$.
 
-There are four classes inheriting the data structure and the method \code{show}%
-\footnote{The function show is used for printing objects of this class, and all superclasses, to the console.}
-from the abstract class \code{QSpecQuantity}. Two such classes, \code{QuantilePG} and \code{SmoothedPG}, implement the computation of the various quantile periodograms and smoothed quantile periodograms, respectively.  A more detailed description has to include the other related classes and is therefore deferred to a separate section (i.\,e., Section~\ref{sec:2-2}). A graphical representation of the relevant parts of the framework can be seen in Figure~\ref{fig:classdiagram1}. The other two of the classes generalizing the abstract class \code{QSpecQuantitiy} are referred to by the names \code{QuantileSD} and \code{IntegrQuantileSD}. These two classes implement the model quantities~\eqref{def:LapSD}--\eqref{def:cumCopSD}. The graphical representation can be seen in Figure~\ref{fig:classdiagram2}. A detailed description is deferred to Section~\ref{sec:2-3}.
+There are four classes inheriting the data structure and the method
+\code{show}%
+\footnote{The function \code{show} is used for printing objects of
+  this class, and all superclasses, to the console.}  from the
+abstract class `\code{QSpecQuantity}'. Two such classes,
+`\code{QuantilePG}' and `\code{SmoothedPG}', implement the computation
+of the various quantile periodograms and smoothed quantile
+periodograms, respectively.  A more detailed description has to
+include the other related classes and is therefore deferred to a
+separate section (i.e., Section~\ref{sec:2-2}). A graphical
+representation of the relevant parts of the framework can be seen in
+Figure~\ref{fig:classdiagram1}. The other two of the classes
+generalizing the abstract class `\code{QSpecQuantity}' are referred
+to by the names `\code{QuantileSD}' and
+`\code{IntegrQuantileSD}'. These two classes implement the model
+quantities~\eqref{def:LapSD}--\eqref{def:cumCopSD}. The graphical
+representation can be seen in Figure~\ref{fig:classdiagram2}. A
+detailed description is deferred to Section~\ref{sec:2-3}.
 
 \subsection{Implementation of the quantile-based (smoothed) periodograms}
 \label{sec:2-2}
@@ -437,9 +505,18 @@ from the abstract class \code{QSpecQuantity}. Two such classes, \code{QuantilePG
   \label{fig:classdiagram1}
 \end{figure}
 
-The components relevant to the implementation of the quantile-based spectral statistics are presented in Figure~\ref{fig:classdiagram1}. As alluded to in the previous section the two classes \code{QuantilePG} and \code{SmoothedPG} will do the job, in conjunction with the superclass \code{QSpecQuantity} from which they inherit the data structure to store the computed values.
+The components relevant to the implementation of the quantile-based
+spectral statistics are presented in
+Figure~\ref{fig:classdiagram1}. As alluded to in the previous section
+the two classes `\code{QuantilePG}' and `\code{SmoothedPG}' will do the
+job, in conjunction with the superclass `\code{QSpecQuantity}' from
+which they inherit the data structure to store the computed values.
 
-To better understand the implementation surrounding \code{QuantilePG}, observe that the quantile-based periodograms defined in Definitions~\ref{def:qregPG} and~\ref{def:clippedPG} share the common structure of an outer product (scaled with $(2\pi n)^{-1}$). To compute either one of the four periodograms
+To better understand the implementation surrounding `\code{QuantilePG}',
+observe that the quantile-based periodograms defined in
+Definitions~\ref{def:qregPG} and~\ref{def:clippedPG} share the common
+structure of an outer product (scaled with $(2\pi n)^{-1}$). To
+compute either one of the four periodograms
 \begin{equation*}
 \begin{split}
 \hat L_{n,R}^{\tau_1,\tau_2}(\omega), \
@@ -458,17 +535,51 @@ d_{n,R}^{\tau}(\omega), & \quad \tau \in T_1 \cup T_2, \ \omega \in F, \\
 d_{n}^{q}(\omega) & \quad q \in Q_1 \cup Q_2, \ \omega \in F,
 \end{split}
 \end{equation}
-respectively. In the framework this fact is incorporated by introduction of the abstract class \code{FreqRep} and its two subclasses \code{ClippedFT} and \code{QRegEstimator}, where the actual computations are implemented via the method \code{initialization()}. The class \code{FreqRep} serves as a common interface to the quantities in~\eqref{eqn:FR}. It provides data fields to store various information, including
+respectively. In the framework this fact is incorporated by
+introducing the abstract class `\code{FreqRep}' and its two
+subclasses `\code{ClippedFT}' and `\code{QRegEstimator}', where the
+actual computations are implemented via the method
+\code{initialization()}. The class `\code{FreqRep}' serves as a common
+interface to the quantities in~\eqref{eqn:FR}. It provides data fields
+to store various information, including
 \begin{itemize}
-  \item the observations \code{Y} from which the quantities were computed,
-  \item the \code{frequencies} and \code{levels} for which the computation was performed,
-  \item the result of the computation, which is stored in an array \code{values}.
+\item the observations \code{Y} from which the quantities were
+  computed,
+\item the \code{frequencies} and \code{levels} for which the
+  computation was performed,
+\item the result of the computation, which is stored in an array
+  \code{values}.
 \end{itemize}
-Further more, a flag \code{isRankBased} indicates whether, prior to the main computations, the observations $(X_t)$ were transformed to pseudo-observations $(\hat F_n(X_t))$. Performing this extra step will yield $\hat b_{n,R}^{\tau}(\omega)$ instead of $\hat b_{n}^{\tau}(\omega)$ or $d_{n,R}^{\tau}(\omega)$ instead of $d_{n}^{\tau}(\omega)$, respectively.
-The class \code{BootPos} allows for performing a block bootstrap procedure by ``shuffling'' the observations and repeatedly doing the computations on these bootstrapped observations. Currently only one method, the \code{MovingBlocks} bootstrap, is implemented.
+Further more, a flag \code{isRankBased} indicates whether, prior to
+the main computations, the observations $(X_t)$ were transformed to
+pseudo-observations $(\hat F_n(X_t))$. Performing this extra step will
+yield $\hat b_{n,R}^{\tau}(\omega)$ instead of
+$\hat b_{n}^{\tau}(\omega)$ or $d_{n,R}^{\tau}(\omega)$ instead of
+$d_{n}^{\tau}(\omega)$, respectively.  The class `\code{BootPos}'
+allows to perform a block bootstrap procedure by ``shuffling'' the
+observations and repeatedly doing the computations on these
+bootstrapped observations. Currently only one method, the
+`\code{MovingBlocks}' bootstrap, is implemented.
 
-Now, turning attention to the class \code{SmoothedPG}, recall that the various
-smoothed periodograms are all defined similarly, in the sense that computing the smoothed periodogram for $\omega_j := 2\pi j /n$, $j=1, \ldots, n-1$ basically means to do a discrete convolution of the sequence of quantile periodograms computed at $\omega_s$ with a sequence of appropriately chosen weight functions $W_n(\omega_s)$. Hence, everything needed for the smoothed periodogram is these two ingredients, which is reflected in the framework by two aggregation relationships involving the class \code{SmoothedPG}. The first such relationship links \code{SmoothedPG} to the \code{QuantilePG}s to be smoothed. The second such relationship links \code{SmoothedPG} to a class \code{Weight}, which provides a common interface to different weight functions. Currently two implementations are included. Employing weights of type \code{KernelWeight}, defined by a kernel \code{W} and a scale parameter~\code{bw} (bandwidth), will yield an estimator for the quantile (i.\,e, Laplace or copula) spectral density. An alternative is to use weights of type \code{SpecDistrWeight}, which yields estimators for the integrated quantile (i.\,e, Laplace or copula) spectral density.
+Now, turning attention to the class `\code{SmoothedPG}', recall that the
+various smoothed periodograms are all defined similarly, in the sense
+that computing the smoothed periodogram for $\omega_j := 2\pi j /n$,
+$j=1, \ldots, n-1$ basically means to do a discrete convolution of the
+sequence of quantile periodograms computed at $\omega_s$ with a
+sequence of appropriately chosen weight functions
+$W_n(\omega_s)$. Hence, everything needed for the smoothed periodogram
+is these two ingredients, which is reflected in the framework by two
+aggregation relationships involving the class `\code{SmoothedPG}'. The
+first such relationship links `\code{SmoothedPG}' to the
+`\code{QuantilePG}' to be smoothed. The second such relationship links
+`\code{SmoothedPG}' to a class `\code{Weight}', which provides a common
+interface to different weight functions. Currently two implementations
+are included. Employing weights of type `\code{KernelWeight}', defined
+by a kernel \code{W} and a scale parameter~\code{bw} (bandwidth), will
+yield an estimator for the quantile (i.e., Laplace or copula)
+spectral density. An alternative is to use weights of type
+`\code{SpecDistrWeight}', which yields estimators for the integrated
+quantile (i.e., Laplace or copula) spectral density.
 
 
 \subsection{Implementation of the quantile-based spectral measures}
@@ -478,15 +589,36 @@ smoothed periodograms are all defined similarly, in the sense that computing the
   \centering
   \scalebox{1.2}{\includegraphics{../man/figures/csd.pdf}}
   \caption{Classes for the numerical computation of (integrated) copula and
-  Laplace spectral densities via simulation.} % and their relations to each other
+  Laplace spectral densities via simulation.}
   \label{fig:classdiagram2}
 \end{figure}
 
-The classes~\code{QuantileSD} and \code{IntegrQuantileSD} were introduced to the framework to make the quantities~\eqref{def:LapSD}--\eqref{def:cumCopSD} available to the user.
+The classes `\code{QuantileSD}' and `\code{IntegrQuantileSD}' were
+introduced to the framework to make the
+quantities~\eqref{def:LapSD}--\eqref{def:cumCopSD} available to the
+user.
 
-To obtain access to a quantity of the form~\eqref{def:LapSD} or~\eqref{def:CopSD}, an instance of~\code{QuantileSD} can be created. In this case, a number of \code{R} independent copies of a time series of length \code{N} are obtained by calling the function \code{ts}. The function \code{ts} is a parameter to specify the model for which to obtain the model quantity and it handles the simulation process. Then, for each of these time series a~\code{QuantilePG} object is created and their values are averaged: first across the \code{R} independent copies, saving the result to \code{meanPG} and an estimation of the standard error to \code{stdError}. After that the averages are averaged again for each combination of levels across frequencies by smoothing. The result is then made available via the data field \code{values} of the superclass. By a call to the method \code{increasePrecision} the number of independent copies can be increased at any time to yield a less fluctuating average.
+To obtain access to a quantity of the form~\eqref{def:LapSD}
+or~\eqref{def:CopSD}, an instance of `\code{QuantileSD}' can be
+created. In this case, \code{R} independent copies of a time series of
+length \code{N} are obtained by calling the function \code{ts}. The
+function \code{ts} is a parameter to specify the model for which to
+obtain the model quantity and it handles the simulation process. Then,
+for each of these time series a `\code{QuantilePG}' object is created
+and their values are averaged: first across the \code{R} independent
+copies, saving the result to \code{meanPG} and an estimation of the
+standard error to \code{stdError}. After that the averages are
+averaged again for each combination of levels across frequencies by
+smoothing. The result is then made available via the data field
+\code{values} of the superclass. By a call to the method
+\code{increasePrecision} the number of independent copies can be
+increased at any time to yield a less fluctuating average.
 
-To obtain access to quantities of the form~\eqref{def:cumLapSD} or~\eqref{def:cumCopSD}, an instance of~\code{IntegrQuantileSD} can be created. For the computation an object of type~\code{QuantileSD} is created and subsequently the integral is approximated via a Riemann sum.
+To obtain access to quantities of the form~\eqref{def:cumLapSD}
+or~\eqref{def:cumCopSD}, an instance of `\code{IntegrQuantileSD}' can
+be created. For the computation an object of type `\code{QuantileSD}'
+is created and subsequently the integral is approximated via a Riemann
+sum.
 
 \section[Reference implementation: The R package quantspec]{Reference implementation: The \proglang{R} package \pkg{quantspec}}
 \label{sec:3}
@@ -504,28 +636,49 @@ functionality among many other, well developed packages. An important example is
 that the function \code{rq} of the \pkg{quantreg} package \citep{quantreg} could
 be used.
 
-Both \proglang{R} and the \pkg{quantspec} package are available from the
-comprehensive \proglang{R} archive network (CRAN,
-\url{http://cran.r-project.org}). The package's development is actively continued with the source code available from a GitHub repository (\url{https://github.com/tobiaskley/quantspec}). Besides the source code of the releases, which are also available from the CRAN servers, the GitHub repository additionally contains a detailed history of all changes, including comments, that were applied to the source code since April/10/2014, when the GitHub repository was created. The repository is organized into several branches: the \code{master} branch, the \code{develop} branch and possibly several topic branches. Since version 1.0-0 the \code{master} branch contains the source code of all release candidates and official releases, the \code{develop} branch contains the most recent updates and bug fixes that were not yet released. The topic branches contain the source code in which extensions to the package are developed.
+Both \proglang{R} and the \pkg{quantspec} package are available from
+the Comprehensive \proglang{R} Archive Network (CRAN) at
+\url{https://CRAN.R-project.org/package=quantspec}). The package's
+development is actively continued with the source code available from
+a GitHub repository
+(\url{https://github.com/tobiaskley/quantspec}). Besides the source
+code of the releases, which are also available from the CRAN servers,
+the GitHub repository additionally contains a detailed history of all
+changes, including comments, that were applied to the source code
+since 2014-04-10, when the GitHub repository was created. The
+repository is organized into several branches: the \code{master}
+branch, the \code{develop} branch and possibly several topic
+branches. Since version 1.0-0 the \code{master} branch contains the
+source code of all release candidates and official releases, the
+\code{develop} branch contains the most recent updates and bug fixes
+that were not yet released. The topic branches contain the source code
+in which extensions to the package are developed.
 
-To install a package from the source code straight from the repository use the
-\code{install_github} function of the \pkg{devtools} package~\citep{devtools}. More precisely, install the \pkg{devtools} package, if it's not already installed, and call
+To install a package from the source code straight from the repository
+use the \code{install_github} function of the \pkg{devtools}
+package~\citep{devtools}. More precisely, install the \pkg{devtools}
+package, if it is not already installed, and call
 
 \begin{Code}
 > library("devtools")
 > install_github("tobiaskley/quantspec", ref = "master")
 \end{Code}
 
-Instead of using \code{"master"}, another branch (e.\,g., \code{develop} to pull
-the most recent updates) or a tag that is pointing to one of the releases
-(e.\,g., \code{v1.0-0-rc1}, to install the $1$st release candidate to version
-1.0-0) can be used as \code{ref}. Note that, in case you are using Windows, to
-use \code{install_github}, you may need to install Rtools,%
-\footnote{Available from \url{http://cran.r-project.org/bin/windows/Rtools/}.}
-if you have not already done so.
-Note that the code in the \code{develop} branch is merged into the \code{master} branch only for a release (candidate) and after being thoroughly tested, so if you're installing from the \code{develop} branch you will potentially be using code that has not been fully tested.
-Use the optional argument \code{build_vignettes = FALSE} if you don't have
-\LaTeX\ installed on your system; i.\,e. call\enlargethispage{1cm}
+Instead of using \code{"master"}, another branch (e.g.,
+\code{"develop"} to pull the most recent updates) or a tag that is
+pointing to one of the releases (e.g., \code{"v1.0-0-rc1"}, to install
+the $1$st release candidate to version 1.0-0) can be used as
+\code{ref}. Note that, in case you are using Windows, to use
+\code{install_github}, you may need to install the \pkg{Rtools},%
+\footnote{Available from
+  \url{https://CRAN.R-project.org/bin/windows/Rtools/}.}  if you have
+not already done so.  Note that the code in the \code{develop} branch
+is merged into the \code{master} branch only for a release (candidate)
+and after being thoroughly tested, so if you are installing from the
+\code{develop} branch you will potentially be using code that has not
+been fully tested.  Use the optional argument \code{build_vignettes =
+  FALSE} if you do not have \LaTeX\ installed on your system; i.e.,
+call\enlargethispage{1cm}
 
 \begin{Code}
 > library("devtools")
@@ -536,15 +689,16 @@ Use the optional argument \code{build_vignettes = FALSE} if you don't have
 \subsection[R code intended for the user and its
 documentation]{\proglang{R} code intended for the user and its documentation}
 
-The classes of the \pkg{quantspec} package, their methods, slots, dependencies
-and inheritance properties are implemented as conceptually designed [cf.
-Section~\ref{sec:2}]. Recall that the design was presented in form of class
-diagrams, on display in Figures~\ref{fig:classdiagram1}
-and~\ref{fig:classdiagram2}, and that no specific programming language was
-assumed. All classes that are intended for the end-user possess a constructor
-method with the same name as the class itself but beginning with a lower case
-letter. The classes intended for the end-user and their constructors are listed
-in Table~\ref{tab:Constructors}.
+The classes of the \pkg{quantspec} package, their methods, slots,
+dependencies and inheritance properties are implemented as
+conceptually designed (cf.~Section~\ref{sec:2}). Recall that the
+design was presented in form of class diagrams, on display in
+Figures~\ref{fig:classdiagram1} and~\ref{fig:classdiagram2}, and that
+no specific programming language was assumed. All classes that are
+intended for the end-user possess a constructor method with the same
+name as the class itself but beginning with a lower case letter. The
+classes intended for the end-user and their constructors are listed in
+Table~\ref{tab:Constructors}.
 
 \begin{table}[t]
   \centering
@@ -589,17 +743,16 @@ called by executing
 help("quantspec")
 @
 
-on the \proglang{R} command line.
-Note that an index of all available
-functions can be accessed at the very bottom of the page. If for example more
-information on the constructor of \texttt{QRegEstimator} and on
-the class itself is desired, then \code{?qRegEstimator} or
-\code{?QRegEstimator}
-should be invoked to access the corresponding help pages. Using this
-class to determine the frequency representation $b_{n,R}^{\tau}(\omega)$, for $\tau \in \{0.25, 0.5, 0.75\}$
-would look as follows. In a toy example, where eight independent random
-variables $X_0, \ldots, X_7 \sim N(0,1)$ are generated and used to compute
-$b_{n,R}^{\tau}(\omega)$, call
+on the \proglang{R} command line.  Note that an index of all available
+functions can be accessed at the very bottom of the page. If for
+example more information on the constructor of `\code{QRegEstimator}'
+and on the class itself is desired, then \code{?qRegEstimator} or
+\code{?QRegEstimator} should be invoked to access the corresponding
+help pages. Using this class to determine the frequency representation
+$b_{n,R}^{\tau}(\omega)$, for $\tau \in \{0.25, 0.5, 0.75\}$ would
+look as follows. In a toy example, where eight independent random
+variables $X_0, \ldots, X_7 \sim N(0,1)$ are generated and used to
+compute $b_{n,R}^{\tau}(\omega)$, call
 
 <<>>=
 Y  <- rnorm(8)
@@ -609,20 +762,19 @@ bn <- qRegEstimator(Y, levels = c(0.25, 0.5, 0.75))
 By default the computation is done for all Fourier frequencies $\omega
 = 2\pi j / n \in [0,\pi]$, $n=8$, $j = 0, \ldots, \lfloor n/2 \rfloor$. The
 computed information can then be viewed by typing the name of the
-variable (i.\,e., \code{bn}) to the \proglang{R} console:
+variable (i.e., \code{bn}) in the \proglang{R} console:
 <<>>=
 bn
 @
 
-Methods other than the constructor are implemented as generic functions.
-To invoke the method \code{f} of an object \code{obj} the call therefore is
-\code{f(obj)}.
-In particular all attributes mentioned in the class diagram can be accessed via
-getter methods. There are no setter methods, because all attributes are
-completely handled by internal functions.
-For an example, to retrieve the
-attributes \code{frequencies} and \code{parallel} of the object \code{bn},
-execute the following lines on the \proglang{R} shell
+Methods other than the constructor are implemented as generic
+functions.  To invoke the method \code{f} of an object `\code{obj}'
+the call therefore is \code{f(obj)}.  In particular all attributes
+mentioned in the class diagram can be accessed via getter
+methods. There are no setter methods, because all attributes are
+completely handled by internal functions.  For an example, to retrieve
+the attributes \code{frequencies} and \code{parallel} of the object
+\code{bn}, execute the following lines on the \proglang{R} shell
 
 <<>>=
 getFrequencies(bn)
@@ -630,7 +782,7 @@ getParallel(bn)
 @
 
 To invoke a method \code{f} with parameters \code{p1, ..., pk} of an
-object \code{obj} the call is \code{f(obj, p1, ..., pk)}. An
+object `\code{obj}' the call is \code{f(obj, p1, ..., pk)}. An
 example is to invoke the accessor function \code{getValues}, which is equipped
 with parameters to get the values associated with certain \code{frequencies} or
 \code{levels}. An exemplary call looks like this:
@@ -650,7 +802,7 @@ help("getValues-FreqRep")
 
 Note the format \code{method_name-class_name} to access the help page of a
 method and that the attribute \code{values} is part of the abstract class
-\code{FreqRep} [cf. Figure~\ref{fig:classdiagram2}].
+`\code{FreqRep}' (cf.~Figure~\ref{fig:classdiagram2}).
 
 A graphical representation of the data can easily be created by applying the
 \code{plot} command. For example, to compute and plot the frequency
@@ -686,9 +838,9 @@ parametrized to show $d_{n,R}(\omega)$ for all Fourier frequencies from
 $[0,4\pi]$ to illustrate characteristic redundancies in the frequency
 representation objects, and to point out that the default values are always
 sufficient. The two relations
-
+%
 \[d_{n,R}^{\tau}(\omega) = \overline{d_{n,R}^{\tau}(2\pi - \omega)}, \quad d_{n,R}^{\tau}(\omega) = d_{n,R}^{\tau}(\omega + 2\pi j),\]
-
+%
 hold for any $\omega \in \IR$ and $j \in \IZ$, $d_{n,R}^{\tau}(\omega)$.
 Therefore, without additional calculations, the plot of $d_{n,R}^{\tau}(\omega)$
 can be determined for any $\omega \in 2\pi j / n$, $j \in \IZ$, as long as
@@ -726,12 +878,13 @@ framework \citep{testthat}.
 S\&P~500 stock index, 2007--2010}
 \label{sec:SP500}
 
-In this section the use of the \pkg{quantspec} package from the perspective of a
-data analysts is explained. To this end an analysis of the returns of the
-S\&P~500 stock index is performed. Note that a similar analysis and the data set
-used are available in the package. Calling \code{demo("sp500")} will start
-the computations and by \code{sp500} the data set can be referenced to do
-additional analysis.
+In this section the use of the \pkg{quantspec} package from the
+perspective of a data analyst is explained. To this end an analysis of
+the returns of the S\&P~500 stock index is performed. Note that a
+similar analysis as well as the data set used are available in the
+package. Calling \code{demo("sp500", package = "quantspec")} will start the computations and
+by \code{sp500} the data set can be referenced to do additional
+analysis.
 
 For the example the years 2007 through to 2010 were selected to have a time
 series that, at least to some degree, can be considered stationary. Aside
@@ -739,7 +892,8 @@ from this more technical consideration, employing the new statistical toolbox
 will reveal interesting features in the returns collected in the financial
 crisis that completely escape the analysis with the traditional tools blindly applied.
 
-For a start, use the following \proglang{R} script to plot the data, the
+For a start, use the following \proglang{R} script to plot the data using the \pkg{zoo}
+package \citep{zoo}, the
 autocovariances of the returns and the autocovariances of the squared returns.
 
 <<plotSP,eval=FALSE>>=
@@ -761,31 +915,33 @@ par(def.par)  #- reset to default
 @
 \end{center}
   \vspace*{-0.7cm}\caption{Returns $(Y_t)$ of the S\&P~500 returns example
-  data (left), autocovariances ${\rm Cov}(Y_{t+k}, Y_t)$ of the returns
-  (middle), and autocovariances ${\rm Cov}(Y_{t+k}^2, Y_t^2)$ of the squared returns
+  data (left), autocovariances $\COV(Y_{t+k}, Y_t)$ of the returns
+  (middle), and autocovariances $\COV(Y_{t+k}^2, Y_t^2)$ of the squared returns
   (right).}
   \label{fig:plotSP}
 \end{figure}
 
-The three plots are
-displayed in Figure~\ref{fig:plotSP}. Inspecting them, it is important to
-observe that the returns themselves appear to be almost uncorrelated. Therefore, not much
-insight into the serial dependency structure of the data can be expected from
-traditional spectral analysis. The squared returns on the other hand are
-significantly correlated. This observation, typically taken as an argument to
-fit an ARCH or GARCH model, clearly proves that serial dependency exists. In
-what follows the copula spectral density will be estimated from the data,
-using quantile periodograms and smoothing them. It will be seen that using the
-\pkg{quantspec} package this can be done with only a few lines of code
-necessary.
+The three plots are displayed in Figure~\ref{fig:plotSP}. Inspecting
+them, it is important to observe that the returns themselves appear to
+be almost uncorrelated. Therefore, not much insight into the serial
+dependency structure of the data can be expected from traditional
+spectral analysis. The squared returns on the other hand are
+significantly correlated. This observation, typically taken as an
+argument to fit an ARCH or GARCH model, clearly proves that serial
+dependency exists. In what follows the copula spectral density will be
+estimated from the data, using quantile periodograms and smoothing
+them. It will be seen that using the \pkg{quantspec} package this can
+be done requiring only a few lines of code.
 
-First, take a look at the CR periodogram $I_{n,R}^{\tau_1, \tau_2}(\omega)$. In
-the \pkg{quantspec} package it is represented as a \code{QuantilePG} object and
-can be computed calling the constructor function \code{quantilePG} with the
-parameter \code{type = "clipped"}. To do the calculation for $\tau_1, \tau_2 \in
-\{0.05, 0.5, 0.95\}$, all Fourier frequencies $\omega$ and with 250 bootstrap
-replications determined from a moving blocks bootstrap with block length $\ell =
-32$, it suffices to execute the first command of the following script:
+irst, take a look at the CR periodogram
+$I_{n,R}^{\tau_1, \tau_2}(\omega)$. In the \pkg{quantspec} package it
+is represented as a `\code{QuantilePG}' object and can be computed
+calling the constructor function \code{quantilePG()} with the parameter
+\code{type = "clipped"}. To do the calculation for
+$\tau_1, \tau_2 \in \{0.05, 0.5, 0.95\}$, all Fourier frequencies
+$\omega$ and with 250 bootstrap replications determined from a moving
+blocks bootstrap with block length $\ell = 32$, it suffices to execute
+the first command of the following script:
 
 <<SPquantilePG,eval=FALSE>>=
 CR <- quantilePG(sp500, levels.1 = c(0.05, 0.5, 0.95),
@@ -799,10 +955,10 @@ plot(CR, levels = c(0.05, 0.5, 0.95),
 Using the second command it is possible to learn for which frequencies the
 values of the CR periodogram are available. As pointed out in the previous
 paragraph it was computed for all Fourier frequencies from the interval
-$[0,2\pi)$, which is the default setting for \code{quantilePG} and
-\code{smoothedPG}. With the third command the graphical representation of the
+$[0,2\pi)$, which is the default setting for \code{quantilePG()} and
+\code{smoothedPG()}. With the third command the graphical representation of the
 CR periodogram, which can be seen in Figure~\ref{fig:SPquantilePG}, is plotted.
-The plot seen here is a typical plot of any \code{QSpecQuantity}: in a
+The plot seen here is a typical plot of any `\code{QSpecQuantity}' object: In a
 configuration with $K$ levels the plot has the form of a $K \times K$ matrix,
 where the subplots on and below the diagonal display the real part of the CR
 periodogram $I_{n,R}^{\tau_1, \tau_2}(\cdot)$, with the levels $\tau_1$ and
@@ -821,19 +977,21 @@ plot(CR, levels = c(0.05, 0.5, 0.95),
 
 The plot is shown in Figure~\ref{fig:SPquantilePG2}.
 
-In the next step the computed quantile periodogram \code{CR} can be used as the
-basis to determine a smoothed CR periodogram \code{sCR}. In the form of a
-\code{SmoothedPG} object it can be generated by the constructor
-\code{smoothedPG} of that class. Besides the \code{QuantilePG} object \code{CR},
-a \code{KernelWeight} object is required, which is easily generated using
-the constructor \code{kernelWeight}. As parameters the constructor
-\code{kernelWeight} requires a kernel \code{W} and a bandwidth \code{bw}. The
-\pkg{quantspec} package comes with several kernels already implemented. The
-Epanechnikov kernel for example can be referred to by the name \code{W1}.
+In the next step the computed quantile periodogram \code{CR} can be
+used as the basis to determine a smoothed CR periodogram
+\code{sCR}. In the form of a `\code{SmoothedPG}' object it can be
+generated by the constructor \code{smoothedPG()} of that
+class. Besides the `\code{QuantilePG}' object \code{CR}, a
+`\code{KernelWeight}' object is required, which is easily generated
+using the constructor \code{kernelWeight()}. As parameters the
+constructor \code{kernelWeight()} requires a kernel \code{W} and a
+bandwidth \code{bw}. The \pkg{quantspec} package comes with several
+kernels already implemented. The Epanechnikov kernel for example can
+be referred to by the name \code{W1}.
 
-To compute the smoothed CR
-periodogram from \code{CR} using the Epanechnikov kernel and bandwidth \code{bw
-= 0.07} the first of the following two commands need to be executed.
+To compute the smoothed CR periodogram from \code{CR} using the
+Epanechnikov kernel and bandwidth \code{bw = 0.07} the first of the
+following two commands needs to be executed.
 
 <<SPsmoothedPG,eval=FALSE>>=
 sPG <- smoothedPG(CR, weight = kernelWeight(W = W1, bw = 0.07))
@@ -869,31 +1027,34 @@ help("plot-SmoothedPG")
 @
 
 Inspecting the plots in
-Figures~\ref{fig:SPquantilePG}--\ref{fig:SPsmoothedPGboot}
-reveals information about the dependency of the events $\{X_t \leq q_{0.05}\}$,
-$\{X_t \leq q_{0.5}\}$ and $\{X_t \leq q_{0.95}\}$ in the data. More precisely,
-the top left, middle and bottom right plots show the copula rank
-periodograms, in Figures~\ref{fig:SPquantilePG} and~\ref{fig:SPquantilePG2}, and
+Figures~\ref{fig:SPquantilePG}--\ref{fig:SPsmoothedPGboot} reveals
+information about the dependency of the events
+$\{X_t \leq q_{0.05}\}$, $\{X_t \leq q_{0.5}\}$ and
+$\{X_t \leq q_{0.95}\}$ in the data. More precisely, the top left,
+middle and bottom right plots show the copula rank periodograms, in
+Figures~\ref{fig:SPquantilePG} and~\ref{fig:SPquantilePG2}, and
 smoothed copula rank periodograms, in Figures~\ref{fig:SPsmoothedPG}
 and~\ref{fig:SPsmoothedPGboot}, that are estimates of the copula
 spectra $\mathfrak{f}_{q_{0.05}, q_{0.05}}(\omega)$,
 $\mathfrak{f}_{q_{0.5}, q_{0.5}}(\omega)$ and
-$\mathfrak{f}_{q_{0.95}, q_{0.95}}(\omega)$, respectively.
-Each set of three plots summarizes the serial dependency
-structure of the three binary time series $I\{X_t \leq q_{0.05}\}$,
-$I\{X_t \leq q_{0.5}\}$ and $I\{X_t \leq q_{0.95}\}$ that indicate values of $X_t$
-below the $0.05$-quantile, median and $0.95$-quantile, respectively. The fact
-that, in the data example discussed here, these copula spectra are not flat can
-be seen as evidence that serial dependency is present; this cannot be seen from
-the auto-correlations. Comparing the two outer spectra allows for a comparison
-between the serial dependency structure in positive and negative extremes; this
-information completely gets lost when the observations are squared. In the
-analyzed S\&P~500 data from 2007--2010 there seems to be only little difference
-between the serial dependency structure of the two types of extreme events. Note
-that this is not always the case. In the QAR model to be discussed in the next
-section, for example, the serial dependency structure of the positive and
-negative extremes is remarkably different [cf.~Figure~\ref{fig:csdQAR}
-and~\ref{fig:csdQARhighprecPlot}].
+$\mathfrak{f}_{q_{0.95}, q_{0.95}}(\omega)$, respectively.  Each set
+of three plots summarizes the serial dependency structure of the three
+binary time series $I\{X_t \leq q_{0.05}\}$, $I\{X_t \leq q_{0.5}\}$
+and $I\{X_t \leq q_{0.95}\}$ that indicate values of $X_t$ below the
+$0.05$-quantile, median and $0.95$-quantile, respectively. The fact
+that, in the data example discussed here, these copula spectra are not
+flat can be seen as evidence that serial dependency is present; this
+cannot be seen from the autocorrelations. Comparing the two outer
+spectra allows for a comparison between the serial dependency
+structure in positive and negative extremes; this information
+completely gets lost when the observations are squared. In the
+analyzed S\&P~500 data from 2007--2010 there seems to be only little
+difference between the serial dependency structure of the two types of
+extreme events. Note that this is not always the case. In the QAR
+model to be discussed in the next section, for example, the serial
+dependency structure of the positive and negative extremes is
+remarkably different (cf.~Figures~\ref{fig:csdQAR}
+and~\ref{fig:csdQARhighprecPlot}).
 
 Additional information can be found in the off-diagonal plots. Take for example
 the bottom left and top right plots where the real and imaginary part of
@@ -903,7 +1064,7 @@ two binary time series $I\{X_t \leq q_{0.05}\}$ and
 $I\{X_t \leq q_{0.95}\}$. For example, if the imaginary part were zero for all
 frequencies this would correspond to a pairwise time reversibility in the sense
 that
-\[\mathbb{P}(X_t \leq q_{0.05}, X_{t-k} \leq q_{0.95}) = \mathbb{P}(X_t \leq q_{0.05}, X_{t+k} \leq q_{0.95}),\]
+\[\Prob(X_t \leq q_{0.05}, X_{t-k} \leq q_{0.95}) = \Prob(X_t \leq q_{0.05}, X_{t+k} \leq q_{0.95}),\]
 for all $k$. This information cannot be recovered from autocovariances, because
 they are symmetric by definition. Further discussion of copula spectra can, for
 example, be found in
@@ -981,7 +1142,7 @@ stationary process for which a function to simulate finite stretches of is
 available can be studied. On the other hand, the finite sample performance of the new spectral methods are to be evaluated. Note that
 the example discussed in this section and the functions to simulate QAR(1)
 processes are available inside the package, by calling
-\code{demo("qar-simulation")} and by referring to the function \code{ts1}, which
+\code{demo("qar-simulation", package = "quantspec")} and by referring to the function \code{ts1}, which
 implements the QAR(1) process that was discussed in \cite{DetteEtAl2013} and
 \cite{KleyEtAl2014}. Recall that a QAR(1) process is a sequence $(X_t)$ of
 random variables that fulfills
@@ -999,7 +1160,8 @@ help("ts-models")
 @
 
 The following, two-line script can be used to generate the graphical
-representation of the copula spectral density that is on display in Figure~\ref{fig:csdQAR}
+representation of the copula spectral density that is on display in
+Figure~\ref{fig:csdQAR}:
 
 <<csdQAR,eval=FALSE>>=
 csd <- quantileSD(N = 2^9, seed.init = 2581, type = "copula",
@@ -1008,12 +1170,12 @@ plot(csd, ylab = expression(f[list(q[tau[1]], q[tau[2]])](omega)))
 @
 
 Figure~\ref{fig:csdQAR} should be read in a way similar to
-Figures~\ref{fig:SPquantilePG}--\ref{fig:SPsmoothedPGboot}. Here, the red line
-represents the simulated spectrum, and the black line is an indicator for the
-precision of the simulation.
-When analyzing a time series model the recommended practice is to compute
-the quantile spectral density once with high precision, store it to the
-hard drive, and load it later whenever it is needed. The following two lines of
+Figures~\ref{fig:SPquantilePG}--\ref{fig:SPsmoothedPGboot}. Here, the
+red line represents the simulated spectrum, and the black line is an
+indicator for the precision of the simulation.  When analyzing a time
+series model the recommended practice is to compute the quantile
+spectral density once with high precision, store it to the hard drive,
+and load it later whenever it is needed. The following two lines of
 code can be used to do this:
 
 <<csdQARhighprec,eval=FALSE>>=
@@ -1022,24 +1184,25 @@ csd <- quantileSD(N = 2^12, seed.init = 2581, type = "copula",
 save(csd, file = "csd-qar1.rdata")
 @
 
-With the first configuration ($N=2^9$ and $R=100$) the computation time
-was only around three seconds. To compute the second \code{csd} object (with
-$N=2^{12}$ and $R=50000$) the same machine needed roughly 2.5 hours. Storing the
-object in a file takes about 1MB of hard disk space. Not only
-\code{values} and \code{stdError}s are stored within the \code{QuantileSD}
-object; also the final state of the pseudo random number generator is stored and
-the method \code{increasePrecision} can be used to add more simulation runs at
-any time to yield a better approximation to the true quantile spectrum. More
-information on this method can be found in the online help, which is accessible
-via
+With the first configuration ($N=2^9$ and $R=100$) the computation
+time was only around three seconds. To compute the second \code{csd}
+object (with $N=2^{12}$ and $R=50000$) the same machine needed roughly
+2.5 hours. Storing the object in a file takes about 1MB of hard disk
+space. Not only \code{values} and \code{stdError}s are stored within
+the `\code{QuantileSD}' object; also the final state of the pseudo
+random number generator is stored and the method
+\code{increasePrecision} can be used to add more simulation runs at
+any time to yield a better approximation to the true quantile
+spectrum. More information on this method can be found in the online
+help, which is accessible via
 \enlargethispage{1cm}
 <<eval=FALSE>>=
 help("increasePrecision-QuantileSD")
 @
 
-Once the computation is finished the diagram on display in
-Figure~\ref{fig:csdQARhighprecPlot} can be created using the following two lines
-of code:
+Once the computation is finished the diagram in
+Figure~\ref{fig:csdQARhighprecPlot} can be created using the following
+two lines of code:
 
 <<csdQARhighprecPlot,eval=FALSE>>=
 load("csd-qar1.rdata")
@@ -1050,8 +1213,8 @@ plot(csd, frequencies = 2 * pi * (1:2^8) / 2^9,
 The parameter \code{frequencies} was used when plotting the copula spectral
 density to create a plot that can be compared to the one in Figure~\ref{fig:csdQAR}.
 Note that by default the plot would have been created using all available
-frequencies which yields a grid of 8 times as many points on the x-axis
-($N=2^{12}$ vs. $N=2^9$). Now, to get a first idea of how well the estimator
+frequencies which yields a grid of 8 times as many points on the $x$-axis
+($N=2^{12}$ vs.~$N=2^9$). Now, to get a first idea of how well the estimator
 performs, plot the smoothed CR periodogram computed from one simulated QAR(1)
 time series of length 512:
 
@@ -1066,13 +1229,13 @@ plot(sCR, qsd = csd,
 The generated plot is on display in Figure~\ref{fig:oneQAR}. It is worth
 pointing out that in this example ($N=512$) the estimator performs already quite
 well.
-Note that a different version of the constructor \code{smoothedPG} was used here
+Note that a different version of the constructor \code{smoothedPG()} was used here
 than in Section~\ref{sec:SP500}. When computing a smoothed quantile periodogram
-straight from a time series, the syntax is the same as for \code{quantilePG},
+straight from a time series, the syntax is the same as for \code{quantilePG()},
 but with the additional parameter \code{weight}.
 
-Finally, for the simulation study, a number of \code{R = 5000} independent
-QAR(1) time series are generated. Before the actual simulations, some
+Finally, for the simulation study, \code{R = 5000} independent QAR(1)
+time series are generated. Before the actual simulations, some
 variables that determine what is to be simulated are defined:
 
 <<eval=FALSE>>=
@@ -1156,12 +1319,10 @@ For the actual simulation the following \code{for} loop can be used:
 <<eval=FALSE>>=
 for (i in 1:R) {
   Y <- ts(N)
-
   CR  <- quantilePG(Y, levels.1 = levels, type = "clipped")
   LP  <- quantilePG(Y, levels.1 = levels, type = "qr")
   sCR <- smoothedPG(CR, weight = weight)
   sLP <- smoothedPG(LP, weight = weight)
-
   sims[1, i, , , ] <- getValues(CR,  frequencies = freq)[, , , 1]
   sims[2, i, , , ] <- getValues(LP,  frequencies = freq)[, , , 1]
   sims[3, i, , , ] <- getValues(sCR, frequencies = freq)[, , , 1]
@@ -1170,7 +1331,7 @@ for (i in 1:R) {
 @
 
 Note that the flexible accessor method \code{getValues} is used to access the
-relevant subset of values for the frequencies specified (i.\,e., \code{freq}).
+relevant subset of values for the frequencies specified (i.e., \code{freq}).
 Once the array \code{sims} is available, many interesting properties of
 the estimator can be analyzed. Examples include the bias,
 variance, etc. Here, using the function \code{getValues} again, the true copula
@@ -1222,19 +1383,21 @@ rimse <- sqrt(apply(SqDev, c(2, 3, 4), mean))
 \end{Soutput}
 \end{Schunk}
 
-These numbers could now be inspected to observe, for example, that the smoothed
-quantile periodogram possess smaller root integrated mean squared errors than the
-quantile periodograms (without smoothing). Further discussion of the numbers is
-omitted, because the crux of this chapter was to explain how to perform the
-simulation study, not to actually do it.
+These numbers could now be inspected to observe, for example, that the
+smoothed quantile periodogram possess smaller root integrated mean
+squared errors than the quantile periodograms (without
+smoothing). Further discussion of the results is omitted, because the
+purpose of this chapter was to explain how to implement the simulation
+study, not to actually perform it.
 
 \section{Roadmap to future developments and concluding remarks}
 
-As the new methodology evolves additional features will be added to the
-\pkg{quantspec} package. For each new feature an entry to the issue tracker
-available on the GitHub will be made. Then the new feature will be implemented
-on a topic branch of the repository. For example, an extension that will allow
-to analyze multivariate time series is currently being developed.
+As the new methodology evolves additional features will be added to
+the \pkg{quantspec} package. For each new feature an entry to the
+issue tracker available on the GitHub repository will be made. Then
+the new feature will be implemented on a topic branch of the
+repository. For example, an extension that will allow to analyze
+multivariate time series is currently being developed.
 
 Other, more complex extensions to the software include the implementation of
 functions to perform quantile spectral analysis for locally stationary
@@ -1244,14 +1407,14 @@ Procedures for graphical representations of these objects, possibly animated
 ones, will amend these planned parts of the package.
 
 Summing up, it can be said that the \pkg{quantspec} package provides a
-comprehensive and conclusive toolbox to perform quantile-based spectral
-analysis. Due to the great interest in and active development of the
-statistical procedures that are quantile-based spectral analysis it was
-deliberately designed in an object-oriented and extensible fashion. Thus it is
-well prepared for the many extensions that are sure to come in the near future.
-The source code is open and extensive documentation of the system freely
-available. Comments on and contribution to the project is, of course, very much
-welcome.
+comprehensive and conclusive toolbox to perform quantile-based
+spectral analysis. Due to the great interest in and active development
+of the statistical procedures that perform quantile-based spectral
+analysis it was deliberately designed in an object-oriented and
+extensible fashion. Thus it is well prepared for the many extensions
+that are sure to come in the near future.  The source code is open and
+extensive documentation of the system is freely available. Comments on
+and contribution to the project are, of course, very much welcome.
 
 \section*{Acknowledgments}
 The author wishes to thank the anonymous reviewer and the associate

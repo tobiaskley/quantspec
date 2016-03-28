@@ -15,7 +15,7 @@ levels <- c(0.25,0.5,0.75)
 system.time(
     qPG.qr <- quantilePG(Y, levels.1 = levels, type="qr"))
 
-## For the CR-periodogram as in Kley et. al (2014) the option 'type="clipped"'
+## For the CR-periodogram as in Kley et. al (2016) the option 'type="clipped"'
 ## has to be used. If bootstrap estimates are to be used the parameters
 ## type.boot, B and l need to be specified.
 system.time(
