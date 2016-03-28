@@ -9,6 +9,8 @@ cache: packages
 
 warnings_are_errors: true
 
+apt_packages: qpdf
+
 env:
  global:
    - CRAN: http://cran.rstudio.com
