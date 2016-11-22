@@ -16,21 +16,27 @@
 #' For an overview on the classes of the framework, and all of their
 #' attributes, see the class diagrams in the package description
 #' [cf. \code{\link{quantspec-package}}].
-
-
+    
+    
 ## Class-FreqRep
-
+    
 #' @name generics-accessors
 #' @aliases getY
 #' @export
-setGeneric("getY",
-    function(object, ...){standardGeneric("getY")})
+    setGeneric("getY",
+        function(object, ...){standardGeneric("getY")})
 
 #' @name generics-accessors
 #' @aliases getValues
 #' @export
 setGeneric("getValues",
     function(object, ...){standardGeneric("getValues")})
+
+#' @name generics-accessors
+#' @aliases getCoherency
+#' @export
+setGeneric("getCoherency",
+    function(object, ...){standardGeneric("getCoherency")})
 
 #' @name generics-accessors
 #' @aliases getIsRankBased
@@ -44,11 +50,23 @@ setGeneric("getIsRankBased",
 setGeneric("getB",
     function(object, ...){standardGeneric("getB")})
 
+
+## Class-LagEstimator
+
 #' @name generics-accessors
-#' @aliases getResampleEcdf
+#' @aliases getLagOperator
 #' @export
-setGeneric("getResampleEcdf",
-    function(object, ...){standardGeneric("getResampleEcdf")})
+setGeneric("getLagOperator",
+    function(object, ...){standardGeneric("getLagOperator")})
+
+
+## Class-LagOperator
+
+#' @name generics-accessors
+#' @aliases getMaxLag
+#' @export
+setGeneric("getMaxLag",
+    function(object, ...){standardGeneric("getMaxLag")})
 
 
 ## Class-QRegEstimator
@@ -110,6 +128,11 @@ setGeneric("getTs", function(object, ...){standardGeneric("getTs")})
 
 
 ## Class-SmoothedPG
+
+#' @name generics-accessors
+#' @aliases getCoherencySdNaive
+#' @export
+setGeneric("getCoherencySdNaive", function(object, ...){standardGeneric("getCoherencySdNaive")})
 
 #' @name generics-accessors
 #' @aliases getSdNaive

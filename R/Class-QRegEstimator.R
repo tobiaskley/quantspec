@@ -9,7 +9,7 @@ NULL
 #' \code{QRegEstimator} is an S4 class that implements the necessary
 #' calculations to determine the frequency representation based on the weigthed
 #' \eqn{L_1}{L1}-projection of a time series as described in
-#' Dette et. al (2014+). As a subclass to \code{\link{FreqRep}}
+#' Dette et. al (2015). As a subclass to \code{\link{FreqRep}}
 #' it inherits slots and methods defined there.
 #'
 #' For each frequency \eqn{\omega}{w} from \code{frequencies} and level
@@ -38,9 +38,10 @@ NULL
 #'                 the package \pkg{snowfall} may be used.
 #'
 #' @references
-#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
+#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
-#' spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+#' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
+#' [cf. \url{http://arxiv.org/abs/1111.7205}]
 ################################################################################
 
 setClass(
@@ -53,44 +54,44 @@ setClass(
 )
 
 #' @importFrom quantreg rq
+#' @importFrom snowfall sfLapply
 setMethod(
     f = "initialize",
     signature = "QRegEstimator",
-    definition = function(.Object, Y, isRankBased, levels, frequencies, positions.boot, resampleEcdf, B, method, parallel) {
-
+    definition = function(.Object, Y, isRankBased, levels, frequencies, positions.boot, B, method, parallel) {
+      
       .Object@Y <- Y
       .Object@isRankBased <- isRankBased
       .Object@levels <- levels
       .Object@frequencies <- frequencies
       .Object@positions.boot <- positions.boot
-      .Object@resampleEcdf <- resampleEcdf
       .Object@B <- B
       .Object@method <- method
       .Object@parallel <- parallel
-
+      
       # Define variables with dimensions
-      T <- length(Y)
+      T <- lenTS(Y)
       K <- length(levels)
       J <- length(frequencies)
-
-      # values[,,1] contains the non-bootstrapped values
-      values <- array(dim=c(J,K,B+1))
-
+      
+      # values[,,,1] contains the non-bootstrapped values
+      values <- array(dim=c(J,dim(Y)[2],K,B+1))
+      
       # Convert Y to "pseudo data", if isRankBased == TRUE
       if (isRankBased) {
-        data <- rank(Y) / T
+        data <- apply(Y,2,rank) / T
       } else {
         data <- Y
       }
-
+      
       qRegSol <- function(X,omega) {
         # Define the harmonic regressors.
         n <- length(X)
         D <- cos(omega*1:n)
         S <- -1*sin(omega*1:n)
-
+        
         # Then perform the quantile regression.
-
+        
         suppressWarnings({ # otherwise rq from package quantreg will issue
               # warnings due to non uniqueness of the minimizer.
               if ( abs(omega %% (2*pi)) < .Machine$double.eps^0.5 ) {
@@ -120,25 +121,28 @@ setMethod(
             })
         return(qregSol)
       }
-
+      
       for (b in 0:B) {
-        if (b == 0) {
-          qRegSolX <- function(omega){qRegSol(data,omega)}
-        } else {
-          pos.boot <- getPositions(.Object@positions.boot,B)
-          qRegSolX <- function(omega){qRegSol(data[pos.boot],omega)}
+        for (d in 1:(dim(data)[2])) {
+          if (b == 0) {
+            qRegSolX <- function(omega){qRegSol(data[,d],omega)}
+          } else {
+            pos.boot <- getPositions(.Object@positions.boot,B)
+            qRegSolX <- function(omega){qRegSol(data[pos.boot,d],omega)}
+          }
+          
+          if (parallel) {
+            listVals <- sfLapply(frequencies, qRegSolX)
+          } else {
+            listVals <- lapply(frequencies, qRegSolX)
+          }
+          values[,d,,b+1] <- aperm(array(unlist(listVals),dim=c(K,J)), perm=c(2,1))
         }
-
-        if (parallel) {
-          listVals <- sfLapply(frequencies, qRegSolX)
-        } else {
-          listVals <- lapply(frequencies, qRegSolX)
-        }
-        values[,,b+1] <- aperm(array(unlist(listVals),dim=c(K,J)), perm=c(2,1))
       }
-
-      .Object@values <- values
-
+      
+      #.Object@values <- values
+      .Object@values <- array(values, dim=c(J,dim(Y)[2],K,B+1))
+      
       # Return object
       return(.Object)
     }
@@ -198,9 +202,6 @@ setMethod(f = "getParallel",
 #' 								  which means nonoverlapping blocks bootstrap, \code{"cbb"} which
 #' 									means circular bootstrap, and \code{"sb"} which stands for
 #' 								  stationary bootstrap. 
-#' @param resampleEcdf A flag that indicates whether the ecdf used to compute the pseudo
-#' 									  data (if \code{isRankBased==TRUE}) is also determined from
-#' 										the block bootstraped observations.
 #' @param method  method used for computing the quantile regression estimates.
 #'                 The choice is passed to \code{qr}; see the
 #'                 documentation of \code{quantreg} for details.
@@ -212,50 +213,49 @@ setMethod(f = "getParallel",
 #' inst/examples/QRegEstimator-parallel.R
 ################################################################################
 qRegEstimator <- function( Y,
-    frequencies=2*pi/length(Y) * 0:(length(Y)-1),
+    frequencies=2*pi/lenTS(Y) * 0:(lenTS(Y)-1),
     levels = 0.5,
     isRankBased=TRUE,
     B = 0,
     l = 0,
-    type.boot = c("none","mbb","nbb","cbb","sb"),
-    resampleEcdf = FALSE,
+    type.boot = c("none", "mbb", "nbb", "cbb", "sb"),
     method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
     parallel = FALSE) {
-
+  
   # Verify if all parameters are valid
   Y <- timeSeriesValidator(Y)
-
+  
   if (!(is.vector(frequencies)  && is.numeric(frequencies))) {
     stop("'frequencies' needs to be specified as a vector of real numbers")
   }
-
+  
   if (!(is.vector(levels) && is.numeric(levels))) {
     stop("'levels' needs to be specified as a vector of real numbers")
   }
-
+  
   if (isRankBased && !(prod(levels >= 0) && prod(levels <=1))) {
     stop("'levels' need to be from [0,1] when isRankBased==TRUE")
   }
-
+  
   # Check validity of frequencies
-  frequencies <- frequenciesValidator(frequencies, length(Y))
-
-  type.boot <- match.arg(type.boot, c("none","mbb","nbb","cbb","sb"))[1]
+  frequencies <- frequenciesValidator(frequencies, lenTS(Y))
+  
+  type.boot <- match.arg(type.boot, c("none", "mbb", "nbb", "cbb", "sb"))[1]
   switch(type.boot,
       "none" = {
-        bootPos <- movingBlocks(length(Y),length(Y))},
+        bootPos <- movingBlocks(lenTS(Y),lenTS(Y))},
       "mbb" = {
-        bootPos <- movingBlocks(l,length(Y))},
+        bootPos <- movingBlocks(l,lenTS(Y))},
       "nbb" = {
-        bootPos <- nonoverlappingBlocks(l,length(Y))},
+        bootPos <- nonoverlappingBlocks(l,lenTS(Y))},
       "cbb" = {
-        bootPos <- circularBlocks(l,length(Y))},
+        bootPos <- circularBlocks(l,lenTS(Y))},
       "sb" = {
-        bootPos <- stationaryBlocks(l,length(Y))}
+        bootPos <- stationaryBlocks(l,lenTS(Y))}
   )
-
+  
   method <- match.arg(method, c("br", "fn", "pfn", "fnc", "lasso", "scad"))[1]
-
+  
   freqRep <- new(
       Class = "QRegEstimator",
       Y = Y,
@@ -263,11 +263,10 @@ qRegEstimator <- function( Y,
       levels = sort(levels),
       B = B,
       positions.boot = bootPos,
-      resampleEcdf = resampleEcdf,
       frequencies = frequencies,
       method = method,
       parallel = parallel
   )
-
+  
   return(freqRep)
 }

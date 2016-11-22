@@ -40,12 +40,13 @@ using namespace Rcpp;
 //'
 //' @return Returns an array with complex numbers
 //'         \eqn{\sigma(\tau_1, \tau_2, \omega_j} as defined in
-//'         Kley et. al (2014), p. 26.
+//'         Kley et. al (2016), p. 26.
 //'
 //' @references
-//' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2014).
-//' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-//' \url{http://arxiv.org/abs/1401.8104}.
+//' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
+//' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
+//' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
+//' [cf. \url{http://arxiv.org/abs/1111.7205}]
 //################################################################################
 // [[Rcpp::export(".computeSdNaive")]]
 

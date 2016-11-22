@@ -93,3 +93,29 @@ WDaniell <- function(x,a=(pi/2)){
   }
   return(Vectorize(WDaniell.simple)(x))
 }
+################################################################################
+#' @details
+#' Parzen Window for lagEstimators
+#'
+#' @name kernels
+#' @aliases WParzen
+#' @export
+#'
+#' @param u real number
+#'
+#' @examples
+#' plot(x=seq(-2,2,0.05),y=WParzen(seq(-2,2,0.05)),type = "l")
+################################################################################
+WParzen <- function(u){
+  WParzen.simple <- function(u) {
+    if (abs(u) <= 1){
+      if (abs(u) <= .5){
+        (1-6*u^2+6*abs(u)^3)
+      }
+      else{
+        (2*(1-abs(u))^3)
+      }
+    }else {(0)}
+  }
+  return(Vectorize(WParzen.simple)(u))
+}

@@ -4,40 +4,48 @@ NULL
 ################################################################################
 #' Quantile-Based Spectral Analysis of Time Series
 #'
-#' Methods to determine, smooth and plot quantile (i. e., Laplace or copula)
-#' periodograms for univariate time series.
+#' Methods to determine, smooth and plot quantile
+#' periodograms for univariate and (since v1.2-0) multivariate time series.
 #'
 #' @details
 #'  \tabular{ll}{
 #'    \cr Package: \tab quantspec
 #'    \cr Type:    \tab Package
-#'    \cr Version: \tab 1.0-3.99
-#'    \cr Date:    \tab 2015-06-16
+#'    \cr Version: \tab 1.2-1.99
+#'    \cr Date:    \tab 2016-03-28
 #'    \cr License: \tab GPL (>= 2)
 #'  }
 #'
 #' @section Contents:
-#' The \pkg{quantspec} package contains an hierachy of S4 classes with
+#' The \pkg{quantspec} package contains a hierachy of S4 classes with
 #' corresponding methods and functions serving as constructors. The following
 #' class diagrams provide an overview on the structure of the package. In the
-#' first class diagram the classes implementing the estimators are implemented.
+#' first and second class diagram the classes implementing the estimators are
+#' shown. In the first diagram the classes related to periodogram-based
+#' estimation are displayed:  
 #'
-#' \if{html}{\figure{main.png}{options: width=960}}
-#' \if{latex}{\figure{main.pdf}{options: width=15cm}}
+#' \if{html}{\figure{main-mv.png}{options: width=960}}
+#' \if{latex}{\figure{main-mv.pdf}{options: width=12cm}}
+#' 
+#' In the second diagram the classes related to lag window-based
+#' estimation are displayed:
+#' 
+#' \if{html}{\figure{main2-mv.png}{options: width=768}}
+#' \if{latex}{\figure{main2-mv.pdf}{options: width=8cm}}
 #'
-#' In the second class diagram the classes implementing model quantities are
+#' In the third class diagram the classes implementing model quantities are
 #' displayed. A relation to the ``empirical classes'' is given via the fact that
 #' the quantile spectral densities are computed by simulation of quantile
 #' periodograms and a common abstract superclass \code{QSpecQuantity} which
 #' is used to provide a common interface to quantile spectral quantities.
 #'
-#' \if{html}{\figure{csd.png}{options: width=768}}
-#' \if{latex}{\figure{csd.pdf}{options: width=12cm}}
+#' \if{html}{\figure{csd-mv.png}{options: width=768}}
+#' \if{latex}{\figure{csd-mv.pdf}{options: width=12cm}}
 #'
 #' Besides the object-oriented design a few
 #' auxiliary functions exists. They serve as parameters or are mostly for
 #' internal use. A more detailed description of the framework can be found in
-#' the paper on the package (Kley, 2015).
+#' the paper on the package (Kley, 2016).
 #'
 #' @section Organization of the source code / files in the \code{/R} folder:
 #' All of the source code related to the specification of a certain class is
@@ -97,19 +105,23 @@ NULL
 #' Computation. Ph.D. Dissertation, Ruhr University Bochum.
 #' \url{http://www-brs.ub.ruhr-uni-bochum.de/netahtml/HSS/Diss/KleyTobias/}.
 #'
-#' Kley, T. (2015). An Object-Oriented Framework for Quantile-Based Spectral
-#' Analysis and a Reference Implementation in R: The quantspec Package.
-#' Vignette to this R package.
+#' Kley, T. (2016). Quantile-Based Spectral Analysis in an Object-Oriented
+#' Framework and a Reference Implementation in R: The quantspec Package.
+#' Journal of Statistical Software, \bold{70}(3), 1--27.
 #'
-#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
+#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
-#' spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+#' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 #' [cf. \url{http://arxiv.org/abs/1111.7205}]
 #'
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
+#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2016).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \emph{Bernoulli}, \bold{forthcoming}.
+#' \emph{Bernoulli}, \bold{22}(3), 1770--1807.
 #' [cf. \url{http://arxiv.org/abs/1401.8104}]
+#' 
+#' Barunik, J. & Kley, T. (2015).
+#' Quantile Cross-Spectral Measures of Dependence between Economic Variables.
+#' [cf. \url{http://arxiv.org/abs/1510.06946}]
 #'
 #' Oracle (2015). Coding conventions of the Java Programming Language.
 #' \url{http://www.oracle.com/technetwork/java/codeconvtoc-136057.html}.

@@ -1,0 +1,13 @@
+% for each UML-sub graph do the following: 
+
+% print a pdf with dia, where page setup is:
+%	margins are 1cm all around
+%	scaling, scale is set to 35
+
+% DejaVuSans,Bold and DejaVuSansMono should be installed.
+
+% crop white margins
+pdfcrop main.pdf main-cropped.pdf
+
+% convert to png for online help
+convert -density 300 main-cropped.pdf -quality 100 -level 50x50% main-cropped.png

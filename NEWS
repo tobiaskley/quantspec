@@ -1,3 +1,37 @@
+quantspec 1.2-1
+===============
+
+ o  Updated CITATION file as required by the JSS editor.
+ o  Updated vignette with editorial changes from JSS. 
+ o  Updated references throughout documentation.
+
+
+quantspec 1.2-0
+===============
+
+MAJOR
+
+ o  Added functionality for the analysis of multiple time series.
+
+MINOR 
+
+ o  Added plot function for LagOperator.
+ o  Fixed two typos in the computation of estimates for standard errors.
+
+
+quantspec 1.1-0
+===============
+
+MAJOR
+
+ o  Added functionality to do lag window estimation.
+
+MINOR 
+
+ o  Fixed a wrong constant in the definition of the W1 kernel.
+ o  Fixed a tiny mistake in getLevels-QSpecQuantity.
+
+
 quantspec 1.0-3
 ===============
 

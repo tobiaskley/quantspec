@@ -9,7 +9,7 @@ test_that("quantilePG works as expected for various levels",{
       lev.ok.2   <- c(0.5,0.75)
       lev.err.1  <- c("non numeric",0.5)
       lev.err.2  <- c(0.5,1.5)
-
+      
       # Check whether it works for all levels:
       V.qr.ref.1 <- array(V.qr.ref[,,,1], dim=c(64,3,3,1))
       V.fft.ref.1 <- array(V.fft.ref[,,,1], dim=c(64,3,3,1))
@@ -93,11 +93,11 @@ test_that("quantilePG works as expected for various frequencies",{
       V.qr <- getValues(qPG.qr, frequencies=freq.call.part)
       expect_that(dim(V.qr),equals(c(32,3,3,1)))
       expect_that(V.qr[,,,1], equals(V.qr.ref[1+2*(0:31),,,1]))
-
+      
       V.fft <- getValues(qPG.fft, frequencies=freq.call.part)
       expect_that(dim(V.fft),equals(c(32,3,3,1)))
       expect_that(V.fft[,,,1], equals(V.fft.ref[1+2*(0:31),,,1]))      
-
+      
       
       # Now the other way around (init with every second, call all!)
       freq.init.part  <- 2*pi*(0:31)/32
@@ -113,7 +113,7 @@ test_that("quantilePG works as expected for various frequencies",{
           gives_warning())
       expect_that(dim(V.qr),equals(c(64,3,3,1)))
       expect_that(V.qr[1+2*(0:31),,,1], equals(V.qr.ref[1+2*(0:31),,,1]))
-
+      
       expect_that(V.fft <- getValues(qPG.fft, frequencies=freq.call.all),
           gives_warning())
       expect_that(dim(V.fft),equals(c(64,3,3,1)))
@@ -139,10 +139,10 @@ test_that("quantilePG works as expected for various frequencies",{
       expect_that(V.fft[34:64,,,1], equals(Conj(V.fft.ref[c(rep(16,16),16:2),,,1])))
       
       # Now check frequencies not from [0,2pi) and in various orders!
-
+      
       freq.init <- 2*pi*(0:63)/64  
       freq.call <- 2*pi*c(64,32,128)/64  
-
+      
       qPG.qr <- quantilePG(Y, levels.1=lev.ok.all, frequencies=freq.init, type="qr")
       V.qr <- getValues(qPG.qr, frequencies = freq.call)
       expect_that(dim(V.qr),equals(c(3,3,3,1)))
@@ -152,9 +152,9 @@ test_that("quantilePG works as expected for various frequencies",{
       V.fft <- getValues(qPG.fft, frequencies = freq.call)
       expect_that(dim(V.fft),equals(c(3,3,3,1)))
       expect_that(V.fft[,,,1], equals(V.fft.ref[c(1,33,1),,,1]))
-    })
-    
-    
+})
+
+
 test_that("quantilePG works as expected with bootstrapping",{
       
       source("load-ref.R")
@@ -174,4 +174,5 @@ test_that("quantilePG works as expected with bootstrapping",{
       expect_that(dim(V.qr),equals(c(64,3,3,2)))
       expect_that(V.qr,equals(V.qr.ref))
       
-    })
+})
+      

@@ -181,6 +181,8 @@ setMethod(f = "getQuantileSD",
 #' @name IntegrQuantileSD-constructor
 #' @aliases integrQuantileSD
 #' @export
+#' 
+#' @importFrom stats rnorm
 #'
 #' @keywords Constructors
 #'

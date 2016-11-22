@@ -1,0 +1,5 @@
+*.o
+*.dll
+.project
+.Rbuildignore
+.settings

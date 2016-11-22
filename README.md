@@ -1,4 +1,7 @@
 [![Build Status](https://travis-ci.org/tobiaskley/quantspec.svg?branch=develop)](https://travis-ci.org/tobiaskley/quantspec)
+[![Coverage Status](https://img.shields.io/codecov/c/github/tobiaskley/quantspec/develop.svg)](https://codecov.io/github/tobiaskley/quantspec?branch=develop)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/quantspec)](http://cran.r-project.org/web/packages/quantspec/index.html)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/quantspec)](http://cran.r-project.org/package=quantspec)
 
 
 quantspec: Quantile-Based Spectral Analysis with R

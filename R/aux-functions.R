@@ -151,13 +151,16 @@ closest.pos <- function(X, Y) {
 #'
 #' @name timeSeriesValidator
 #' @export
+#' 
 #' @importFrom zoo is.zoo coredata
+#' @importFrom stats is.ts
+#' @importFrom utils head
 #'
 #' @keywords Validator-functions
 #'
 #' @param Y the time series to be validated.
 #'
-#' @return Returns the time series as a numeric.
+#' @return Returns the time series as a matrix.
 #'
 #' @examples
 #' Y <- timeSeriesValidator(sp500)
@@ -167,19 +170,58 @@ closest.pos <- function(X, Y) {
 ################################################################################
 
 timeSeriesValidator <- function(Y) {
-  if (!(is.vector(Y)  && is.numeric(Y)) & !is.ts(Y) & !is.zoo(Y)) {
-    stop("'Y' needs to be specified as a vector of real numbers, a ts or a zoo object")
+  if (!(is.matrix(Y)  && is.numeric(Y)) & !(is.vector(Y)  && is.numeric(Y)) & !is.ts(Y) & !is.zoo(Y)) {
+    stop("'Y' needs to be specified as a vector or matrix of real numbers, a ts or a zoo object")
   }
 
   if (is.ts(Y)) {
-    Y <- Y[1:(length(Y))]
+    Y <- head(Y)
+  }
+  
+  if (is.vector(Y)) {
+    Y <- matrix(Y, ncol=1)
   }
 
   if (is.zoo(Y)) {
-    Y <- coredata(Y)
+    Y <- as.matrix(Y)
   }
   return(Y)
 }
+
+
+
+################################################################################
+#' Validates if \code{Y} is of an appropriate type for a time series and
+#' returns the length of the time series.
+#'
+#' Runs \code{\link{timeSeriesValidator}} and returns the number of rows of the
+#' returned matrix.
+#'
+#' @name lenTS
+#' @export
+#' @importFrom zoo is.zoo coredata
+#'
+#' @keywords Validator-functions
+#'
+#' @param Y the time series to be validated and of which the length is to
+#' 					be returned.
+#'
+#' @return Returns the length of the time series after validating it's valid.
+#'
+#' @examples
+#' Y <- lenTS(sp500)
+#' Y <- lenTS(wheatprices)
+#' Y <- lenTS(rnorm(10))
+#' \dontrun{Y <- lenTS("Not a valid input")}
+################################################################################
+
+lenTS <- function(Y) {
+  
+  Y <- timeSeriesValidator(Y)
+  
+  return(dim(Y)[1])
+}
+
 
 ################################################################################
 #' Checks whether \code{x} contains integer numbers.

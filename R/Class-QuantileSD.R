@@ -62,15 +62,19 @@ NULL
 #' \code{\link{ts-models}}.
 #'
 #' @references
-#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2014+).
+#' Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 #' Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
-#' spectral analysis. \emph{Bernoulli}, \bold{forthcoming}.
+#' spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 #' [cf. \url{http://arxiv.org/abs/1111.7205}]
 #'
-#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2015+).
+#' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2016).
 #' Quantile Spectral Processes: Asymptotic Analysis and Inference.
-#' \emph{Bernoulli}, \bold{forthcoming}.
+#' \emph{Bernoulli}, \bold{22}(3), 1770--1807.
 #' [cf. \url{http://arxiv.org/abs/1401.8104}]
+#' 
+#' Barunik, J. & Kley, T. (2015).
+#' Quantile Cross-Spectral Measures of Dependence between Economic Variables.
+#' [preprint available from the authors]
 #'
 #' @example
 #' inst/examples/QuantileSD.R
@@ -100,6 +104,8 @@ setClass(
 #'
 #' @name increasePrecision-QuantileSD
 #' @aliases increasePrecision,QuantileSD-method
+#' 
+#' @importFrom stats smooth.spline
 #'
 #' @param object The \code{\link{QuantileSD}} of which to increase the precision.
 #' @param R value of which to enlarge R
@@ -140,6 +146,9 @@ setMethod(f = "increasePrecision",
 
       sumPG <- object@sumPG
       sumSqPG <- object@sumSqPG
+      
+      J <- dim(sumPG)[1]
+      P <- dim(sumPG)[2]
 
       type <- object@type
 
@@ -188,9 +197,14 @@ setMethod(f = "increasePrecision",
         A <- getValues(quantilePG(Y, type="clipped", isRankBased=rb,
                 levels.1 = levels.1, levels.2 = levels.2),
             frequencies = freq)
-
-        sumPG <- sumPG + A[,,,1]
-        sumSqPG <- sumSqPG + abs(A[,,,1])^2
+        if (length(dim(A)) == 4) {
+          A <- A[,,,1]
+        } else {
+          A <- A[,,,,,1]
+        }
+        A <- array(A, dim = c(J,P,K1,P,K2))
+        sumPG <- sumPG + A 
+        sumSqPG <- sumSqPG + abs(A)^2
       }
 
       object@R <- object@R + R
@@ -202,15 +216,18 @@ setMethod(f = "increasePrecision",
       object@meanPG <- meanPG
 
 
-      values <- array(0, dim=c(L+1,K1,K2))
-      for (j1 in 1:K1) {
-        for (j2 in 1:K2) {
-          Rp <- smooth.spline(x=0:L, y=Re(meanPG[,j1,j2]))$y
-          Ip <- smooth.spline(x=0:L, y=Im(meanPG[,j1,j2]))$y
-          values[,j1,j2] <- complex(real=Rp, imaginary=Ip)
+      values <- array(0, dim=c(L+1,P,K1,P,K2))
+      for (p1 in 1:P) {
+        for (p2 in 1:P) {
+          for (j1 in 1:K1) {
+            for (j2 in 1:K2) {
+              Rp <- smooth.spline(x=0:L, y=Re(meanPG[,p1,j1,p2,j2]))$y
+              Ip <- smooth.spline(x=0:L, y=Im(meanPG[,p1,j1,p2,j2]))$y
+              values[,p1,j1,p2,j2] <- complex(real=Rp, imaginary=Ip)
+            }
+          }
         }
       }
-
       object@values <- values
       object@seed.last <- save_rng()
 
@@ -238,9 +255,13 @@ setMethod(
 
       K1 <- length(getLevels(.Object,1))
       K2 <- length(getLevels(.Object,2))
+      
+      #TODO: check the next two lines again!
+      Y_test <- timeSeriesValidator(ts(2))
+      P <- dim(Y_test)[2]
 
-      .Object@sumPG <- array(0, dim=c(L+1,K1,K2))
-      .Object@sumSqPG <- array(0, dim=c(L+1,K1,K2))
+      .Object@sumPG <- array(0, dim=c(L+1,P,K1,P,K2))
+      .Object@sumSqPG <- array(0, dim=c(L+1,P,K1,P,K2))
 
       .Object@seed.last <- seed.last
 
@@ -262,9 +283,7 @@ setMethod(
 #' \code{levels.1[k1]} and \code{levels.2[k2]} that are closest to the
 #' \code{frequencies}, \code{levels.1} and \code{levels.2}
 #' available in \code{object}; \code{\link{closest.pos}} is used to determine
-#' what closest to means. \code{b==1} corresponds to the estimator, while
-#' \code{b>1} corresponds to the estimator determiend from the \code{b-1}th
-#' boothstrap replicate.
+#' what closest to means.
 #'
 #' @name getValues-QuantileSD
 #' @aliases getValues,QuantileSD-method
@@ -275,6 +294,9 @@ setMethod(
 #' @param frequencies a vector of frequencies for which to get the values
 #' @param levels.1 the first vector of levels for which to get the values
 #' @param levels.2 the second vector of levels for which to get the values
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 data; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
 #'
 #' @return Returns data from the array \code{values} that's a slot of
 #'          \code{object}.
@@ -287,7 +309,9 @@ setMethod(f = "getValues",
     definition = function(object,
         frequencies=2*pi*(0:(object@N-1))/object@N,
         levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2)) {
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4])) {
 
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
@@ -298,6 +322,12 @@ setMethod(f = "getValues",
       }
       if (!hasArg("levels.2")) {
         levels.2 <- getLevels(object,2)
+      }
+      if (!hasArg("d1")) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg("d2")) {
+        d2 <- 1:(dim(object@values)[4])
       }
       # end: workaround
 
@@ -346,15 +376,163 @@ setMethod(f = "getValues",
       J <- length(frequencies)
       K1 <- length(levels.1)
       K2 <- length(levels.2)
-      res <- array(dim=c(J, K1, K2))
+      D1 <- length(d1)
+      D2 <- length(d2)
+      res <- array(dim=c(J, D1, K1, D2, K2))
 
       if (length(r1.pos) > 0) {
-        res[which(f <= pi),,] <- object@values[r1.pos,c.1.pos,c.2.pos]
+        res[which(f <= pi),,,,] <- object@values[r1.pos,d1,c.1.pos,d2,c.2.pos]
       }
       if (length(r2.pos) > 0) {
-        res[which(f > pi),,] <- Conj(object@values[r2.pos,c.1.pos,c.2.pos])
+        res[which(f > pi),,,,] <- Conj(object@values[r2.pos,d1,c.1.pos,d2,c.2.pos])
+      }
+      
+
+      if (D1 == 1 && D2 == 1) {
+        final.dim.res <- c(J, K1, K2)
+      } else {
+        final.dim.res <- c(J, D1, K1, D2, K2)
+      }
+      
+      res <- array(res, dim=final.dim.res)
+
+      return(res)
+    }
+)
+
+
+################################################################################
+#' Compute quantile coherency from a quantile spectral density kernel
+#'
+#' Returns quantile coherency defined as
+#' \deqn{\frac{f^{j_1, j_2}(\omega; \tau_1, \tau_2)}{(f^{j_1, j_1}(\omega; \tau_1, \tau_1) f^{j_2, j_2}(\omega; \tau_2, \tau_2))^{1/2}}}
+#' where \eqn{f^{j_1, j_2}(\omega; \tau_1, \tau_2)} is the quantile spectral density.
+#' 
+#' For the mechanism of selecting frequencies, dimensions and/or levels see,
+#' for example, \code{\link{getValues-QuantileSD}}.
+#' 
+#' @name getCoherency-QuantileSD
+#' @aliases getCoherency,QuantileSD-method
+#'
+#' @keywords Access-functions
+#'
+#' @param object \code{QuantileSD} of which to get the values
+#' @param frequencies a vector of frequencies for which to get the values
+#' @param levels.1 the first vector of levels for which to get the values
+#' @param levels.2 the second vector of levels for which to get the values
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 data; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
+#'
+#' @return Returns data from the coherency as defined in the details.
+#'
+#' @seealso
+#' For examples on how to use this function go to \code{\link{QuantileSD}}.
+################################################################################
+setMethod(f = "getCoherency",
+    signature = signature("QuantileSD"),
+    definition = function(object,
+        frequencies=2*pi*(0:(object@N-1))/object@N,
+        levels.1=getLevels(object,1),
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4])) {
+      
+      # workaround: default values don't seem to work for generic functions?
+      if (!hasArg(frequencies)) {
+        frequencies <- 2*pi*(0:(object@N-1))/object@N
+      }
+      if (!hasArg("levels.1")) {
+        levels.1 <- getLevels(object,1)
+      }
+      if (!hasArg("levels.2")) {
+        levels.2 <- getLevels(object,2)
+      }
+      if (!hasArg("d1")) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg("d2")) {
+        d2 <- 1:(dim(object@values)[4])
+      }
+      # end: workaround
+      
+#      ##############################
+#      ## (Similar) Code also in Class-FreqRep!!!
+#      ## (Similar) Code also in Class-SmoothedPG!!!
+#      ##############################
+#      
+#      # Transform all frequencies to [0,2pi)
+#      frequencies <- frequencies %% (2*pi)
+#      
+#      # Create an aux vector with all available frequencies
+#      oF <- object@frequencies
+#      f <- frequencies
+#      
+#      # returns TRUE if x c y
+#      subsetequal.approx <- function(x,y) {
+#        X <- round(x, .Machine$double.exponent-2)
+#        Y <- round(y, .Machine$double.exponent-2)
+#        return(setequal(X,intersect(X,Y)))
+#      }
+#      
+#      C1 <- subsetequal.approx(f[f <= pi], oF)
+#      C2 <- subsetequal.approx(f[f > pi], 2*pi - oF[which(oF != 0 & oF != pi)])
+#      
+#      if (!(C1 & C2)) {
+#        warning("Not all 'values' for 'frequencies' requested were available. 'values' for the next available Fourier frequencies are returned.")
+#      }
+#      
+#      # Select columns
+#      c.1.pos <- closest.pos(getLevels(object,1),levels.1)
+#      c.2.pos <- closest.pos(getLevels(object,2),levels.2)
+#      
+#      if (!subsetequal.approx(levels.1, getLevels(object,1))) {
+#        warning("Not all 'values' for 'levels.1' requested were available. 'values' for the next available level are returned.")
+#      }
+#      
+#      if (!subsetequal.approx(levels.2, getLevels(object,2))) {
+#        warning("Not all 'values' for 'levels.2' requested were available. 'values' for the next available level are returned.")
+#      }
+#      
+#      # Select rows
+#      r1.pos <- closest.pos(oF, f[f <= pi])
+#      r2.pos <- closest.pos(-1*(2*pi-oF),-1*f[f > pi])
+      
+      J <- length(frequencies)
+      K1 <- length(levels.1)
+      K2 <- length(levels.2)
+      D1 <- length(d1)
+      D2 <- length(d2)
+      res <- array(dim=c(J, D1, K1, D2, K2))
+      
+#      if (length(r1.pos) > 0) {
+#        res[which(f <= pi),,,,] <- object@values[r1.pos,,c.1.pos,,c.2.pos]
+#      }
+#      if (length(r2.pos) > 0) {
+#        res[which(f > pi),,,,] <- Conj(object@values[r2.pos,,c.1.pos,,c.2.pos])
+#      }
+#
+
+    #if (class(object@weight) != "KernelWeight") {
+    #  error("Coherency can only be determined if weight is of type KernelWeight.")
+    #}
+    d <- union(d1,d2)
+    V <- getValues(object, d1 = d, d2 = d, frequencies = frequencies)
+    V <- array(V, dim = c(dim(V), 1))
+    
+    d1.pos <- closest.pos(d, d1)
+    d2.pos <- closest.pos(d, d2)
+    
+    res <- .computeCoherency(V, d1.pos, d2.pos)
+
+      if (D1 == 1 && D2 == 1) {
+        final.dim.res <- c(J, K1, K2)
+      } else {
+        final.dim.res <- c(J, D1, K1, D2, K2)
       }
 
+      res <- array(res, dim=final.dim.res)
+      
       return(res)
     }
 )
@@ -448,6 +626,9 @@ setMethod(f = "getTs",
 #' @param frequencies a vector of frequencies for which to get the \code{meanPG}
 #' @param levels.1 the first vector of levels for which to get the \code{meanPG}
 #' @param levels.2 the second vector of levels for which to get the \code{meanPG}
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 \code{meanPG}; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
 #'
 #' @return Returns the array \code{meanPG} that's a slot of \code{object}.
 ################################################################################
@@ -456,7 +637,9 @@ setMethod(f = "getMeanPG",
     definition = function(object,
         frequencies=2*pi*(0:(getN(object)-1))/getN(object),
         levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2)) {
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4])) {
 
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
@@ -468,12 +651,39 @@ setMethod(f = "getMeanPG",
       if (!hasArg("levels.2")) {
         levels.2 <- getLevels(object,2)
       }
+      if (!hasArg("d1")) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg("d2")) {
+        d2 <- 1:(dim(object@values)[4])
+      }
       # end: workaround
 
       pfreq <- closest.pos(object@frequencies, frequencies)
       plevels1 <- closest.pos(getLevels(object,1), levels.1)
       plevels2 <- closest.pos(getLevels(object,2), levels.2)
-      return(object@meanPG[pfreq, plevels1, plevels2, drop=F])
+      
+      J <- length(pfreq)
+      K1 <- length(plevels1)
+      K2 <- length(plevels2)
+      D1 <- length(d1)
+      D2 <- length(d2)
+      
+      res <- object@meanPG[pfreq, d1, plevels1, d2, plevels2, drop=F]
+      
+      final.dim.res <- c(J)
+      if (D1 > 1) {
+        final.dim.res <- c(final.dim.res,D1)
+      }
+      final.dim.res <- c(final.dim.res,K1)
+      if (D2 > 1) {
+        final.dim.res <- c(final.dim.res,D2)
+      }
+      final.dim.res <- c(final.dim.res,K2)
+      
+      res <- array(res, dim=final.dim.res)
+      
+      return(res)
     }
 )
 
@@ -493,6 +703,9 @@ setMethod(f = "getMeanPG",
 #' @param frequencies a vector of frequencies for which to get the \code{stdError}
 #' @param levels.1 the first vector of levels for which to get the \code{stdError}
 #' @param levels.2 the second vector of levels for which to get the \code{stdError}
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 \code{stdError}; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
 #'
 #' @return Returns the array \code{stdError} that's a slot of \code{object}.
 ################################################################################
@@ -501,7 +714,9 @@ setMethod(f = "getStdError",
     definition = function(object,
         frequencies=2*pi*(0:(object@N-1))/object@N,
         levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2)) {
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4])) {
 
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
@@ -513,12 +728,40 @@ setMethod(f = "getStdError",
       if (!hasArg("levels.2")) {
         levels.2 <- getLevels(object,2)
       }
+      if (!hasArg("d1")) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg("d2")) {
+        d2 <- 1:(dim(object@values)[4])
+      }
       # end: workaround
 
       pfreq <- closest.pos(object@frequencies, frequencies)
       plevels1 <- closest.pos(getLevels(object,1), levels.1)
       plevels2 <- closest.pos(getLevels(object,2), levels.2)
-      return(object@stdError[pfreq, plevels1, plevels2])
+      
+      J <- length(pfreq)
+      K1 <- length(plevels1)
+      K2 <- length(plevels2)
+      D1 <- length(d1)
+      D2 <- length(d2)
+      
+      res <- object@stdError[pfreq, d1, plevels1, d2, plevels2, drop=F]
+      
+      final.dim.res <- c(J)
+      if (D1 > 1) {
+        final.dim.res <- c(final.dim.res,D1)
+      }
+      final.dim.res <- c(final.dim.res,K1)
+      if (D2 > 1) {
+        final.dim.res <- c(final.dim.res,D2)
+      }
+      final.dim.res <- c(final.dim.res,K2)
+      
+      res <- array(res, dim=final.dim.res)
+      
+      return(res)
+
     }
 )
 
@@ -548,6 +791,9 @@ setMethod(f = "getQuantilePG",
 #' @name QuantileSD-constructor
 #' @aliases quantileSD
 #' @export
+#' 
+#' @importFrom stats rnorm
+#' @importFrom stats runif
 #'
 #' @keywords Constructors
 #'
@@ -620,6 +866,8 @@ quantileSD <- function(N=2^8,
 #' }
 #' for the combination of levels \eqn{\tau_1}{tau1} and \eqn{\tau_2}{tau2}
 #' denoted on the left and bottom margin of the plot are displayed.
+#' 
+#' Currently, only the plot for the first component is shown.
 #'
 #' @name plot-QuantileSD
 #' @aliases plot,QuantileSD,ANY-method
@@ -671,9 +919,9 @@ tryCatch({
     N <- x@N
     K <- length(levels)
     values <- getValues(x, frequencies = frequencies,
-                        levels.1=levels, levels.2=levels)
+                        levels.1=levels, levels.2=levels, d1=1, d2=1)
     meanPG <- getMeanPG(x, frequencies = frequencies,
-        levels.1=levels, levels.2=levels)
+        levels.1=levels, levels.2=levels, d1=1, d2=1)
 
     p <- K
     M <- matrix(1:p^2, ncol=p)

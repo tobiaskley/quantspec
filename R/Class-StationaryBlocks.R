@@ -25,6 +25,8 @@ NULL
 #' @aliases StationaryBlocks
 #' @exportClass StationaryBlocks
 #'
+#' @importFrom stats rgeom
+#' 
 #' @keywords S4-classes
 #'
 #' @seealso \code{\link{getPositions-StationaryBlocks}}

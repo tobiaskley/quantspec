@@ -187,7 +187,7 @@ setMethod(f = "getWnj",
             function(x, tol = .Machine$double.eps^0.5) {abs(x - round(x)) < tol}
 
         if (!all(is.wholenumber(j) & (j > 0))) {
-          error("j needs to be a vector of positive integers")
+          stop("j needs to be a vector of positive integers")
         } else {
           return(object@env$Wnj[j])
         }

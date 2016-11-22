@@ -1,17 +1,26 @@
-language: c
+language: r
+r:
+  - release
+  - devel
+
+sudo: required
+
+cache: packages
+
+warnings_are_errors: false
 
 before_install:
-  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-  - chmod 755 ./travis-tool.sh
-  - ./travis-tool.sh bootstrap
-install:
-  - ./travis-tool.sh install_deps
-script: ./travis-tool.sh run_tests
+   - sudo apt-get update
+   - sudo apt-get install qpdf
 
-after_failure:
-  - ./travis-tool.sh dump_logs
+env:
+ global:
+   - CRAN: http://cran.rstudio.com
+   - R_BUILD_ARGS="--resave-data --compact-vignettes=gs+qpdf"
+   - R_CHECK_ARGS="--as-cran"
 
-notifications:
-  email:
-    on_success: change
-    on_failure: change
+r_github_packages:
+  - jimhester/covr
+
+after_success:
+  - Rscript -e 'covr::codecov()'

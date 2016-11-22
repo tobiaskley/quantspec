@@ -1,10 +1,12 @@
 Package: quantspec
-Version: 1.0-3.99
+Version: 1.2-1.99
 Encoding: UTF-8
-Date: 2015-06-16
+Date: 2016-03-28
 Title: Quantile-Based Spectral Analysis of Time Series
-Authors@R: person("Tobias", "Kley", role=c("aut","cre"),
-    email = "tobias.kley@ruhr-uni-bochum.de")
+Authors@R: c(person("Tobias", "Kley", role=c("aut","cre"),
+        email = "t.kley@lse.ac.uk"),
+    person("Stefan", "Birr",  role = c("ctb"), 
+        comment = "Contributions to lag window estimation", email = "stefan.birr@rub.de"))
 Depends:
     R (>= 3.0.0),
     stats4
@@ -18,8 +20,8 @@ Imports:
     zoo,
     snowfall,
     Rcpp (>= 0.11.0)
-Description: Methods to determine, smooth and plot quantile (i. e., Laplace or
-    copula) periodograms for univariate time series.
+Description: Methods to determine, smooth and plot quantile periodograms for
+    univariate and multivariate time series.
 License: GPL (>= 2)
 URL: http://github.com/tobiaskley/quantspec
 BugReports: http://github.com/tobiaskley/quantspec/issues
@@ -29,14 +31,19 @@ Collate:
     'generics.R'
     'Class-BootPos.R'
     'Class-CircularBlocks.R'
-    'aux-functions.R'
+    'Class-LagOperator.R'
+    'Class-ClippedCov.R'
     'Class-QSpecQuantity.R'
+    'aux-functions.R'
     'Class-FreqRep.R'
     'Class-ClippedFT.R'
     'Class-QuantileSD.R'
     'Class-IntegrQuantileSD.R'
     'Class-Weight.R'
     'Class-KernelWeight.R'
+    'Class-LagEstimator.R'
+    'kernels.R'
+    'Class-LagKernelWeight.R'
     'Class-MovingBlocks.R'
     'Class-NonoverlappingBlocks.R'
     'Class-QRegEstimator.R'
@@ -47,6 +54,6 @@ Collate:
     'RcppExports.R'
     'data.R'
     'deprecated.R'
-    'kernels.R'
     'models.R'
     'quantspec-package.R'
+RoxygenNote: 5.0.1

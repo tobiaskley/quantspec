@@ -2,7 +2,7 @@
 ## This script illustrates how to work with QuantilePG objects
 
 ## Simulate a time series Y1,...,Y128 from the QAR(1) process discussed in
-## Dette et. al (2014).
+## Dette et. al (2015).
 Y <- ts1(64)
 
 ## For a defined set of quantile levels
@@ -10,12 +10,12 @@ levels <- c(0.25,0.5,0.75)
 
 ## the various quantile periodograms can be calculated calling quantilePG:
 
-## For a copula periodogram as in Dette et. al (2014) the option 'type="qr"'
+## For a copula periodogram as in Dette et. al (2015) the option 'type="qr"'
 ## has to be used:
 system.time(
     qPG.qr <- quantilePG(Y, levels.1 = levels, type="qr"))
 
-## For the CR-periodogram as in Kley et. al (2014) the option 'type="clipped"'
+## For the CR-periodogram as in Kley et. al (2016) the option 'type="clipped"'
 ## has to be used. If bootstrap estimates are to be used the parameters
 ## type.boot, B and l need to be specified.
 system.time(
