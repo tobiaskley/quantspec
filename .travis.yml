@@ -12,6 +12,7 @@ warnings_are_errors: false
 before_install:
    - sudo apt-get update
    - sudo apt-get install qpdf
+   - sudo apt-get install gsl-bin
 
 env:
  global:
