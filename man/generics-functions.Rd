@@ -2,6 +2,7 @@
 % Please edit documentation in R/generics.R
 \name{generics-functions}
 \alias{generics-functions}
+\alias{getMultipliers}
 \alias{getPositions}
 \alias{increasePrecision}
 \title{Generic functions for implementation of methods of a class}
@@ -9,6 +10,8 @@
 increasePrecision(object, ...)
 
 getPositions(object, ...)
+
+getMultipliers(object, ...)
 }
 \arguments{
 \item{object}{specifies the object from which the method is to be applied.}

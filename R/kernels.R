@@ -119,3 +119,81 @@ WParzen <- function(u){
   }
   return(Vectorize(WParzen.simple)(u))
 }
+
+################################################################################
+#' Further Kernel function, used for the dependent multiplier sequences
+#'
+#' Implementations of kernel functions
+#'
+#' Truncated \code{kappaT}:
+#' \deqn{\kappa_T(x) = I\{|x| \leq 1\}.}
+#'
+#' @name kernels-multiplier
+#' @aliases kappaT
+#' @export
+#'
+#' @param x real-valued argument to the function; can be a vector
+#'
+#' @examples
+#' plot(x=seq(-2,2,0.05), y=kappaT(seq(-2,2,0.05)), type="l")
+################################################################################
+kappaT <- function(x){
+  return( abs(x) <= 1 )
+}
+
+################################################################################
+#' @details
+#' Bartlett kernel \code{kappaB}:
+#' \deqn{(1 - |x|) \vee 0.}
+#'
+#'
+#' @name kernels-multiplier
+#' @aliases kappaB
+#' @export
+#'
+#' @examples
+#' plot(x=seq(-2,2,0.05), y=kappaB(seq(-2,2,0.05)), type="l")
+################################################################################
+kappaB <- function(x){
+  return( (1 - abs(x)) * (1-abs(x) >= 0) )
+}
+
+################################################################################
+#' @details
+#' Bartlett kernel \code{kappaB}:
+#' \deqn{(1 - |x|) \vee 0.}
+#'
+#'
+#' @name kernels-multiplier
+#' @aliases kappaB
+#' @export
+#'
+#' @examples
+#' plot(x=seq(-2,2,0.05), y=kappaB(seq(-2,2,0.05)), type="l")
+################################################################################
+kappaP <- function(x){
+  return( (1 - 6*x^2 + 6*abs(x)^3) * (abs(x) <= 0) + 2 * (1-abs(x))^3 * (1/2 < abs(x) && abs(x) <= 1) )
+}
+
+################################################################################
+#' @details
+#' Flat top kernel \code{kappaF}:
+#' \deqn{[\{(1 - |x|)/(1-c)\} \vee 0] \wedge 1, \quad 0 \leq c \leq 1.}
+#'
+#'
+#' @name kernels-multiplier
+#' @aliases kappaF
+#' @export
+#' 
+#' @param c cut-off point, \eqn{0 \leq c \leq 1}.
+#'
+#' @examples
+#' plot(x=seq(-2,2,0.05), y=kappaF(seq(-2,2,0.05)), type="l")
+#' plot(x=seq(-2,2,0.05), y=kappaF(seq(-2,2,0.05), 0.4), type="l")
+################################################################################
+kappaF <- function(x, c=0.14){
+  kappaF.simple <- function(x) {
+    return( min(max((1-abs(x))/(1-c),0),1) )
+  }
+  return(Vectorize(kappaF.simple)(x))
+}

@@ -21,7 +21,10 @@ block resampling procedure.
 Currently the following implementations are available:
 
 \itemize{
-		\item \code{\link{MovingBlocks}} and \code{\link{getPositions-MovingBlocks}}.
+		\item \code{\link{MovingBlocks}} and \code{\link{getPositions-MovingBlocks}},
+		\item \code{\link{NonoverlappingBlocks}} and \code{\link{getPositions-NonoverlappingBlocks}},
+		\item \code{\link{CircularBlocks}} and \code{\link{getPositions-CircularBlocks}},
+		\item \code{\link{StationaryBlocks}} and \code{\link{getPositions-StationaryBlocks}}.
 }
 }
 \section{Slots}{

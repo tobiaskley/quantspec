@@ -209,6 +209,14 @@ setGeneric("increasePrecision",
 setGeneric("getPositions",
     function(object, ... ){standardGeneric("getPositions")}) # B=1
 
+## Class-DependentMultipliers
+
+#' @name generics-functions
+#' @aliases getMultipliers
+#' @export
+setGeneric("getMultipliers",
+    function(object, ... ){standardGeneric("getMultipliers")}) # B=1
+
 ################################################################################
 #' Generic functions for accessing associations of objects
 #'
