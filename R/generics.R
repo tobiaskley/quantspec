@@ -209,7 +209,7 @@ setGeneric("increasePrecision",
 setGeneric("getPositions",
     function(object, ... ){standardGeneric("getPositions")}) # B=1
 
-## Class-DependentMultipliers
+## Class-BootMultipliers
 
 #' @name generics-functions
 #' @aliases getMultipliers

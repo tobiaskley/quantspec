@@ -5,7 +5,7 @@
 \alias{covarianceMatrixMultipliers}
 \title{Create an instance of the \code{\link{CovarianceMatrixMultipliers}} class.}
 \usage{
-covarianceMatrixMultipliers(l, N, phi)
+covarianceMatrixMultipliers(l, N, phi, distrInnov)
 }
 \arguments{
 \item{l}{the range of dependence of the multipliers (they are l-dependent)}
@@ -13,6 +13,9 @@ covarianceMatrixMultipliers(l, N, phi)
 \item{N}{length of the sequence of dependent multipliers}
 
 \item{phi}{function from assumption (M3)}
+
+\item{distrInnov}{function with one argument n that generates the independent
+innovations}
 }
 \value{
 Returns an instance of \code{CovarianceMatrixMultipliers}.

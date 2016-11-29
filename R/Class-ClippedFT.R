@@ -27,6 +27,8 @@ NULL
 #' @exportClass ClippedFT
 #'
 #' @keywords S4-classes
+#' 
+#' @slot multipliers.boot multipliers to be used
 #'
 #' @references
 #' Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2016).
@@ -43,6 +45,9 @@ NULL
 ################################################################################
 setClass(
     Class = "ClippedFT",
+    representation=representation(
+        multipliers.boot = "BootMultipliers"
+    ),
     contains = "FreqRep"
 )
 
@@ -50,13 +55,14 @@ setClass(
 setMethod(
     f = "initialize",
     signature = "ClippedFT",
-    definition = function(.Object, Y, isRankBased, levels, frequencies, positions.boot, B) {
+    definition = function(.Object, Y, isRankBased, levels, frequencies, positions.boot, multipliers.boot, B) {
       
       .Object@Y <- Y
       .Object@isRankBased <- isRankBased
       .Object@levels <- levels
       .Object@frequencies <- frequencies
       .Object@positions.boot <- positions.boot
+      .Object@multipliers.boot <- multipliers.boot
       .Object@B <- B
       
       # Define variables with dimensions
@@ -152,14 +158,21 @@ setMethod(
 #' @param isRankBased If true the time series is first transformed to pseudo
 #'                    data [cf. \code{\link{FreqRep}}].
 #' @param B number of bootstrap replications
-#' @param l (expected) length of blocks
+#' @param l (expected) length of blocks or the parameter for the multipliers
 #' @param type.boot A flag to choose a method for the block bootstrap; currently
 #'                  two options are implemented: \code{"none"}, \code{"mbb"}
 #'                  which means to do a moving blocks bootstrap with \code{B}
 #'                  and \code{l} as specified. Further options are \code{"nbb"},
 #' 								  which means nonoverlapping blocks bootstrap, \code{"cbb"} which
 #' 									means circular bootstrap, and \code{"sb"} which stands for
-#' 								  stationary bootstrap. 
+#' 								  stationary bootstrap.
+#' @param kappa_phi function to be used for generation of multipliers
+#'                 (kappa when multipliers are generated using the moving
+#'                 average approach and phi for the covariance matrix approach,
+#'                 respectively.
+#' @param mult.distr Distribution to be used for the innovations of the moving
+#'                   average or covariance matrix approach when using multiplier
+#'                   bootstrap
 #'
 #' @return Returns an instance of \code{ClippedFT}.
 #'
@@ -172,7 +185,9 @@ clippedFT <- function( Y,
     isRankBased=TRUE,
     B = 0,
     l = 0,
-    type.boot = c("none","mbb","nbb","cbb","sb")) {
+    type.boot = c("none","mbb","nbb","cbb","sb","mult.ma","mult.cov"),
+    kappa_phi = kappaT,
+    mult.distr = rnorm) {
   
   # Verify if all parameters are valid
   Y <- timeSeriesValidator(Y)
@@ -192,18 +207,29 @@ clippedFT <- function( Y,
   # Check validity of frequencies
   frequencies <- frequenciesValidator(frequencies, lenTS(Y))
   
-  type.boot <- match.arg(type.boot, c("none", "mbb", "nbb", "cbb", "sb"))[1]
+  type.boot <- match.arg(type.boot, c("none", "mbb", "nbb", "cbb", "sb", "mult.ma", "mult.cov"))[1]
   switch(type.boot,
       "none" = {
-        bootPos <- movingBlocks(lenTS(Y),lenTS(Y))},
+        bootPos <- movingBlocks(lenTS(Y),lenTS(Y))
+        bootMultipliers <- noneMultipliers(lenTS(Y))},
       "mbb" = {
-        bootPos <- movingBlocks(l,lenTS(Y))},
+        bootPos <- movingBlocks(l,lenTS(Y))
+        bootMultipliers <- noneMultipliers(lenTS(Y))},
       "nbb" = {
-        bootPos <- nonoverlappingBlocks(l,lenTS(Y))},
+        bootPos <- nonoverlappingBlocks(l,lenTS(Y))
+        bootMultipliers <- noneMultipliers(lenTS(Y))},
       "cbb" = {
-        bootPos <- circularBlocks(l,lenTS(Y))},
+        bootPos <- circularBlocks(l,lenTS(Y))
+        bootMultipliers <- noneMultipliers(lenTS(Y))},
       "sb" = {
-        bootPos <- stationaryBlocks(l,lenTS(Y))}
+        bootPos <- stationaryBlocks(l,lenTS(Y))
+        bootMultipliers <- noneMultipliers(lenTS(Y))},
+      "mult.ma" = {
+        bootPos <- movingBlocks(lenTS(Y),lenTS(Y))
+        bootMultipliers <- movingAverageMultipliers(l, lenTS(Y), kappa_phi, mult.distr)},
+      "mult.cov" = {
+        bootPos <- movingBlocks(lenTS(Y),lenTS(Y))
+        bootMultipliers <- covarianceMatrixMultipliers(l, lenTS(Y), kappa_phi, mult.distr)}
   )
   
   freqRep <- new(
@@ -213,6 +239,7 @@ clippedFT <- function( Y,
       levels = sort(levels),
       B = B,
       positions.boot = bootPos,
+      multipliers.boot = bootMultipliers,
       frequencies = frequencies
   )
   

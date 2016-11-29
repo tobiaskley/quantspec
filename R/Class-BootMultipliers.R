@@ -2,7 +2,7 @@
 NULL
 
 ################################################################################
-#' Class for Generation of Dependent Multipliers to be used for bootstrapping.
+#' Class for Generation of Multipliers to be used for bootstrapping.
 #'
 #' \code{DependentMultipliers} is an S4 class that provides a common interface
 #' to different algorithms that can be used for implementation of a dependent
@@ -25,9 +25,9 @@ NULL
 #'           and \code{\link{getMultipliers-CovarianceMatrixMultipliers}},
 #' }
 #'
-#' @name   DependentMultipliers-class
-#' @aliases DependentMultipliers
-#' @exportClass DependentMultipliers
+#' @name   BootMultipliers-class
+#' @aliases BootMultipliers
+#' @exportClass BootMultipliers
 #'
 #' @keywords S4-classes
 #'
@@ -41,7 +41,7 @@ NULL
 ################################################################################
 
 setClass(
-    Class = "DependentMultipliers",
+    Class = "BootMultipliers",
     representation=representation(
         l = "numeric",
         N = "numeric"

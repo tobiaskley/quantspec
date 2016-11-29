@@ -5,7 +5,7 @@
 \alias{movingAverageMultipliers}
 \title{Create an instance of the \code{\link{MovingAverageMultipliers}} class.}
 \usage{
-movingAverageMultipliers(l, N, kappa, innovDistr = rnorm)
+movingAverageMultipliers(l, N, kappa, distrInnov = rnorm)
 }
 \arguments{
 \item{l}{the range of dependence of the multipliers (they are l-dependent);

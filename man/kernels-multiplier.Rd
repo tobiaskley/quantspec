@@ -31,8 +31,8 @@ Truncated \code{kappaT}:
 Bartlett kernel \code{kappaB}:
 \deqn{(1 - |x|) \vee 0.}
 
-Bartlett kernel \code{kappaB}:
-\deqn{(1 - |x|) \vee 0.}
+Parzen kernel \code{kappaP}:
+\deqn{(1-6x^2+6|x|^3)I\{|x| \leq 1/2\} + 2 (1-|x|)^3 I\{1/2 < |x| \leq 1\}.}
 
 Flat top kernel \code{kappaF}:
 \deqn{[\{(1 - |x|)/(1-c)\} \vee 0] \wedge 1, \quad 0 \leq c \leq 1.}
@@ -40,7 +40,7 @@ Flat top kernel \code{kappaF}:
 \examples{
 plot(x=seq(-2,2,0.05), y=kappaT(seq(-2,2,0.05)), type="l")
 plot(x=seq(-2,2,0.05), y=kappaB(seq(-2,2,0.05)), type="l")
-plot(x=seq(-2,2,0.05), y=kappaB(seq(-2,2,0.05)), type="l")
+plot(x=seq(-2,2,0.05), y=kappaP(seq(-2,2,0.05)), type="l")
 plot(x=seq(-2,2,0.05), y=kappaF(seq(-2,2,0.05)), type="l")
 plot(x=seq(-2,2,0.05), y=kappaF(seq(-2,2,0.05), 0.4), type="l")
 }

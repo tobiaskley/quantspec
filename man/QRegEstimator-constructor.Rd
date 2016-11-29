@@ -7,8 +7,8 @@
 \usage{
 qRegEstimator(Y, frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1),
   levels = 0.5, isRankBased = TRUE, B = 0, l = 0,
-  type.boot = c("none", "mbb", "nbb", "cbb", "sb"), method = c("br", "fn",
-  "pfn", "fnc", "lasso", "scad"), parallel = FALSE)
+  type.boot = c("none", "mbb", "nbb", "cbb", "sb", "mult.ma", "mult.cov"),
+  method = c("br", "fn", "pfn", "fnc", "lasso", "scad"), parallel = FALSE)
 }
 \arguments{
 \item{Y}{A \code{vector} of real numbers containing the time series from

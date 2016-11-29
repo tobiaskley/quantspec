@@ -12,7 +12,7 @@ bootstrap described in B{\"u}cher and Kojadinovic (2016), Section 5.2.2.
 }
 \details{
 \code{CovarianceMatrixMultipliers} extends the S4 class
-\code{\link{DependentMultipliers}} and the remarks made in its documentation
+\code{\link{BootMultipliers}} and the remarks made in its documentation
 apply here as well.
 
 TODO: Add more description here!
@@ -21,6 +21,11 @@ TODO: Add more description here!
 
 \describe{
 \item{\code{phi}}{function from assumption (M3)}
+
+\item{\code{distrInnov}}{function with one argument n that generates the independent
+innovations}
+
+\item{\code{sqrt_Sigma}}{the positive definite square root of Sigma_n}
 }}
 \references{
 B{\"u}cher, A., & Kojadinovic, I. (2016).

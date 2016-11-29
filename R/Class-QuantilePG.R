@@ -249,7 +249,14 @@ setMethod(f = "getFreqRep",
 #'                  and \code{l} as specified. Further options are \code{"nbb"},
 #' 								  which means nonoverlapping blocks bootstrap, \code{"cbb"} which
 #' 									means circular bootstrap, and \code{"sb"} which stands for
-#' 								  stationary bootstrap. 
+#' 								  stationary bootstrap.
+#' @param kappa_phi function to be used for generation of multipliers
+#'                 (kappa when multipliers are generated using the moving
+#'                 average approach and phi for the covariance matrix approach,
+#'                 respectively.
+#' @param mult.distr Distribution to be used for the innovations of the moving
+#'                   average or covariance matrix approach when using multiplier
+#'                   bootstrap
 #' @param method  method used for computing the quantile regression estimates.
 #'                 The choice is passed to \code{qr}; see the
 #'                 documentation of \code{quantreg} for details.
@@ -264,9 +271,11 @@ quantilePG <- function( Y,
     levels.2=levels.1,
     isRankBased=TRUE,
     type=c("clipped","qr"),
-    type.boot = c("none","mbb","nbb","cbb","sb"),
     B = 0,
     l = 0,
+    type.boot = c("none","mbb","nbb","cbb","sb","mult.ma","mult.cov"),
+    kappa_phi = kappaT,
+    mult.distr = rnorm,
     method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
     parallel=FALSE) {
   
@@ -290,7 +299,7 @@ quantilePG <- function( Y,
   type <- match.arg(type, c("clipped","qr"))[1]
   switch(type,
       "clipped" = {
-        freqRep <- clippedFT(Y, frequencies, levels.all, isRankBased, B, l, type.boot)},
+        freqRep <- clippedFT(Y, frequencies, levels.all, isRankBased, B, l, type.boot, kappa_phi, mult.distr)},
       "qr" = {
         freqRep <- qRegEstimator(Y, frequencies, levels.all, isRankBased, B, l, type.boot, method, parallel)}
   )

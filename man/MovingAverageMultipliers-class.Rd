@@ -12,7 +12,7 @@ bootstrap described in B{\"u}cher and Kojadinovic (2016), Section 5.2.1.
 }
 \details{
 \code{MovingAverageMultipliers} extends the S4 class
-\code{\link{DependentMultipliers}} and the remarks made in its documentation
+\code{\link{BootMultipliers}} and the remarks made in its documentation
 apply here as well.
 
 TODO: Add more description here!

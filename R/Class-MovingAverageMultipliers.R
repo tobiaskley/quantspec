@@ -1,4 +1,4 @@
-#' @include Class-DependentMultipliers.R
+#' @include Class-BootMultipliers.R
 NULL
 
 ################################################################################
@@ -8,7 +8,7 @@ NULL
 #' bootstrap described in B{\"u}cher and Kojadinovic (2016), Section 5.2.1.
 #'
 #' \code{MovingAverageMultipliers} extends the S4 class
-#' \code{\link{DependentMultipliers}} and the remarks made in its documentation
+#' \code{\link{BootMultipliers}} and the remarks made in its documentation
 #' apply here as well.
 #'
 #' TODO: Add more description here!
@@ -36,19 +36,21 @@ NULL
 setClass(
     Class = "MovingAverageMultipliers",
     representation=representation(
-        kappa = "function"
+        kappa = "function",
+        distrInnov = "function"
     ),
-    contains = "DependentMultipliers"
+    contains = "BootMultipliers"
 )
 
 setMethod(
     f = "initialize",
     signature = "MovingAverageMultipliers",
-    definition = function(.Object, l, N, phi) {
+    definition = function(.Object, l, N, kappa, distrInnov) {
       
       .Object@l <- l
       .Object@N <- N
-      .Object@N <- phi
+      .Object@kappa <- kappa
+      .Object@distrInnov <- distrInnov
       
       # Return object
       return(.Object)
@@ -79,25 +81,22 @@ setMethod(f = "getMultipliers",
       N <- object@N
       l <- object@l
       kappa <- object@kappa
+      distrInnov <- object@distrInnov
       
       b <- (l+1)/2
       w <- kappa( (1:l - b)/b )
-#      nBlocks <- ceiling(N/l)
-#      
-#      positions <- c()
-#      
-#      for (b in 1:B) {
-#        blocks <- matrix(ncol=nBlocks, nrow=l)
-#        blocks[1,] <- floor(runif(n=nBlocks, min=1,max=N-l+1))
-#        if (l > 1) {
-#          for (i in 2:l) {
-#            blocks[i,] <- blocks[1,]+i-1
-#          }
-#        }
-#        positions <- c(positions,as.vector(blocks)[1:N])
-#      }
-#      
-#      return(matrix(positions,nrow=N))
+      
+      Z <- matrix( distrInnov( B * (N + 2*b - 2) ), ncol=B)
+      
+      #Z2 <- Z[,2]
+      
+      res  <- c()
+      for (i in 1:N) {
+        # res <- c(res, sum(w * Z2[i + 1:l - 1]))
+        res <- cbind(res, w %*% Z[i + 1:l - 1, ])
+      }
+      
+      return(t(res) / sum(w^2)^(1/2) )
     }
 )
 
@@ -121,7 +120,7 @@ setMethod(f = "getMultipliers",
 #' @return Returns an instance of \code{MovingAverageMultipliers}.
 ################################################################################
 
-movingAverageMultipliers <- function( l, N, kappa, innovDistr = rnorm ) {
+movingAverageMultipliers <- function( l, N, kappa, distrInnov = rnorm ) {
   
   # TODO: Add more checks
   if (!(is.wholenumber(l) && is.wholenumber(N) && 0 < l && l <= N)) {
@@ -133,7 +132,7 @@ movingAverageMultipliers <- function( l, N, kappa, innovDistr = rnorm ) {
       l = l,
       N = N,
       kappa = kappa,
-      innovDistr = innovDistr
+      distrInnov = distrInnov
   )
   
   return(obj)

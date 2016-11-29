@@ -1,4 +1,4 @@
-#' @include Class-DependentMultipliers.R
+#' @include Class-BootMultipliers.R
 NULL
 
 ################################################################################
@@ -8,7 +8,7 @@ NULL
 #' bootstrap described in B{\"u}cher and Kojadinovic (2016), Section 5.2.2.
 #'
 #' \code{CovarianceMatrixMultipliers} extends the S4 class
-#' \code{\link{DependentMultipliers}} and the remarks made in its documentation
+#' \code{\link{BootMultipliers}} and the remarks made in its documentation
 #' apply here as well.
 #'
 #' TODO: Add more description here!
@@ -22,6 +22,9 @@ NULL
 #' @keywords S4-classes
 #' 
 #' @slot phi function from assumption (M3)
+#' @slot distrInnov function with one argument n that generates the independent
+#'                  innovations
+#' @slot sqrt_Sigma the positive definite square root of Sigma_n
 #'
 #' @seealso \code{\link{getMultipliers-CovarianceMatrixMultipliers}}
 #'
@@ -34,19 +37,43 @@ NULL
 setClass(
     Class = "CovarianceMatrixMultipliers",
     representation=representation(
-        phi = "function"
+        phi = "function",
+        distrInnov = "function",
+        sqrt_Sigma = "matrix"
     ),
-    contains = "DependentMultipliers"
+    contains = "BootMultipliers"
 )
 
+#' @importFrom stats toeplitz
 setMethod(
     f = "initialize",
     signature = "CovarianceMatrixMultipliers",
-    definition = function(.Object, l, N, phi) {
+    definition = function(.Object, l, N, phi, distrInnov) {
       
       .Object@l <- l
       .Object@N <- N
-      .Object@N <- phi
+      .Object@phi <- phi
+      .Object@distrInnov <- distrInnov
+      
+      Sigma <- toeplitz(phi( (0:(N-1))/l ))
+      
+      ## find sqrtm of Sigma
+      ## Version 1
+      e <- eigen(Sigma)
+      V <- e$vectors
+      
+      .Object@sqrt_Sigma <- V %*% diag(sqrt(e$values)) %*% t(V)
+      
+#      ## Version 2
+#      clChol <- chol(Sigma)
+#      svdCC <- svd(t(clChol))
+#      
+#      sqrt_Sigma2 <- svdCC$u %*% diag(svdCC$d) %*% t(svdCC$u)
+
+#      ## Version 3
+#      require(expm)
+#      sqrt_Sigma3 <- sqrtm(Sigma)
+      
       
       # Return object
       return(.Object)
@@ -75,24 +102,14 @@ setMethod(f = "getMultipliers",
     definition = function(object, B=1) {
       
       N <- object@N
-      l <- object@l
-      phi <- object@phi
-#      nBlocks <- ceiling(N/l)
-#      
-#      positions <- c()
-#      
-#      for (b in 1:B) {
-#        blocks <- matrix(ncol=nBlocks, nrow=l)
-#        blocks[1,] <- floor(runif(n=nBlocks, min=1,max=N-l+1))
-#        if (l > 1) {
-#          for (i in 2:l) {
-#            blocks[i,] <- blocks[1,]+i-1
-#          }
-#        }
-#        positions <- c(positions,as.vector(blocks)[1:N])
-#      }
-#      
-#      return(matrix(positions,nrow=N))
+      #l <- object@l
+      #phi <- object@phi
+      distrInnov <- object@distrInnov
+      
+      sqrt_Sigma <- object@sqrt_Sigma
+      
+      return( sqrt_Sigma %*% matrix(distrInnov(N*B), ncol=B) )
+      
     }
 )
 
@@ -109,11 +126,13 @@ setMethod(f = "getMultipliers",
 #' @param l   the range of dependence of the multipliers (they are l-dependent)
 #' @param N   length of the sequence of dependent multipliers
 #' @param phi function from assumption (M3)
+#' @param distrInnov function with one argument n that generates the independent
+#'                   innovations
 #'
 #' @return Returns an instance of \code{CovarianceMatrixMultipliers}.
 ################################################################################
 
-covarianceMatrixMultipliers <- function( l, N, phi ) {
+covarianceMatrixMultipliers <- function( l, N, phi, distrInnov ) {
   
   # TODO: Add more checks
   if (!(is.wholenumber(l) && is.wholenumber(N) && 0 < l && l <= N)) {
@@ -124,7 +143,8 @@ covarianceMatrixMultipliers <- function( l, N, phi ) {
       Class = "CovarianceMatrixMultipliers",
       l = l,
       N = N,
-      phi = phi
+      phi = phi,
+      distrInnov = distrInnov
   )
   
   return(obj)

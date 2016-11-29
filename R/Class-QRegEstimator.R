@@ -218,7 +218,7 @@ qRegEstimator <- function( Y,
     isRankBased=TRUE,
     B = 0,
     l = 0,
-    type.boot = c("none", "mbb", "nbb", "cbb", "sb"),
+    type.boot = c("none", "mbb", "nbb", "cbb", "sb", "mult.ma", "mult.cov"),
     method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
     parallel = FALSE) {
   
@@ -240,7 +240,7 @@ qRegEstimator <- function( Y,
   # Check validity of frequencies
   frequencies <- frequenciesValidator(frequencies, lenTS(Y))
   
-  type.boot <- match.arg(type.boot, c("none", "mbb", "nbb", "cbb", "sb"))[1]
+  type.boot <- match.arg(type.boot, c("none", "mbb", "nbb", "cbb", "sb", "mult.ma", "mult.cov"))[1]
   switch(type.boot,
       "none" = {
         bootPos <- movingBlocks(lenTS(Y),lenTS(Y))},
@@ -251,7 +251,11 @@ qRegEstimator <- function( Y,
       "cbb" = {
         bootPos <- circularBlocks(l,lenTS(Y))},
       "sb" = {
-        bootPos <- stationaryBlocks(l,lenTS(Y))}
+        bootPos <- stationaryBlocks(l,lenTS(Y))},
+      "mult.ma" = {
+        stop("multiplier bootstrap for qRegEstimator not supported.")},
+      "mult.cov" = {
+        stop("multiplier bootstrap for qRegEstimator not supported.")}
   )
   
   method <- match.arg(method, c("br", "fn", "pfn", "fnc", "lasso", "scad"))[1]

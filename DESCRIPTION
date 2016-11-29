@@ -30,6 +30,7 @@ LazyData: TRUE
 LinkingTo: Rcpp
 Collate:
     'generics.R'
+    'Class-BootMultipliers.R'
     'Class-BootPos.R'
     'Class-CircularBlocks.R'
     'Class-LagOperator.R'
@@ -38,7 +39,6 @@ Collate:
     'aux-functions.R'
     'Class-FreqRep.R'
     'Class-ClippedFT.R'
-    'Class-DependentMultipliers.R'
     'Class-CovarianceMatrixMultipliers.R'
     'Class-QuantileSD.R'
     'Class-IntegrQuantileSD.R'
@@ -49,6 +49,7 @@ Collate:
     'Class-LagKernelWeight.R'
     'Class-MovingAverageMultipliers.R'
     'Class-MovingBlocks.R'
+    'Class-NoneMultipliers.R'
     'Class-NonoverlappingBlocks.R'
     'Class-QRegEstimator.R'
     'Class-QuantilePG.R'

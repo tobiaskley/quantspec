@@ -1478,7 +1478,14 @@ setMethod(f = "getQuantilePG",
 #'                  and \code{l} as specified. Further options are \code{"nbb"},
 #' 								  which means nonoverlapping blocks bootstrap, \code{"cbb"} which
 #' 									means circular bootstrap, and \code{"sb"} which stands for
-#' 								  stationary bootstrap. 
+#' 								  stationary bootstrap.
+#' @param kappa_phi function to be used for generation of multipliers
+#'                 (kappa when multipliers are generated using the moving
+#'                 average approach and phi for the covariance matrix approach,
+#'                 respectively.
+#' @param mult.distr Distribution to be used for the innovations of the moving
+#'                   average or covariance matrix approach when using multiplier
+#'                   bootstrap
 #' @param method  method used for computing the quantile regression estimates.
 #'                 The choice is passed to \code{qr}; see the
 #'                 documentation of \code{quantreg} for details.
@@ -1516,11 +1523,13 @@ smoothedPG <- function(
     levels.2=levels.1,
     isRankBased=TRUE,
     type=c("clipped","qr"),
-    type.boot=c("none","mbb","nbb","cbb","sb"),
-    method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
-    parallel=FALSE,
     B = 0,
     l = 1,
+    type.boot=c("none","mbb","nbb","cbb","sb","mult.ma","mult.cov"),
+    kappa_phi = kappaT,
+    mult.distr = rnorm,
+    method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
+    parallel=FALSE,
     weight = kernelWeight()) {
   
   if (class(object) == "numeric" | class(object) == "matrix") {
@@ -1565,7 +1574,8 @@ smoothedPG <- function(
         levels.1 = levels.1,
         levels.2 = levels.2,
         isRankBased = isRankBased,
-        type=type, type.boot = type.boot, B=B, l=l)
+        type=type, B=B, l=l, type.boot = type.boot, kappa_phi = kappa_phi, mult.distr = mult.distr,
+        method = method, parallel = parallel)
   } else if (versConstr == 2) {
     qPG <- object
   }

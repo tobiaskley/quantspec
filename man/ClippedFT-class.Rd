@@ -24,6 +24,11 @@ good performance.
 Note that, all remarks made in the documentation of the super-class
 \code{\link{FreqRep}} apply.
 }
+\section{Slots}{
+
+\describe{
+\item{\code{multipliers.boot}}{multipliers to be used}
+}}
 \references{
 Kley, T., Volgushev, S., Dette, H. & Hallin, M. (2016).
 Quantile Spectral Processes: Asymptotic Analysis and Inference.

@@ -7,7 +7,8 @@
 \usage{
 clippedFT(Y, frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1), levels = 0.5,
   isRankBased = TRUE, B = 0, l = 0, type.boot = c("none", "mbb", "nbb",
-  "cbb", "sb"))
+  "cbb", "sb", "mult.ma", "mult.cov"), kappa_phi = kappaT,
+  mult.distr = rnorm)
 }
 \arguments{
 \item{Y}{A \code{matrix} of real numbers containing the time series from
@@ -26,7 +27,7 @@ data [cf. \code{\link{FreqRep}}].}
 
 \item{B}{number of bootstrap replications}
 
-\item{l}{(expected) length of blocks}
+\item{l}{(expected) length of blocks or the parameter for the multipliers}
 
 \item{type.boot}{A flag to choose a method for the block bootstrap; currently
 two options are implemented: \code{"none"}, \code{"mbb"}
@@ -35,6 +36,15 @@ and \code{l} as specified. Further options are \code{"nbb"},
                  which means nonoverlapping blocks bootstrap, \code{"cbb"} which
                    means circular bootstrap, and \code{"sb"} which stands for
                  stationary bootstrap.}
+
+\item{kappa_phi}{function to be used for generation of multipliers
+(kappa when multipliers are generated using the moving
+average approach and phi for the covariance matrix approach,
+respectively.}
+
+\item{mult.distr}{Distribution to be used for the innovations of the moving
+average or covariance matrix approach when using multiplier
+bootstrap}
 }
 \value{
 Returns an instance of \code{ClippedFT}.

@@ -160,8 +160,8 @@ kappaB <- function(x){
 
 ################################################################################
 #' @details
-#' Bartlett kernel \code{kappaB}:
-#' \deqn{(1 - |x|) \vee 0.}
+#' Parzen kernel \code{kappaP}:
+#' \deqn{(1-6x^2+6|x|^3)I\{|x| \leq 1/2\} + 2 (1-|x|)^3 I\{1/2 < |x| \leq 1\}.}
 #'
 #'
 #' @name kernels-multiplier
@@ -169,10 +169,10 @@ kappaB <- function(x){
 #' @export
 #'
 #' @examples
-#' plot(x=seq(-2,2,0.05), y=kappaB(seq(-2,2,0.05)), type="l")
+#' plot(x=seq(-2,2,0.05), y=kappaP(seq(-2,2,0.05)), type="l")
 ################################################################################
 kappaP <- function(x){
-  return( (1 - 6*x^2 + 6*abs(x)^3) * (abs(x) <= 0) + 2 * (1-abs(x))^3 * (1/2 < abs(x) && abs(x) <= 1) )
+  return( (1 - 6*x^2 + 6*abs(x)^3) * (abs(x) <= 1/2) + 2 * (1-abs(x))^3 * (1/2 < abs(x)) * (abs(x) <= 1) )
 }
 
 ################################################################################
