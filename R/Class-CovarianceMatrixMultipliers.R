@@ -54,16 +54,16 @@ setMethod(
       .Object@N <- N
       .Object@phi <- phi
       .Object@distrInnov <- distrInnov
-      
+
       Sigma <- toeplitz(phi( (0:(N-1))/l ))
-      
+
       ## find sqrtm of Sigma
       ## Version 1
       e <- eigen(Sigma)
       V <- e$vectors
-      
+
       .Object@sqrt_Sigma <- V %*% diag(sqrt(e$values)) %*% t(V)
-      
+
 #      ## Version 2
 #      clChol <- chol(Sigma)
 #      svdCC <- svd(t(clChol))

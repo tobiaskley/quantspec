@@ -2,6 +2,7 @@
 % Please edit documentation in R/generics.R
 \name{generics-associations}
 \alias{generics-associations}
+\alias{getBootMultipliers}
 \alias{getBootPos}
 \alias{getFreqRep}
 \alias{getQuantilePG}
@@ -12,6 +13,8 @@
 getQuantilePG(object, ...)
 
 getBootPos(object, ...)
+
+getBootMultipliers(object, ...)
 
 getFreqRep(object, ...)
 

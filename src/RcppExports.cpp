@@ -30,3 +30,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// generateIndMatrix
+NumericMatrix generateIndMatrix(NumericMatrix Y, NumericMatrix pos_boot, NumericMatrix mult_boot, NumericVector levels, bool isRankBased);
+RcppExport SEXP quantspec_generateIndMatrix(SEXP YSEXP, SEXP pos_bootSEXP, SEXP mult_bootSEXP, SEXP levelsSEXP, SEXP isRankBasedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type pos_boot(pos_bootSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type mult_boot(mult_bootSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type levels(levelsSEXP);
+    Rcpp::traits::input_parameter< bool >::type isRankBased(isRankBasedSEXP);
+    rcpp_result_gen = Rcpp::wrap(generateIndMatrix(Y, pos_boot, mult_boot, levels, isRankBased));
+    return rcpp_result_gen;
+END_RCPP
+}

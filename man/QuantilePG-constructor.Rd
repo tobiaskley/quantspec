@@ -8,9 +8,9 @@
 quantilePG(Y, frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1),
   levels.1 = 0.5, levels.2 = levels.1, isRankBased = TRUE,
   type = c("clipped", "qr"), B = 0, l = 0, type.boot = c("none", "mbb",
-  "nbb", "cbb", "sb", "mult.ma", "mult.cov"), kappa_phi = kappaT,
-  mult.distr = rnorm, method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
-  parallel = FALSE)
+  "nbb", "cbb", "sb", "mult.ma", "mult.cov"),
+  bootMultipliers = noneMultipliers(lenTS(Y)), method = c("br", "fn", "pfn",
+  "fnc", "lasso", "scad"), parallel = FALSE)
 }
 \arguments{
 \item{Y}{A \code{vector} of real numbers containing the time series from
@@ -45,14 +45,10 @@ and \code{l} as specified. Further options are \code{"nbb"},
                    means circular bootstrap, and \code{"sb"} which stands for
                  stationary bootstrap.}
 
-\item{kappa_phi}{function to be used for generation of multipliers
-(kappa when multipliers are generated using the moving
-average approach and phi for the covariance matrix approach,
-respectively.}
-
-\item{mult.distr}{Distribution to be used for the innovations of the moving
-average or covariance matrix approach when using multiplier
-bootstrap}
+\item{bootMultipliers}{\code{\link{BootMultipliers}} object; has to be of type
+\code{MovingAverageMultipliers} if \code{type.boot=="mult.ma"}, of
+type \code{CovarianceMatrixMultipliers} if \code{type.boot=="mult.cov"}
+                 and of type \code{NoneMultiplier} otherwise (default).}
 
 \item{method}{method used for computing the quantile regression estimates.
 The choice is passed to \code{qr}; see the

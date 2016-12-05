@@ -56,3 +56,24 @@ NULL
     .Call('quantspec_computeSdNaive', PACKAGE = 'quantspec', V, W)
 }
 
+#' Workhorse function for \code{\link{initialize-ClippedFT}}.
+#'
+#' C++ implementation to increase performance.
+#'
+#' @name .generateIndMatrix
+#'
+#' @keywords internals
+#'
+#' @param Y time series to analysis; a T x D matrix.
+#' @param pos.boot block bootstrap positions; a T x (B+1) matrix.
+#' @param mult.boot multipliers for bootstrap; a T x (B+1) matrix.
+#' @param levels levels; a vector of length K.
+#' @param isRankBased passed from ClippedFT; boolean.
+#'
+#' @return Returns a matrix of dimension T x D*K*(B+1).
+NULL
+
+.generateIndMatrix <- function(Y, pos_boot, mult_boot, levels, isRankBased) {
+    .Call('quantspec_generateIndMatrix', PACKAGE = 'quantspec', Y, pos_boot, mult_boot, levels, isRankBased)
+}
+

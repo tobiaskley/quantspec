@@ -1479,13 +1479,10 @@ setMethod(f = "getQuantilePG",
 #' 								  which means nonoverlapping blocks bootstrap, \code{"cbb"} which
 #' 									means circular bootstrap, and \code{"sb"} which stands for
 #' 								  stationary bootstrap.
-#' @param kappa_phi function to be used for generation of multipliers
-#'                 (kappa when multipliers are generated using the moving
-#'                 average approach and phi for the covariance matrix approach,
-#'                 respectively.
-#' @param mult.distr Distribution to be used for the innovations of the moving
-#'                   average or covariance matrix approach when using multiplier
-#'                   bootstrap
+#' @param bootMultipliers \code{\link{BootMultipliers}} object; has to be of type
+#'                \code{MovingAverageMultipliers} if \code{type.boot=="mult.ma"}, of
+#'                type \code{CovarianceMatrixMultipliers} if \code{type.boot=="mult.cov"}
+#' 								and of type \code{NoneMultiplier} otherwise (default).
 #' @param method  method used for computing the quantile regression estimates.
 #'                 The choice is passed to \code{qr}; see the
 #'                 documentation of \code{quantreg} for details.
@@ -1526,8 +1523,7 @@ smoothedPG <- function(
     B = 0,
     l = 1,
     type.boot=c("none","mbb","nbb","cbb","sb","mult.ma","mult.cov"),
-    kappa_phi = kappaT,
-    mult.distr = rnorm,
+    bootMultipliers = noneMultipliers(lenTS(Y)),
     method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
     parallel=FALSE,
     weight = kernelWeight()) {
@@ -1543,9 +1539,7 @@ smoothedPG <- function(
     Y <- coredata(object)
   } else if (class(object) == "QuantilePG") {
     versConstr <- 2
-    
-    
-    
+   
     if (!hasArg(frequencies)) {
       Y <- object@freqRep@Y
       frequencies <- 2*pi/lenTS(Y) * 0:(lenTS(Y)-1)
@@ -1574,7 +1568,7 @@ smoothedPG <- function(
         levels.1 = levels.1,
         levels.2 = levels.2,
         isRankBased = isRankBased,
-        type=type, B=B, l=l, type.boot = type.boot, kappa_phi = kappa_phi, mult.distr = mult.distr,
+        type=type, B=B, l=l, type.boot = type.boot, bootMultipliers = bootMultipliers,
         method = method, parallel = parallel)
   } else if (versConstr == 2) {
     qPG <- object

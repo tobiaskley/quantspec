@@ -93,10 +93,10 @@ setMethod(f = "getMultipliers",
       res  <- c()
       for (i in 1:N) {
         # res <- c(res, sum(w * Z2[i + 1:l - 1]))
-        res <- cbind(res, w %*% Z[i + 1:l - 1, ])
+        res <- rbind(res, w %*% Z[i + 1:l - 1, ])
       }
       
-      return(t(res) / sum(w^2)^(1/2) )
+      return(res / sum(w^2)^(1/2) )
     }
 )
 
@@ -125,6 +125,12 @@ movingAverageMultipliers <- function( l, N, kappa, distrInnov = rnorm ) {
   # TODO: Add more checks
   if (!(is.wholenumber(l) && is.wholenumber(N) && 0 < l && l <= N)) {
     stop("'l' and 'N' need to be specified as integers with 0 < l <= N")
+  }
+  
+  # enlarge l by +1, if even
+  if (l %% 2 == 0) {
+    message("'l' enlarged by +1, as l needs to be odd.")
+    l <- l + 1
   }
   
   obj <- new(

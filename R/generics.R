@@ -253,6 +253,12 @@ setGeneric("getQuantilePG",
 setGeneric("getBootPos",
     function(object, ...){standardGeneric("getBootPos")})
 
+#' @name generics-associations
+#' @aliases getBootMultipliers
+#' @export
+setGeneric("getBootMultipliers",
+    function(object, ...){standardGeneric("getBootMultipliers")})
+
 ## Class-QuantilePG
 
 #' @name generics-associations

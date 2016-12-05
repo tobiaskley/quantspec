@@ -340,6 +340,26 @@ setMethod(f = "getBootPos",
     }
 )
 
+################################################################################
+#' Get associated \code{\link{BootMultipliers}} from a
+#' \code{\link{FreqRep}}.
+#'
+#' @name getBootMultipliers-FreqRep
+#' @aliases getBootMultipliers,FreqRep-method
+#'
+#' @keywords Access-association-functions
+#'
+#' @param object \code{FreqRep} from which to get the
+#'                \code{\link{BootMultipliers}}.
+#' @return Returns the \code{\link{BootMultipliers}} object associated.
+################################################################################
+setMethod(f = "getBootMultipliers",
+    signature = "FreqRep",
+    definition = function(object) {
+      return(object@multipliers.boot)
+    }
+)
+
 # Always shows the frequency representation of the first component
 setMethod(f = "show",
     signature = "FreqRep",

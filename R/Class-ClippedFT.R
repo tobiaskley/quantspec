@@ -76,51 +76,112 @@ setMethod(
       
       levels <- sort(levels)
       
-      if (B > 0) {
-        pos.boot <- getPositions(.Object@positions.boot,B)
-      }
-
+      ## Create the Indicator matrix
       
-      ## This used to be an option to choose!!
-      resampleEcdf <- TRUE
+      if (class(multipliers.boot) == "NoneMultipliers") {
       
-      for (b in 0:B) {
-        
-        ## If bootstrap with resampled ecdf
-        if (b > 0 && resampleEcdf) {
-          pos <- pos.boot[, b]
-        } else {
-          pos <- 1:T
+        ## VERSION 1 - works without multipliers!
+        ## This used to be an option to choose!!
+        resampleEcdf <- TRUE
+  
+        if (B > 0) {
+          pos.boot <- getPositions(.Object@positions.boot, B)
+          mult.boot <- getMultipliers(.Object@multipliers.boot, B)
         }
         
-        # Convert Y to "pseudo data", if isRankBased == TRUE
-        if (isRankBased) {
-          data <- apply(Y[pos,, drop=F], 2, rank, ties.method = "max") / T
-        } else {
-          data <- Y[pos,, drop=F]
-        }
-        
-        for (d in 1:D) {
-          sortedData <- sort(data[,d])
+        for (b in 0:B) {
           
-          if ( (b == 0) || (b > 0 && resampleEcdf) ) {
-            # Fill the matrix
-            t <- 1
-            for (i in 1:K) {
-              while (t <= T && sortedData[t] <= levels[i]) {t <- t+1}
-              if (t > 1) {
-                IndMatrix[1:(t-1), b*(K*D)+(d-1)*K+i] <- 1
-              }
-            }
-            IndMatrix[, b*(K*D)+(d-1)*K+1:K] <- IndMatrix[rank(data[,d]), b*(K*D)+(d-1)*K+1:K]
+          ## If bootstrap with resampled ecdf
+          if (b > 0 && resampleEcdf) {
+            pos <- pos.boot[, b]
+          } else {
+            pos <- 1:T
           }
+          
+          # Convert Y to "pseudo data", if isRankBased == TRUE
+          if (isRankBased) {
+            data <- apply(Y[pos,, drop=F], 2, rank, ties.method = "max") / T
+          } else {
+            data <- Y[pos,, drop=F]
+          }
+          
+          for (d in 1:D) {
+            sortedData <- sort(data[,d])
+            
+            if ( (b == 0) || (b > 0 && resampleEcdf) ) {
+              # Fill the matrix
+              t <- 1
+              for (i in 1:K) {
+                while (t <= T && sortedData[t] <= levels[i]) {t <- t+1}
+                if (t > 1) {
+                  IndMatrix[1:(t-1), b*(K*D)+(d-1)*K+i] <- 1
+                }
+              }
+              IndMatrix[, b*(K*D)+(d-1)*K+1:K] <- IndMatrix[rank(data[,d]), b*(K*D)+(d-1)*K+1:K]
+            }
+          }
+          
+          if ( b > 0  && !resampleEcdf ) {
+            IndMatrix[,(b*(K*D)+1):((b+1)*(K*D))] <- IndMatrix[pos.boot[,b],1:(K*D)]
+          }
+  
         }
-        
-        if ( b > 0  && !resampleEcdf ) {
-          IndMatrix[,(b*(K*D)+1):((b+1)*(K*D))] <- IndMatrix[pos.boot[,b],1:(K*D)]
+        ## END VERSION 1
+        } else {
+
+#      ## VERSION 2 - naive!
+#
+#      if (B > 0) {
+#        pos.boot <- getPositions(.Object@positions.boot, B)
+#        mult.boot <- getMultipliers(.Object@multipliers.boot, B)
+#      }
+#
+#      for (b in 0:B) {
+#        
+#          if (b > 0) {
+#            pos <- pos.boot[, b]
+#            mult <- mult.boot[, b]          
+#          } else {
+#            pos <- 1:T
+#            mult <- rep(1,T)
+#          }  
+#        
+#        for (d in 1:D) {
+#          
+#          if (isRankBased) {
+#            myEdf <- function(x) {
+#              myEdf.simple <- function(x) {return( sum( mult * (Y[pos, d] <= x) ) / T )}
+#              return( Vectorize(myEdf.simple)(x) )
+#            }
+#          } else {
+#            myEdf <- function(x) {
+#              return( x )
+#            }
+#          }
+#          
+#          for (i in 1:K) {
+#            for (t in 1:T) {
+#              IndMatrix[t, b*(K*D)+(d-1)*K+i] <- mult[t] * ( myEdf(Y[pos[t],d]) <= levels[i] )
+#            }
+#          }
+#        }
+#      }
+#      ## END VERSION 2
+
+        ## VERSION 3 - implemented via Rcpp
+  
+        pos.boot <- matrix(0:(T-1), ncol=1)
+        mult.boot <- matrix(rep(1,T), ncol=1)
+        if (B > 0) {
+          pos.boot <- cbind(pos.boot, getPositions(.Object@positions.boot, B) - 1)
+          mult.boot <- cbind(mult.boot, getMultipliers(.Object@multipliers.boot, B))
         }
+  
+        IndMatrix <- .generateIndMatrix(Y, pos.boot, mult.boot, levels, isRankBased)
+        ## END VERSION 3
 
       }
+
       cfft <- mvfft(IndMatrix)
       
       # Modify object to return (only requested frequencies!)
@@ -166,13 +227,10 @@ setMethod(
 #' 								  which means nonoverlapping blocks bootstrap, \code{"cbb"} which
 #' 									means circular bootstrap, and \code{"sb"} which stands for
 #' 								  stationary bootstrap.
-#' @param kappa_phi function to be used for generation of multipliers
-#'                 (kappa when multipliers are generated using the moving
-#'                 average approach and phi for the covariance matrix approach,
-#'                 respectively.
-#' @param mult.distr Distribution to be used for the innovations of the moving
-#'                   average or covariance matrix approach when using multiplier
-#'                   bootstrap
+#' @param bootMultipliers \code{\link{BootMultipliers}} object; has to be of type
+#'                \code{MovingAverageMultipliers} if \code{type.boot=="mult.ma"}, of
+#'                type \code{CovarianceMatrixMultipliers} if \code{type.boot=="mult.cov"}
+#' 								and of type \code{NoneMultiplier} otherwise (default).
 #'
 #' @return Returns an instance of \code{ClippedFT}.
 #'
@@ -186,8 +244,7 @@ clippedFT <- function( Y,
     B = 0,
     l = 0,
     type.boot = c("none","mbb","nbb","cbb","sb","mult.ma","mult.cov"),
-    kappa_phi = kappaT,
-    mult.distr = rnorm) {
+    bootMultipliers = noneMultipliers(lenTS(Y))) {
   
   # Verify if all parameters are valid
   Y <- timeSeriesValidator(Y)
@@ -211,26 +268,41 @@ clippedFT <- function( Y,
   switch(type.boot,
       "none" = {
         bootPos <- movingBlocks(lenTS(Y),lenTS(Y))
-        bootMultipliers <- noneMultipliers(lenTS(Y))},
+        if (class(bootMultipliers) != "NoneMultipliers") {
+          stop("bootMultipliers has to be of type NoneMultipliers if type.boot=='none'.")
+        }},
       "mbb" = {
         bootPos <- movingBlocks(l,lenTS(Y))
-        bootMultipliers <- noneMultipliers(lenTS(Y))},
+        if (class(bootMultipliers) != "NoneMultipliers") {
+          stop("bootMultipliers has to be of type NoneMultipliers if type.boot=='mbb'.")
+        }},
       "nbb" = {
         bootPos <- nonoverlappingBlocks(l,lenTS(Y))
-        bootMultipliers <- noneMultipliers(lenTS(Y))},
+        if (class(bootMultipliers) != "NoneMultipliers") {
+          stop("bootMultipliers has to be of type NoneMultipliers if type.boot=='nbb'.")
+        }},
       "cbb" = {
         bootPos <- circularBlocks(l,lenTS(Y))
-        bootMultipliers <- noneMultipliers(lenTS(Y))},
+        if (class(bootMultipliers) != "NoneMultipliers") {
+          stop("bootMultipliers has to be of type NoneMultipliers if type.boot=='cbb'.")
+        }},
       "sb" = {
         bootPos <- stationaryBlocks(l,lenTS(Y))
-        bootMultipliers <- noneMultipliers(lenTS(Y))},
+        if (class(bootMultipliers) != "NoneMultipliers") {
+          stop("bootMultipliers has to be of type NoneMultipliers if type.boot=='sb'.")
+        }},
       "mult.ma" = {
         bootPos <- movingBlocks(lenTS(Y),lenTS(Y))
-        bootMultipliers <- movingAverageMultipliers(l, lenTS(Y), kappa_phi, mult.distr)},
+        if (class(bootMultipliers) != "MovingAverageMultipliers") {
+          stop("bootMultipliers has to be of type MovingAverageMultipliers if type.boot=='mult.ma'.")
+        }},
       "mult.cov" = {
         bootPos <- movingBlocks(lenTS(Y),lenTS(Y))
-        bootMultipliers <- covarianceMatrixMultipliers(l, lenTS(Y), kappa_phi, mult.distr)}
+        if (class(bootMultipliers) != "CovarianceMatrixMultipliers") {
+          stop("bootMultipliers has to be of type CovarianceMatrixMultipliers if type.boot=='mult.cov'.")
+        }}
   )
+  bootMult <- bootMultipliers
   
   freqRep <- new(
       Class = "ClippedFT",

@@ -7,8 +7,8 @@
 \usage{
 clippedFT(Y, frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1), levels = 0.5,
   isRankBased = TRUE, B = 0, l = 0, type.boot = c("none", "mbb", "nbb",
-  "cbb", "sb", "mult.ma", "mult.cov"), kappa_phi = kappaT,
-  mult.distr = rnorm)
+  "cbb", "sb", "mult.ma", "mult.cov"),
+  bootMultipliers = noneMultipliers(lenTS(Y)))
 }
 \arguments{
 \item{Y}{A \code{matrix} of real numbers containing the time series from
@@ -37,14 +37,10 @@ and \code{l} as specified. Further options are \code{"nbb"},
                    means circular bootstrap, and \code{"sb"} which stands for
                  stationary bootstrap.}
 
-\item{kappa_phi}{function to be used for generation of multipliers
-(kappa when multipliers are generated using the moving
-average approach and phi for the covariance matrix approach,
-respectively.}
-
-\item{mult.distr}{Distribution to be used for the innovations of the moving
-average or covariance matrix approach when using multiplier
-bootstrap}
+\item{bootMultipliers}{\code{\link{BootMultipliers}} object; has to be of type
+\code{MovingAverageMultipliers} if \code{type.boot=="mult.ma"}, of
+type \code{CovarianceMatrixMultipliers} if \code{type.boot=="mult.cov"}
+                 and of type \code{NoneMultiplier} otherwise (default).}
 }
 \value{
 Returns an instance of \code{ClippedFT}.
