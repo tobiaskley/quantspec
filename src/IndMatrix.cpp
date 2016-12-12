@@ -77,8 +77,8 @@ NumericMatrix generateIndMatrix(NumericMatrix Y, NumericMatrix pos_boot, Numeric
                   FhatXt = 0;
                   for (int j = 0; j < T; j++) {
                      if (Y_star[j] <= Y_star[t]) {
-                        FhatXt += mult_boot(j, b) * mult_boot(j, b);
-                        // FhatXt += 1;
+                        // FhatXt += mult_boot(j, b) * mult_boot(j, b);
+                        FhatXt += 1;
                      } 
                   }
                   FhatXt /= T;
