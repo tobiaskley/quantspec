@@ -77,7 +77,8 @@ NumericMatrix generateIndMatrix(NumericMatrix Y, NumericMatrix pos_boot, Numeric
                   FhatXt = 0;
                   for (int j = 0; j < T; j++) {
                      if (Y_star[j] <= Y_star[t]) {
-                        FhatXt += mult_boot(j, b);
+                        FhatXt += mult_boot(j, b) * mult_boot(j, b);
+                        // FhatXt += 1;
                      } 
                   }
                   FhatXt /= T;
@@ -87,9 +88,11 @@ NumericMatrix generateIndMatrix(NumericMatrix Y, NumericMatrix pos_boot, Numeric
                
                idx = b*(K*D) + d*K + i;
                if (FhatXt <= levels[i]) {
-                  res(t, idx) = mult_boot(t, b);
+                  // res(t, idx) = mult_boot(t, b);
+                  res(t, idx) = mult_boot(t, b) * (1 - levels[i]);
                } else {
-                  res(t, idx) = 0;
+                  // res(t, idx) = 0;
+                  res(t, idx) = mult_boot(t, b) * (0 - levels[i]);
                }
             }
          }

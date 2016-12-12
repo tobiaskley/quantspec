@@ -1716,7 +1716,7 @@ setMethod(f = "plot",
               j.max <- round(max(frequencies*2^8/(2*pi)))
               freq.csd <- 2*pi*(j.min:j.max)/2^8
               csd <- getValues(qsd, frequencies = freq.csd,
-                  levels.1=levels, levels.2=levels)
+                  levels.1=levels, levels.2=levels, d1=1, d2=1)
             }
             
             #text.headline <- x@weight@descr

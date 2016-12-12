@@ -111,10 +111,16 @@ test_that("clippedFT works as expected (with bootstrap)",{
       Fn <- ecdf(Y1[pos])
       Y3 <- Fn(Y1[pos])
 
+      # Stanislav's version
       Fn <- function(x) {
-        return(sum(mult[, 1] * (Y1 <= x)) / length(Y1))
+        return(sum(mult[, 1]^2 * (Y1 <= x)) / length(Y1))
+#        return(sum((Y1 <= x)) / length(Y1))
       }
-      Y4 <- Fn(Y1)
+      
+      # (My) naive version:
+      #Fn <- ecdf(Y1)
+      Y4 <- Vectorize(Fn)(Y1)
+      #Y4 <- Fn(Y1)
       
       
       # Compute cFT 'by hand':
@@ -128,7 +134,7 @@ test_that("clippedFT works as expected (with bootstrap)",{
           res1[f,l] <- sum((Y1[pos] <= levels[l]) * exp(-1*ii*(0:63)*freq[f]))
           res2[f,l] <- sum((Y2 <= levels[l]) * exp(-1*ii*(0:63)*freq[f]))
           res3[f,l] <- sum((Y3 <= levels[l]) * exp(-1*ii*(0:63)*freq[f]))
-          res4[f,l] <- sum(mult[,1] * (Y4 <= levels[l]) * exp(-1*ii*(0:63)*freq[f]))
+          res4[f,l] <- sum(mult[,1] * ( (Y4 <= levels[l]) - levels[l]) * exp(-1*ii*(0:63)*freq[f]))
         }
       }
       
