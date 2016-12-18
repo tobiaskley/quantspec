@@ -113,7 +113,7 @@ test_that("clippedFT works as expected (with bootstrap)",{
 
       # Stanislav's version
       Fn <- function(x) {
-#        return(sum(mult[, 1]^2 * (Y1 <= x)) / length(Y1))
+#        return(sum(mult[, 1] * (Y1 <= x)) / length(Y1))
         return(sum((Y1 <= x)) / length(Y1))
       }
       
