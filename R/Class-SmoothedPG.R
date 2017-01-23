@@ -1340,40 +1340,53 @@ setMethod(f = "getPointwiseCIs",
           # TODO: Error Msg ausgeben falls B == 0
           B <- object@qPG@freqRep@B
           # TODO: fix...
-          
-          switch(quantity,
-              "spectral density" = {
-                v <- getValues(object,
-                    frequencies = frequencies,
-                    levels.1 = levels.1,
-                    levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=FALSE]
-                
-              },
-              "coherency" = {
-                v <- getCoherency(object,
-                    frequencies = frequencies,
-                    levels.1 = levels.1,
-                    levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=FALSE]
-              },
-              "coherence" = {
-                v <- getCoherency(object,
-                    frequencies = frequencies,
-                    levels.1 = levels.1,
-                    levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=FALSE]
-                v <- abs(v)^2
-              })
-          
-          v <- getValues(object,
-              frequencies = frequencies,
-              levels.1 = levels.1,
-              levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=FALSE]
+#          
+#          switch(quantity,
+#              "spectral density" = {
+#                v <- getValues(object,
+#                    frequencies = frequencies,
+#                    levels.1 = levels.1,
+#                    levels.2 = levels.2, d1=d1, d2=d2)[,,,2:(B+1), drop=FALSE]
+#                
+#              },
+#              "coherency" = {
+#                v <- getCoherency(object,
+#                    frequencies = frequencies,
+#                    levels.1 = levels.1,
+#                    levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=FALSE]
+#              },
+#              "coherence" = {
+#                v <- getCoherency(object,
+#                    frequencies = frequencies,
+#                    levels.1 = levels.1,
+#                    levels.2 = levels.2, d1=1, d2=1)[,,,2:(B+1), drop=FALSE]
+#                v <- abs(v)^2
+#              })
+
           uQuantile <- function(x) {complex(real = quantile(Re(x),1-alpha/2),
                 imaginary = quantile(Im(x),1-alpha/2))}
           lQuantile <- function(x) {complex(real = quantile(Re(x),alpha/2),
                 imaginary = quantile(Im(x),alpha/2))}
           
-          upperCIs <- apply(v, c(1,2,3), uQuantile)
-          lowerCIs <- apply(v, c(1,2,3), lQuantile)
+          if (D1 == 1 && D2 == 1) {
+            
+            v <- getValues(object,
+                frequencies = frequencies,
+                levels.1 = levels.1,
+                levels.2 = levels.2, d1=d1, d2=d2)[,,,2:(B+1), drop=FALSE]
+            
+            upperCIs <- apply(v, c(1,2,3), uQuantile)
+            lowerCIs <- apply(v, c(1,2,3), lQuantile)
+          } else {
+            
+            v <- getValues(object,
+                frequencies = frequencies,
+                levels.1 = levels.1,
+                levels.2 = levels.2, d1=d1, d2=d2)[,,,,,2:(B+1), drop=FALSE]
+            
+            upperCIs <- apply(v, c(1,2,3,4,5), uQuantile)
+            lowerCIs <- apply(v, c(1,2,3,4,5), lQuantile)
+          }
           
         }
       }
