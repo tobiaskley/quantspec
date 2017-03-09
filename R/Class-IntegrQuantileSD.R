@@ -44,7 +44,7 @@ setMethod(
     f = "initialize",
     signature = "IntegrQuantileSD",
     definition = function(.Object, qsd) {
-      cat("~~~ IntegrQuantileSD: initializator ~~~ \n")
+      # cat("~~~ IntegrQuantileSD: initializator ~~~ \n")
 
       .Object@qsd <- qsd
       N <- getN(qsd)
@@ -56,7 +56,14 @@ setMethod(
       K1 <- length(getLevels(.Object,1))
       K2 <- length(getLevels(.Object,2))
 
-      .Object@values <- (2*pi/N) * apply(getValues(qsd, frequencies = freq), c(2,3), cumsum)
+      #TODO: check the next two lines again!
+      ts <- qsd@ts
+      Y_test <- timeSeriesValidator(ts(2))
+      P <- dim(Y_test)[2]
+      
+      res <- array(getValues(qsd, frequencies = freq), dim = c(N, P, K1, P, K2))
+      
+      .Object@values <- (2*pi/N) * apply(res, c(2,3,4,5), cumsum)
 
       return(.Object)
     }
@@ -84,6 +91,9 @@ setMethod(
 #' @param frequencies a vector of frequencies for which to get the values
 #' @param levels.1 the first vector of levels for which to get the values
 #' @param levels.2 the second vector of levels for which to get the values
+#' @param d1 optional parameter that determine for which j1 to return the
+#' 					 data; may be a vector of elements 1, ..., D
+#' @param d2 same as d1, but for j2
 #'
 #' @return Returns data from the array \code{values} that's a slot of
 #'          \code{object}.
@@ -96,7 +106,9 @@ setMethod(f = "getValues",
     definition = function(object,
         frequencies=2*pi*(0:(getN(object@qsd)-1))/getN(object@qsd),
         levels.1=getLevels(object,1),
-        levels.2=getLevels(object,2)) {
+        levels.2=getLevels(object,2),
+        d1 = 1:(dim(object@values)[2]),
+        d2 = 1:(dim(object@values)[4])) {
 
       # workaround: default values don't seem to work for generic functions?
       if (!hasArg(frequencies)) {
@@ -107,6 +119,12 @@ setMethod(f = "getValues",
       }
       if (!hasArg("levels.2")) {
         levels.2 <- getLevels(object,2)
+      }
+      if (!hasArg("d1")) {
+        d1 <- 1:(dim(object@values)[2])
+      }
+      if (!hasArg("d2")) {
+        d2 <- 1:(dim(object@values)[4])
       }
       # end: workaround
 
@@ -151,7 +169,23 @@ setMethod(f = "getValues",
       # Select rows
       r.pos <- closest.pos(oF, f)
 
-      return(object@values[r.pos,c.1.pos,c.2.pos])
+      J <- length(frequencies)
+      K1 <- length(levels.1)
+      K2 <- length(levels.2)
+      D1 <- length(d1)
+      D2 <- length(d2)
+      
+      if (D1 == 1 && D2 == 1) {
+        final.dim.res <- c(J, K1, K2)
+      } else {
+        final.dim.res <- c(J, D1, K1, D2, K2)
+      }
+      
+      res <- object@values[r.pos,d1,c.1.pos,d2,c.2.pos]
+      res <- array(res, dim=final.dim.res)
+      
+      return(res)
+
     }
 )
 
@@ -302,7 +336,7 @@ tryCatch({
 
     K <- length(levels)
     values <- getValues(x, frequencies = frequencies,
-                        levels.1=levels, levels.2=levels)
+                        levels.1=levels, levels.2=levels, d1=1, d2=1)
 
     p <- K
     M <- matrix(1:p^2, ncol=p)
