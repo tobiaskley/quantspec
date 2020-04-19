@@ -1,10 +1,10 @@
 Package: quantspec
-Version: 1.2-1.99
+Version: 1.2-2
 Encoding: UTF-8
-Date: 2016-03-28
+Date: 2020-04-19
 Title: Quantile-Based Spectral Analysis of Time Series
 Authors@R: c(person("Tobias", "Kley", role=c("aut","cre"),
-    email = "t.kley@lse.ac.uk"),
+    email = "tobias.kley@bristol.ac.uk"),
     person("Stefan", "Birr",  role = c("ctb"), 
 	comment = "Contributions to lag window estimation", email = "stefan.birr@rub.de"))
 Depends:
