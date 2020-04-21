@@ -27,4 +27,3 @@ is.wholenumber( x ) #-->  TRUE FALSE TRUE ...
 }
 }
 \keyword{internals}
-

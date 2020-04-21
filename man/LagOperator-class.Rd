@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-LagOperator.R
 \docType{class}
 \name{LagOperator-class}
-\alias{LagOperator}
 \alias{LagOperator-class}
+\alias{LagOperator}
 \title{Interface Class to access different types of operators on time series.}
 \description{
 \code{LagOperator} is an S4 class that provides a common interface to
@@ -39,5 +39,5 @@ replicates of the time series.}
 
 \item{\code{B}}{Number of bootstrap replications to perform.}
 }}
-\keyword{S4-classes}
 
+\keyword{S4-classes}

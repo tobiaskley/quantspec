@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-ClippedFT.R
 \docType{class}
 \name{ClippedFT-class}
-\alias{ClippedFT}
 \alias{ClippedFT-class}
+\alias{ClippedFT}
 \title{Class for Fourier transform of the clipped time series.}
 \description{
 \code{ClippedFT} is an S4 class that implements the necessary
@@ -38,4 +38,3 @@ Quantile Cross-Spectral Measures of Dependence between Economic Variables.
 For an example see \code{\link{FreqRep}}.
 }
 \keyword{S4-classes}
-

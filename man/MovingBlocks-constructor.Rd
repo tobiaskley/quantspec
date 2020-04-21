@@ -19,4 +19,3 @@ Returns an instance of \code{MovingBlocks}.
 Create an instance of the \code{\link{MovingBlocks}} class.
 }
 \keyword{Constructors}
-

@@ -5,8 +5,15 @@
 \alias{clippedFT}
 \title{Create an instance of the \code{\link{ClippedFT}} class.}
 \usage{
-clippedFT(Y, frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1), levels = 0.5,
-  isRankBased = TRUE, B = 0, l = 0, type.boot = c("none", "mbb"))
+clippedFT(
+  Y,
+  frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1),
+  levels = 0.5,
+  isRankBased = TRUE,
+  B = 0,
+  l = 0,
+  type.boot = c("none", "mbb")
+)
 }
 \arguments{
 \item{Y}{A \code{matrix} of real numbers containing the time series from
@@ -47,4 +54,3 @@ be the undisturbed time series.
 For an example see \code{\link{FreqRep}}.
 }
 \keyword{Constructors}
-

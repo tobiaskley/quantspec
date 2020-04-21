@@ -1,3 +1,11 @@
+quantspec 1.2-2
+===============
+
+ o  Fixed a bug relating to matrix now also inheriting from array.
+ o  Updated author's email address.
+ o  Updated references throughout documentation.
+
+
 quantspec 1.2-1
 ===============
 

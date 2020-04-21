@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-Weight.R
 \docType{class}
 \name{Weight-class}
-\alias{Weight}
 \alias{Weight-class}
+\alias{Weight}
 \title{Interface Class to access different types of weighting functions.}
 \description{
 \code{Weights} is an S4 class that provides a common interface to
@@ -22,5 +22,5 @@ Currently three implementations are available:
 
 \item{\code{descr}}{a description to be used in some plots.}
 }}
-\keyword{S4-classes}
 
+\keyword{S4-classes}

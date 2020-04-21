@@ -5,10 +5,19 @@
 \alias{quantilePG}
 \title{Create an instance of the \code{\link{QuantilePG}} class.}
 \usage{
-quantilePG(Y, frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1),
-  levels.1 = 0.5, levels.2 = levels.1, isRankBased = TRUE,
-  type = c("clipped", "qr"), type.boot = c("none", "mbb"), B = 0, l = 0,
-  method = c("br", "fn", "pfn", "fnc", "lasso", "scad"), parallel = FALSE)
+quantilePG(
+  Y,
+  frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1),
+  levels.1 = 0.5,
+  levels.2 = levels.1,
+  isRankBased = TRUE,
+  type = c("clipped", "qr"),
+  type.boot = c("none", "mbb"),
+  B = 0,
+  l = 0,
+  method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
+  parallel = FALSE
+)
 }
 \arguments{
 \item{Y}{A \code{vector} of real numbers containing the time series from
@@ -59,4 +68,3 @@ would never be called. If \code{B>0} then each bootstrap replication would
 be the undisturbed time series.
 }
 \keyword{Constructors}
-

@@ -13,7 +13,6 @@
 #' @docType data
 #'
 #' @references Yahoo! Finance Website
-#' \url{http://finance.yahoo.com/q/hp?s=^GSPC+Historical+Prices}
 #' @keywords data
 #'
 #' @examples

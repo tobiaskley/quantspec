@@ -5,7 +5,9 @@
 \alias{data-wheatprices}
 \alias{wheatprices}
 \title{Beveridge's Wheat Price Index (detrended and demeaned), 1500--1869}
-\format{A univariate time series \eqn{(z_t)} with 370 observations; a \code{ts} object.}
+\format{
+A univariate time series \eqn{(z_t)} with 370 observations; a \code{ts} object.
+}
 \description{
 Contains a detrended and demeaned version of the well-known Beveridge Wheat
 Price Index which gives annual price data from 1500 to 1869, averaged over
@@ -32,4 +34,3 @@ Granger, C. W. J. (1964). \emph{Spectral Analysis of Economic Time Series}.
 Princeton University Press, Princeton, NJ.
 }
 \keyword{data}
-

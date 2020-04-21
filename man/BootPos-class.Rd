@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-BootPos.R
 \docType{class}
 \name{BootPos-class}
-\alias{BootPos}
 \alias{BootPos-class}
+\alias{BootPos}
 \title{Class for Generation of Bootstrapped Replications of a Time Series.}
 \description{
 \code{BootPos} is an S4 class that provides a common interface
@@ -31,9 +31,9 @@ Currently the following implementations are available:
 
 \item{\code{N}}{number of available observations to bootstrap from}
 }}
+
 \references{
 Lahiri, S. N. (1999). Theoretical Comparisons of Block Bootstrap Methods.
 \emph{The Annals of Statistics}, \bold{27}(1), 386--404.
 }
 \keyword{S4-classes}
-

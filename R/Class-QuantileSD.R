@@ -513,7 +513,7 @@ setMethod(f = "getCoherency",
 #      }
 #
 
-    #if (class(object@weight) != "KernelWeight") {
+    #if (!inherits(object@weight, "KernelWeight")) {
     #  error("Coherency can only be determined if weight is of type KernelWeight.")
     #}
     d <- union(d1,d2)

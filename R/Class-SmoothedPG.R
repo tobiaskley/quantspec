@@ -85,9 +85,9 @@ setMethod(
       
       # Transform all frequencies to Fourier frequencies
       # and remove redundancies
-      if (class(weight) == "KernelWeight") {
+      if (inherits(weight, "KernelWeight")) {
         freq <- frequenciesValidator(frequencies, N, steps=1:6)
-      } else if (class(weight) == "SpecDistrWeight") {
+      } else if (inherits(weight, "SpecDistrWeight")) {
         freq <- frequenciesValidator(frequencies, N, steps=c(1:3,5:6))
       } else {
         stop("Cannot handle this type of Weight object.")
@@ -114,7 +114,7 @@ setMethod(
       
       .Object@values <- array(0, dim=c(J,P,K1,P,K2,B+1))
       
-      if (class(weight) == "KernelWeight") {
+      if (inherits(weight, "KernelWeight")) {
         
         WW <- getValues(.Object@weight, N=N)
         Wnj <- weight@env$Wnj
@@ -144,7 +144,7 @@ setMethod(
           .Object@values[which(freq == 0),,,,,] <- (2*pi/N) * res
         }
         rm(II)
-      } else if (class(weight) == "SpecDistrWeight") {
+      } else if (inherits(weight, "SpecDistrWeight")) {
         if (max(freq) > 0) {
           
           II <- getValues(.Object@qPG, frequencies = 2*pi*(1:(N-1))/N,
@@ -289,7 +289,7 @@ setMethod(f = "getValues",
       res <- array(dim=c(J, D1, K1, D2, K2, object@qPG@freqRep@B+1))
       
       
-      if (class(object@weight) == "KernelWeight") {
+      if (inherits(object@weight, "KernelWeight")) {
         
         # Select rows
         r1.pos <- closest.pos(oF, f[f <= pi])
@@ -302,7 +302,7 @@ setMethod(f = "getValues",
           res[which(f > pi),,,,,] <- Conj(object@values[r2.pos,d1,c.1.pos,d2,c.2.pos,])
         }
         
-      } else if (class(object@weight) == "SpecDistrWeight") {
+      } else if (inherits(object@weight, "SpecDistrWeight")) {
         # Select rows
         r.pos <- closest.pos(oF, f)
         res[,,,,,] <- object@values[r.pos,,c.1.pos,,c.2.pos,]
@@ -388,7 +388,7 @@ setMethod(f = "getCoherency",
       res <- array(dim=c(J, D1, K1, D2, K2, object@qPG@freqRep@B+1))
       
       
-      if (class(object@weight) != "KernelWeight") {
+      if (!inherits(object@weight, "KernelWeight")) {
         stop("Coherency can only be determined if weight is of type KernelWeight.")
       }
       d <- union(d1,d2)
@@ -490,7 +490,7 @@ setMethod(f = "getCoherencySdNaive",
         type = c("1", "2"),
         impl=c("R","C")) {
       
-      if (class(getWeight(object)) != "KernelWeight") {
+      if (!inherits(getWeight(object), "KernelWeight")) {
         stop("getSdNaive currently only available for 'KernelWeight'.")
       }
       
@@ -824,7 +824,7 @@ setMethod(f = "getSdNaive",
         d2 = 1:(dim(object@values)[4]),
         impl=c("R","C")) {
       
-      if (class(getWeight(object)) != "KernelWeight") {
+      if (!inherits(getWeight(object), "KernelWeight")) {
         stop("getSdNaive currently only available for 'KernelWeight'.")
       }
       
@@ -1106,7 +1106,7 @@ setMethod(f = "getSdBoot",
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2)) {
       
-      if (class(getWeight(object)) != "KernelWeight") {
+      if (!inherits(getWeight(object), "KernelWeight")) {
         stop("getSdBoot currently only available for 'KernelWeight'.")
       }
       
@@ -1520,16 +1520,16 @@ smoothedPG <- function(
     l = 1,
     weight = kernelWeight()) {
   
-  if (class(object) == "numeric" | class(object) == "matrix") {
+  if (inherits(object, "numeric") | inherits(object, "matrix")) {
     versConstr <- 1
     Y <- object
-  } else if (class(object) == "ts") {
+  } else if (inherits(object, "ts")) {
     versConstr <- 1
     Y <- object[1:length(object)]
-  } else if (class(object) == "zoo") {
+  } else if (inherits(object, "zoo")) {
     versConstr <- 1
     Y <- coredata(object)
-  } else if (class(object) == "QuantilePG") {
+  } else if (inherits(object, "QuantilePG")) {
     versConstr <- 2
     
     

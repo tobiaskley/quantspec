@@ -12,7 +12,7 @@ NULL
 #'    \cr Package: \tab quantspec
 #'    \cr Type:    \tab Package
 #'    \cr Version: \tab 1.2-2
-#'    \cr Date:    \tab 2020-04-19
+#'    \cr Date:    \tab 2020-04-21
 #'    \cr License: \tab GPL (>= 2)
 #'  }
 #'
@@ -103,7 +103,7 @@ NULL
 #' @references
 #' Kley, T. (2014a). Quantile-Based Spectral Analysis: Asymptotic Theory and
 #' Computation. Ph.D. Dissertation, Ruhr University Bochum.
-#' \url{http://www-brs.ub.ruhr-uni-bochum.de/netahtml/HSS/Diss/KleyTobias/}.
+#' \url{https://hss-opus.ub.ruhr-uni-bochum.de/opus4/frontdoor/index/index/docId/3894}.
 #'
 #' Kley, T. (2016). Quantile-Based Spectral Analysis in an Object-Oriented
 #' Framework and a Reference Implementation in R: The quantspec Package.
@@ -119,8 +119,9 @@ NULL
 #' \emph{Bernoulli}, \bold{22}(3), 1770--1807.
 #' [cf. \url{http://arxiv.org/abs/1401.8104}]
 #' 
-#' Barunik, J. & Kley, T. (2015).
-#' Quantile Cross-Spectral Measures of Dependence between Economic Variables.
+#' Barunik, J. & Kley, T. (2019).
+#' Quantile Coherency: A General Measure for Dependence between Cyclical
+#' Economic Variables. \emph{Econometrics Journal}, \bold{22}, 131--152. 
 #' [cf. \url{http://arxiv.org/abs/1510.06946}]
 #'
 #' Oracle (2015). Coding conventions of the Java Programming Language.

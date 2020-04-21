@@ -59,4 +59,3 @@ res <- frequenciesValidator(freq, N=10, steps=1:6)
 res * 10 / (2*pi) # Returns: [1] 1 2 3 5
 }
 \keyword{Validator-functions}
-

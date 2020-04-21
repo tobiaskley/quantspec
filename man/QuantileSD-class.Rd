@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-QuantileSD.R
 \docType{class}
 \name{QuantileSD-class}
-\alias{QuantileSD}
 \alias{QuantileSD-class}
+\alias{QuantileSD}
 \title{Class for a simulated quantile (i. e., Laplace or copula)
 density kernel.}
 \description{
@@ -64,6 +64,7 @@ periodograms}
 \item{\code{stdError}}{an \code{array} used to store the estimated standard error of the mean
 of the simulated quantile periodograms}
 }}
+
 \examples{
 ## This script can be used to create and store a QuantileSD object
 
@@ -142,4 +143,3 @@ Examples for implementations of functions \code{ts} can be found at:
 \code{\link{ts-models}}.
 }
 \keyword{S4-classes}
-

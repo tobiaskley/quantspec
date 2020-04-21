@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-LagKernelWeight.R
 \docType{class}
 \name{LagKernelWeight-class}
-\alias{LagKernelWeight}
 \alias{LagKernelWeight-class}
+\alias{LagKernelWeight}
 \title{Class for lag window generators}
 \description{
 \code{LagKernelWeight} is an S4 class that implements a weighting function by
@@ -30,9 +30,9 @@ accessable in a call-by-reference manner:
         section.}
 }}
 }}
+
 \seealso{
 Examples for implementations of kernels \code{W} can be found at:
 \code{\link{kernels}}.
 }
 \keyword{S4-classes}
-

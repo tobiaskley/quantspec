@@ -2,30 +2,30 @@
 % Please edit documentation in R/generics.R
 \name{generics-accessors}
 \alias{generics-accessors}
-\alias{getB}
-\alias{getBw}
-\alias{getCoherency}
-\alias{getCoherencySdNaive}
-\alias{getDescr}
-\alias{getFrequencies}
-\alias{getIsRankBased}
-\alias{getLagOperator}
-\alias{getLevels}
-\alias{getMaxLag}
-\alias{getMeanPG}
-\alias{getN}
-\alias{getParallel}
-\alias{getPointwiseCIs}
-\alias{getR}
-\alias{getSdBoot}
-\alias{getSdNaive}
-\alias{getStdError}
-\alias{getTs}
-\alias{getType}
-\alias{getValues}
-\alias{getW}
-\alias{getWnj}
 \alias{getY}
+\alias{getValues}
+\alias{getCoherency}
+\alias{getIsRankBased}
+\alias{getB}
+\alias{getLagOperator}
+\alias{getMaxLag}
+\alias{getParallel}
+\alias{getFrequencies}
+\alias{getLevels}
+\alias{getMeanPG}
+\alias{getStdError}
+\alias{getN}
+\alias{getR}
+\alias{getType}
+\alias{getTs}
+\alias{getCoherencySdNaive}
+\alias{getSdNaive}
+\alias{getSdBoot}
+\alias{getPointwiseCIs}
+\alias{getDescr}
+\alias{getW}
+\alias{getBw}
+\alias{getWnj}
 \title{Generic functions for accessing attributes of objects}
 \usage{
 getY(object, ...)
@@ -93,4 +93,3 @@ For an overview on the classes of the framework, and all of their
 attributes, see the class diagrams in the package description
 [cf. \code{\link{quantspec-package}}].
 }
-

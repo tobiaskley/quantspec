@@ -5,8 +5,12 @@
 \alias{kernelWeight}
 \title{Create an instance of the \code{\link{KernelWeight}} class.}
 \usage{
-kernelWeight(W = W0, N = 1, bw = 0.1 * N^(-1/5), descr = paste("bw=",
-  round(bw, 3), ", N=", N, sep = ""))
+kernelWeight(
+  W = W0,
+  N = 1,
+  bw = 0.1 * N^(-1/5),
+  descr = paste("bw=", round(bw, 3), ", N=", N, sep = "")
+)
 }
 \arguments{
 \item{W}{A kernel function}
@@ -34,4 +38,3 @@ plot(wgt2, main="Weights determined from Epanechnikov kernel")
 \code{\link{kernels}}
 }
 \keyword{Constructors}
-

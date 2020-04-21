@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-FreqRep.R
 \docType{class}
 \name{FreqRep-class}
-\alias{FreqRep}
 \alias{FreqRep-class}
+\alias{FreqRep}
 \title{Class for Frequency Representation.}
 \description{
 \code{FreqRep} is an S4 class that encapsulates, for a multivariate time
@@ -74,6 +74,7 @@ replicates of the time series.}
 
 \item{\code{B}}{Number of bootstrap replications to perform.}
 }}
+
 \examples{
 Y       <- rnorm(32)
 freq    <- 2*pi*c(0:31)/32 
@@ -101,4 +102,3 @@ V.part   <- getValues(cFT, frequencies = 2*pi*c(0:16)/32, levels = c(0.25))
 V.part.alt <- getValues(cFT, frequencies = freq[freq <= pi], levels = c(0.25))
 }
 \keyword{S4-classes}
-

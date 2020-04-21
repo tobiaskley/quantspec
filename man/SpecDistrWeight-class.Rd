@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-SpecDistrWeight.R
 \docType{class}
 \name{SpecDistrWeight-class}
-\alias{SpecDistrWeight}
 \alias{SpecDistrWeight-class}
+\alias{SpecDistrWeight}
 \title{Class for weights to estimate integrated spectral density kernels.}
 \description{
 \code{SpecDistrWeight} is an S4 class that implements a weighting function given
@@ -18,4 +18,3 @@ The number \code{length(values)} of Fourier frequencies for which
 evoking the method \code{getValues}.
 }
 \keyword{S4-classes}
-

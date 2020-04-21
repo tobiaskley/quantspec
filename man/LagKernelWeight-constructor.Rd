@@ -5,8 +5,12 @@
 \alias{lagKernelWeight}
 \title{Create an instance of the \code{\link{LagKernelWeight}} class.}
 \usage{
-lagKernelWeight(W = WParzen, bw = K/2, K = 10, descr = paste("bw=", bw,
-  ", K=", K, sep = ""))
+lagKernelWeight(
+  W = WParzen,
+  bw = K/2,
+  K = 10,
+  descr = paste("bw=", bw, ", K=", K, sep = "")
+)
 }
 \arguments{
 \item{W}{A kernel function}
@@ -33,4 +37,3 @@ print(wgt1)
 \code{\link{kernels}}
 }
 \keyword{Constructors}
-

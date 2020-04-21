@@ -217,12 +217,12 @@ integrQuantileSD <- function(
         seed.init = 2581,
         levels.1 = 0.5, levels.2=levels.1, R = 1, quiet = FALSE) {
 
-  if (class(object) == "numeric") {
+  if (inherits(object, "numeric")) {
     N <- object
     qsd <- quantileSD(N=N, type=type, ts=ts, seed.init=seed.init,
         levels.1=levels.1, levels.2=levels.2, R=R, quiet=quiet)
 
-  } else if (class(object) == "QuantileSD") {
+  } else if (inherits(object, "QuantileSD")) {
     qsd <- object
   } else {
     stop("object is neither 'numeric', nor 'QuantileSD'.")

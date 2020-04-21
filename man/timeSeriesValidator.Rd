@@ -29,4 +29,3 @@ Y <- timeSeriesValidator(rnorm(10))
 \dontrun{Y <- timeSeriesValidator("Not a valid input")}
 }
 \keyword{Validator-functions}
-

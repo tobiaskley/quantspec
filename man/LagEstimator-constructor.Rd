@@ -5,9 +5,14 @@
 \alias{lagEstimator}
 \title{Create an instance of the \code{LagEstimator} class.}
 \usage{
-lagEstimator(Y, frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
-  levels.1 = 0.5, levels.2 = levels.1, weight = lagKernelWeight(K =
-  length(Y), bw = 100), type = c("clippedCov"))
+lagEstimator(
+  Y,
+  frequencies = 2 * pi/length(Y) * 0:(length(Y) - 1),
+  levels.1 = 0.5,
+  levels.2 = levels.1,
+  weight = lagKernelWeight(K = length(Y), bw = 100),
+  type = c("clippedCov")
+)
 }
 \arguments{
 \item{Y}{a time series (\code{numeric}, \code{ts}, or \code{zoo} object) or a 
@@ -41,4 +46,3 @@ lagOp <- clippedCov(Y,levels.1 = levels.1)
 lagEst <- lagEstimator(lagOp, weight = weight)
 }
 \keyword{Constructors}
-

@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-QRegEstimator.R
 \docType{class}
 \name{QRegEstimator-class}
-\alias{QRegEstimator}
 \alias{QRegEstimator-class}
+\alias{QRegEstimator}
 \title{Class for quantile regression-based estimates in the harmonic linear model.}
 \description{
 \code{QRegEstimator} is an S4 class that implements the necessary
@@ -36,6 +36,7 @@ documentation of \code{quantreg} for details.}
 \item{\code{parallel}}{a flag that signalizes that parallelization mechanisms from
 the package \pkg{snowfall} may be used.}
 }}
+
 \references{
 Dette, H., Hallin, M., Kley, T. & Volgushev, S. (2015).
 Of Copulas, Quantiles, Ranks and Spectra: an \eqn{L_1}{L1}-approach to
@@ -43,4 +44,3 @@ spectral analysis. \emph{Bernoulli}, \bold{21}(2), 781--831.
 [cf. \url{http://arxiv.org/abs/1111.7205}]
 }
 \keyword{S4-classes}
-

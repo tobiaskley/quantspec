@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-LagEstimator.R
 \docType{class}
 \name{LagEstimator-class}
-\alias{LagEstimator}
 \alias{LagEstimator-class}
+\alias{LagEstimator}
 \title{Class for a lag-window type estimator.}
 \description{
 For a given time series Y a lag-window estimator of the Form
@@ -34,5 +34,5 @@ accessable in a call-by-reference manner:
   \item{\code{sdNaive.done}}{a flag indicating whether \code{sdNaive}
       has been set yet.}}}
 }}
-\keyword{S4-classes}
 
+\keyword{S4-classes}

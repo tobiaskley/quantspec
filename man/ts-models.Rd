@@ -45,4 +45,3 @@ Lee, J., & Subba Rao, S. (2012).
 The Quantile Spectral Density and Comparison based Tests for Nonlinear Time
 Series. \url{http://arxiv.org/abs/1112.2759}.
 }
-

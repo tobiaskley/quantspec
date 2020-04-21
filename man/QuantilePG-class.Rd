@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-QuantilePG.R
 \docType{class}
 \name{QuantilePG-class}
-\alias{QuantilePG}
 \alias{QuantilePG-class}
+\alias{QuantilePG}
 \title{Class for a quantile (i. e., Laplace or copula) periodogram.}
 \description{
 \code{QuantilePG} is an S4 class that implements the necessary
@@ -32,6 +32,7 @@ All remarks made in the documentation of the super-class
 \item{\code{freqRep}}{a \code{\link{FreqRep}} object where the quantile periodogram will
 be based on.}
 }}
+
 \examples{
 ################################################################################
 ## This script illustrates how to work with QuantilePG objects
@@ -107,4 +108,3 @@ Quantile Spectral Processes: Asymptotic Analysis and Inference.
 [cf. \url{http://arxiv.org/abs/1401.8104}]
 }
 \keyword{S4-classes}
-

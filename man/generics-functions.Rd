@@ -2,8 +2,8 @@
 % Please edit documentation in R/generics.R
 \name{generics-functions}
 \alias{generics-functions}
-\alias{getPositions}
 \alias{increasePrecision}
+\alias{getPositions}
 \title{Generic functions for implementation of methods of a class}
 \usage{
 increasePrecision(object, ...)
@@ -25,4 +25,3 @@ For an overview on the classes of the framework, and all of their
 methods, see the class diagrams in the package description
 [cf. \code{\link{quantspec-package}}].
 }
-

@@ -3,8 +3,8 @@
 \docType{class}
 \encoding{latin1}
 \name{MovingBlocks-class}
-\alias{MovingBlocks}
 \alias{MovingBlocks-class}
+\alias{MovingBlocks}
 \title{Class for Moving Blocks Bootstrap implementation.}
 \description{
 \code{MovingBlocks} is an S4 class that implements the moving blocks
@@ -29,4 +29,3 @@ observations. \emph{The Annals of Statistics}, \bold{17}, 1217--1261.
 \code{\link{getPositions-MovingBlocks}}
 }
 \keyword{S4-classes}
-

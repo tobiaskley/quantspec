@@ -25,4 +25,3 @@ Y <- lenTS(rnorm(10))
 \dontrun{Y <- lenTS("Not a valid input")}
 }
 \keyword{Validator-functions}
-

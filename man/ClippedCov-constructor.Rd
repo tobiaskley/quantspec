@@ -5,9 +5,16 @@
 \alias{clippedCov}
 \title{Create an instance of the \code{\link{ClippedCov}} class.}
 \usage{
-clippedCov(Y, maxLag = length(Y) - 1, levels.1 = c(0.5),
-  levels.2 = levels.1, isRankBased = TRUE, B = 0, l = 0,
-  type.boot = c("none", "mbb"))
+clippedCov(
+  Y,
+  maxLag = length(Y) - 1,
+  levels.1 = c(0.5),
+  levels.2 = levels.1,
+  isRankBased = TRUE,
+  B = 0,
+  l = 0,
+  type.boot = c("none", "mbb")
+)
 }
 \arguments{
 \item{Y}{Time series to calculate the copula covariance from}
@@ -46,4 +53,3 @@ plot(ccf, maxLag = 20)
 \code{\link{LagOperator}}
 }
 \keyword{Constructors}
-

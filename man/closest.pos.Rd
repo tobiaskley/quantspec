@@ -32,4 +32,3 @@ closest.pos(X1, c(1.3,2.2))
 X2 <- c(2,1,3)
 closest.pos(X2, 1.5)
 }
-

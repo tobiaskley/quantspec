@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-IntegrQuantileSD.R
 \docType{class}
 \name{IntegrQuantileSD-class}
-\alias{IntegrQuantileSD}
 \alias{IntegrQuantileSD-class}
+\alias{IntegrQuantileSD}
 \title{Class for a simulated integrated quantile (i. e., Laplace or copula)
 density kernel.}
 \description{
@@ -26,6 +26,7 @@ Note that, all remarks made in the documentation of the super-class
 \describe{
 \item{\code{qsd}}{a \code{\link{QuantileSD}} from which to begin the computations.}
 }}
+
 \examples{
 ################################################################################
 ## This script illustrates how to estimate integrated quantile spectral densities
@@ -57,4 +58,3 @@ plot(sPG.cl, ptw.CIs = 0.1, qsd = icsd, type.CIs = "boot.full")
 
 }
 \keyword{S4-classes}
-

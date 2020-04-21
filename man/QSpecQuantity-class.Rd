@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-QSpecQuantity.R
 \docType{class}
 \name{QSpecQuantity-class}
-\alias{QSpecQuantity}
 \alias{QSpecQuantity-class}
+\alias{QSpecQuantity}
 \title{Class for a Quantile Spectral Estimator.}
 \description{
 \code{QSpecQuantity} is an S4 class that provides a common interface to
@@ -33,5 +33,5 @@ available.}
 \item{\code{levels}}{A list of vectors containing the levels \eqn{x_i}{xi} serving
 as argument for the estimator.}
 }}
-\keyword{S4-classes}
 
+\keyword{S4-classes}

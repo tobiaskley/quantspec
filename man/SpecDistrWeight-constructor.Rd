@@ -20,4 +20,3 @@ Create an instance of the \code{\link{SpecDistrWeight}} class.
 wgt <- specDistrWeight()
 }
 \keyword{Constructors}
-

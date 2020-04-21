@@ -55,8 +55,9 @@ int idx (int n, int d1, int k1, int d2, int k2, int b, int N, int D1, int K1, in
 //'         Kley et. al (2016), p. 26.
 //'
 //' @references
-//' Barunik, J. & Kley, T. (2015+).
-//' Quantile-Based Coherence: A Measure of Dependence for Econometric Variables.
+//' Barunik, J. & Kley, T. (2019).
+//' Quantile Coherency: A General Measure for Dependence Between Cyclical
+//' Economic Variables. Econometrics Journal, 22, 131--152.
 //' \url{http://arxiv.org/abs/1401.8104}.
 //################################################################################
 // [[Rcpp::export(".computeCoherency")]]

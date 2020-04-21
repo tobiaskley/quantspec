@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-KernelWeight.R
 \docType{class}
 \name{KernelWeight-class}
-\alias{KernelWeight}
 \alias{KernelWeight-class}
+\alias{KernelWeight}
 \title{Class for Brillinger-type Kernel weights.}
 \description{
 \code{KernelWeight} is an S4 class that implements a weighting function by
@@ -36,6 +36,7 @@ accessable in a call-by-reference manner:
         see the Details section.}
 }}
 }}
+
 \references{
 Brillinger, D. R. (1975). \emph{Time Series: Data Analysis and Theory}.
 Holt, Rinehart and Winston, Inc., New York. [cf. p. 146 f.]
@@ -45,4 +46,3 @@ Examples for implementations of kernels \code{W} can be found at:
 \code{\link{kernels}}.
 }
 \keyword{S4-classes}
-

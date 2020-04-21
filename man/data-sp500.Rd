@@ -5,7 +5,9 @@
 \alias{data-sp500}
 \alias{sp500}
 \title{S&P 500: Standard and Poor's 500 stock index, 2007--2010}
-\format{A univariate time series with 1008 observations; a \code{zoo} object}
+\format{
+A univariate time series with 1008 observations; a \code{zoo} object
+}
 \description{
 Contains the returns of the S&P 500 stock index for the years 2007--2010.
 The returns were computed as \code{(Adjusted.Close-Open)/Open}.
@@ -18,7 +20,5 @@ plot(sp500)
 }
 \references{
 Yahoo! Finance Website
-\url{http://finance.yahoo.com/q/hp?s=^GSPC+Historical+Prices}
 }
 \keyword{data}
-

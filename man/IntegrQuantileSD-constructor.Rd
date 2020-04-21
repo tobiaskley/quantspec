@@ -5,9 +5,16 @@
 \alias{integrQuantileSD}
 \title{Create an instance of the \code{\link{IntegrQuantileSD}} class.}
 \usage{
-integrQuantileSD(object = 2^8, type = c("copula", "Laplace"), ts = rnorm,
-  seed.init = 2581, levels.1 = 0.5, levels.2 = levels.1, R = 1,
-  quiet = FALSE)
+integrQuantileSD(
+  object = 2^8,
+  type = c("copula", "Laplace"),
+  ts = rnorm,
+  seed.init = 2581,
+  levels.1 = 0.5,
+  levels.2 = levels.1,
+  R = 1,
+  quiet = FALSE
+)
 }
 \arguments{
 \item{object}{the number \code{N} of Fourier frequencies to be used;
@@ -46,4 +53,3 @@ Create an instance of the \code{\link{IntegrQuantileSD}} class.
 For an example see \code{\link{IntegrQuantileSD}}.
 }
 \keyword{Constructors}
-

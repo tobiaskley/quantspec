@@ -5,9 +5,16 @@
 \alias{quantileSD}
 \title{Create an instance of the \code{\link{QuantileSD}} class.}
 \usage{
-quantileSD(N = 2^8, type = c("copula", "Laplace"), ts = rnorm,
-  seed.init = runif(1), levels.1, levels.2 = levels.1, R = 1,
-  quiet = FALSE)
+quantileSD(
+  N = 2^8,
+  type = c("copula", "Laplace"),
+  ts = rnorm,
+  seed.init = runif(1),
+  levels.1,
+  levels.2 = levels.1,
+  R = 1,
+  quiet = FALSE
+)
 }
 \arguments{
 \item{N}{the number of Fourier frequencies to be used.}
@@ -43,4 +50,3 @@ Create an instance of the \code{\link{QuantileSD}} class.
 For examples see \code{\link{QuantileSD}}.
 }
 \keyword{Constructors}
-

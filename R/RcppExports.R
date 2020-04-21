@@ -19,8 +19,9 @@
 #'         Kley et. al (2016), p. 26.
 #'
 #' @references
-#' Barunik, J. & Kley, T. (2015+).
-#' Quantile-Based Coherence: A Measure of Dependence for Econometric Variables.
+#' Barunik, J. & Kley, T. (2019).
+#' Quantile Coherency: A General Measure for Dependence Between Cyclical
+#' Economic Variables. Econometrics Journal, 22, 131--152.
 #' \url{http://arxiv.org/abs/1401.8104}.
 NULL
 

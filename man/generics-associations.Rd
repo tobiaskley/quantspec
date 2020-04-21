@@ -2,9 +2,9 @@
 % Please edit documentation in R/generics.R
 \name{generics-associations}
 \alias{generics-associations}
+\alias{getQuantilePG}
 \alias{getBootPos}
 \alias{getFreqRep}
-\alias{getQuantilePG}
 \alias{getQuantileSD}
 \alias{getWeight}
 \title{Generic functions for accessing associations of objects}
@@ -35,4 +35,3 @@ For an overview on the classes of the framework, and all
 associations, see the class diagrams in the package description
 [cf. \code{\link{quantspec-package}}].
 }
-

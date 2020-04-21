@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-ClippedCov.R
 \docType{class}
 \name{ClippedCov-class}
-\alias{ClippedCov}
 \alias{ClippedCov-class}
+\alias{ClippedCov}
 \title{Class to calculate copula covariances from a time series with given levels.
  
 Calculates for each combination of levels \eqn{(\tau_1,\tau_2)}{(tau1,tau2)} 
@@ -22,4 +22,3 @@ Currently, the implementation of this class allows only for the analysis of
 univariate time series.
 }
 \keyword{S4-classes}
-

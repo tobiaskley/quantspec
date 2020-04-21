@@ -2,8 +2,8 @@
 % Please edit documentation in R/Class-SmoothedPG.R
 \docType{class}
 \name{SmoothedPG-class}
-\alias{SmoothedPG}
 \alias{SmoothedPG-class}
+\alias{SmoothedPG}
 \title{Class for a smoothed quantile periodogram.}
 \description{
 \code{SmoothedPG} is an S4 class that implements the necessary
@@ -43,5 +43,5 @@ accessable in a call-by-reference manner:
 
 \item{\code{weight}}{the \code{\link{Weight}} to be used for smoothing}
 }}
-\keyword{S4-classes}
 
+\keyword{S4-classes}

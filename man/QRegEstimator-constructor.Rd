@@ -5,10 +5,17 @@
 \alias{qRegEstimator}
 \title{Create an instance of the \code{QRegEstimator} class.}
 \usage{
-qRegEstimator(Y, frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1),
-  levels = 0.5, isRankBased = TRUE, B = 0, l = 0,
-  type.boot = c("none", "mbb"), method = c("br", "fn", "pfn", "fnc",
-  "lasso", "scad"), parallel = FALSE)
+qRegEstimator(
+  Y,
+  frequencies = 2 * pi/lenTS(Y) * 0:(lenTS(Y) - 1),
+  levels = 0.5,
+  isRankBased = TRUE,
+  B = 0,
+  l = 0,
+  type.boot = c("none", "mbb"),
+  method = c("br", "fn", "pfn", "fnc", "lasso", "scad"),
+  parallel = FALSE
+)
 }
 \arguments{
 \item{Y}{A \code{vector} of real numbers containing the time series from
@@ -78,4 +85,3 @@ V2 <- getValues(qRegEst2)
 sum(abs(V1-V2)) # Returns: [1] 0
 }
 \keyword{Constructors}
-

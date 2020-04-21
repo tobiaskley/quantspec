@@ -209,7 +209,7 @@ setMethod(f = "getValues",
             res <- array(dim=c(J, K1, K2, getB(object@lagOp)+1))
             
             
-            if (class(object@weight) == "LagKernelWeight") {
+            if (inherits(object@weight, "LagKernelWeight")) {
               
               # Select rows
               r1.pos <- closest.pos(oF, f[f <= pi])
@@ -277,7 +277,7 @@ setMethod(f = "getSdNaive",
                                 levels.1=getLevels(object,1),
                                 levels.2=getLevels(object,2)) {
             
-            if (class(object@weight) != "LagKernelWeight") {
+            if (!inherits(object@weight, "LagKernelWeight")) {
               stop("getSdNaive currently only available for 'LagKernelWeight'.")
             }
             
@@ -427,7 +427,7 @@ setMethod(f = "getSdBoot",
         levels.1=getLevels(object,1),
         levels.2=getLevels(object,2)) {
       
-      if (class(getWeight(object)) != "LagKernelWeight") {
+      if (!inherits(getWeight(object), "LagKernelWeight")) {
         stop("getSdBoot currently only available for 'LagKernelWeight'.")
       }
       
@@ -634,16 +634,16 @@ lagEstimator <- function(Y,
   
   #ToDo Check if params are okay
   #     Transform to Fourier frequencies
-  if (class(Y) == "numeric") {
+  if (inherits(Y, "numeric")) {
     versConstr <- 1
     Y <- Y
-  } else if (class(Y) == "ts") {
+  } else if (inherits(Y, "ts")) {
     versConstr <- 1
     Y <- Y[1:length(Y)]
-  } else if (class(Y) == "zoo") {
+  } else if (inherits(Y, "zoo")) {
     versConstr <- 1
     Y <- coredata(Y)
-  } else if ( is(Y,"LagOperator")) {
+  } else if (is(Y, "LagOperator")) {
     lagOp = Y
     versConstr <- 2
     if (!hasArg(frequencies)) {
