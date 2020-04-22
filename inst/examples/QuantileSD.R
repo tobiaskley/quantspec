@@ -1,5 +1,6 @@
 ## This script can be used to create and store a QuantileSD object
 
+\dontrun{
 ## Parameters for the simulation:
 R <- 50                      # number of independent repetitions;
                              # R should be much larger than this in practice!
@@ -54,3 +55,4 @@ Coh <- getCoherency(qsd, freq = 2*pi*(0:64)/128)
 ## We now plot the real part of the quantile coherency for j1 = 1, j2 = 2,
 ## tau1 = 0.3 and tau2 = 0.6
 plot(x = 2*pi*(0:64)/128, Re(Coh[,1,3,2,6]), type="l")
+}
