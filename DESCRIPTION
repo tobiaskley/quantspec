@@ -1,7 +1,7 @@
 Package: quantspec
-Version: 1.2-2
+Version: 1.2-3
 Encoding: UTF-8
-Date: 2020-04-22
+Date: 2020-07-14
 Title: Quantile-Based Spectral Analysis of Time Series
 Authors@R: c(person("Tobias", "Kley", role=c("aut","cre"),
     email = "tobias.kley@bristol.ac.uk"),
@@ -21,7 +21,8 @@ Imports:
     snowfall,
     Rcpp (>= 0.11.0)
 Description: Methods to determine, smooth and plot quantile periodograms for
-    univariate and multivariate time series.
+    univariate and multivariate time series. See Kley (2016) <doi:10.18637/jss.v070.i03>
+    for a description and tutorial.
 License: GPL (>= 2)
 URL: http://github.com/tobiaskley/quantspec
 BugReports: http://github.com/tobiaskley/quantspec/issues

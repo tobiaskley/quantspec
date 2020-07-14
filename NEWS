@@ -1,3 +1,11 @@
+quantspec 1.2-3
+===============
+
+ o  Fixed a bug related to rounding frequencies in ClippedFT.
+ o  Updated a test that should have caught the bug.
+ o  Added reference to Kley (2016) to package description.
+
+
 quantspec 1.2-2
 ===============
 

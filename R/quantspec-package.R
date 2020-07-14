@@ -6,13 +6,14 @@ NULL
 #'
 #' Methods to determine, smooth and plot quantile
 #' periodograms for univariate and (since v1.2-0) multivariate time series.
+#' See Kley (2016) <doi:10.18637/jss.v070.i03> for a description and tutorial.
 #'
 #' @details
 #'  \tabular{ll}{
 #'    \cr Package: \tab quantspec
 #'    \cr Type:    \tab Package
-#'    \cr Version: \tab 1.2-2
-#'    \cr Date:    \tab 2020-04-22
+#'    \cr Version: \tab 1.2-3
+#'    \cr Date:    \tab 2020-07-14
 #'    \cr License: \tab GPL (>= 2)
 #'  }
 #'
