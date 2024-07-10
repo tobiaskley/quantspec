@@ -7,7 +7,9 @@
 \usage{
 QAR1(
   n,
-  th1 = function(u) {     1.9 * ((u - 0.5)) },
+  th1 = function(u) {
+     1.9 * ((u - 0.5))
+ },
   overhead = 1000,
   th0 = qnorm
 )

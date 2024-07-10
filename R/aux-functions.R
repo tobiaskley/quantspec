@@ -32,7 +32,7 @@
 #' @param freq the vector of frequencies to be validated.
 #' @param N    the base of the Fourier frequencies against which the values in
 #'             \code{freq} will be compared.
-#' @param steps a vector containing a subset of {1,2,3,4,5,6}, indicating
+#' @param steps a vector containing a subset of \eqn{\{1,2,3,4,5,6\}}, indicating
 #'              which of the steps are to be performed.
 #'
 #' @return Returns a vector of Fourier frequencies that is yield by the

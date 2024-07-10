@@ -8,13 +8,14 @@
 \description{
 Methods to determine, smooth and plot quantile
 periodograms for univariate and (since v1.2-0) multivariate time series.
+See Kley (2016) <doi:10.18637/jss.v070.i03> for a description and tutorial.
 }
 \details{
 \tabular{ll}{
    \cr Package: \tab quantspec
    \cr Type:    \tab Package
-   \cr Version: \tab 1.2-2
-   \cr Date:    \tab 2020-04-22
+   \cr Version: \tab 1.2-4
+   \cr Date:    \tab 2024-07-10
    \cr License: \tab GPL (>= 2)
  }
 }
@@ -122,8 +123,16 @@ Economic Variables. \emph{Econometrics Journal}, \bold{22}, 131--152.
 [cf. \url{http://arxiv.org/abs/1510.06946}]
 
 Oracle (2015). Coding conventions of the Java Programming Language.
-\url{http://www.oracle.com/technetwork/java/codeconvtoc-136057.html}.
+\url{https://www.oracle.com/java/technologies/javase/codeconventions-contents.html}.
 Accessed 2015-03-25.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/tobiaskley/quantspec}
+  \item Report bugs at \url{https://github.com/tobiaskley/quantspec/issues}
+}
+
 }
 \author{
 Tobias Kley

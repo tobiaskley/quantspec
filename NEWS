@@ -1,3 +1,9 @@
+quantspec 1.2-4
+===============
+
+ o  Updated email of maintainer.
+ o  Fixed incorrect URLs in documentation.
+
 quantspec 1.2-3
 ===============
 
@@ -108,8 +114,6 @@ VIGNETTE
    quantile-based spectral analysis, a description of the framework,
    a tutorial and two worked examples.
 
-
-quantspec 0.2
 quantspec 0.1
 =============
 

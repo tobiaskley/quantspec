@@ -12,8 +12,8 @@ NULL
 #'  \tabular{ll}{
 #'    \cr Package: \tab quantspec
 #'    \cr Type:    \tab Package
-#'    \cr Version: \tab 1.2-3
-#'    \cr Date:    \tab 2020-07-14
+#'    \cr Version: \tab 1.2-4
+#'    \cr Date:    \tab 2024-07-10
 #'    \cr License: \tab GPL (>= 2)
 #'  }
 #'
@@ -126,10 +126,10 @@ NULL
 #' [cf. \url{http://arxiv.org/abs/1510.06946}]
 #'
 #' Oracle (2015). Coding conventions of the Java Programming Language.
-#' \url{http://www.oracle.com/technetwork/java/codeconvtoc-136057.html}.
+#' \url{https://www.oracle.com/java/technologies/javase/codeconventions-contents.html}.
 #' Accessed 2015-03-25.
 #'
-NULL
+"_PACKAGE"
 
 # Taken from quantreg-package and adapted.
 ".onAttach" <- function(lib, pkg) {

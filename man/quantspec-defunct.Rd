@@ -25,8 +25,14 @@ plotLaplacePeriodogram(
   CL = 1:length(taus),
   hRange = FALSE,
   hOffset = FALSE,
-  ylabel = expression({     {         hat(f)     }[n]^{         list(tau[1], tau[2])   
-     } }(omega)),
+  ylabel = expression({
+     {
+         hat(f)
+     }[n]^{
+         list(tau[1], tau[2])
+
+        }
+ }(omega)),
   oma = c(2.5, 2.5, 2.5, 2.5),
   mar = c(4.5, 4.5, 1, 0) + 0.1,
   cex.lab = 1.5

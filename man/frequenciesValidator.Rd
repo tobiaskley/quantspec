@@ -13,7 +13,7 @@ frequenciesValidator(freq, N, steps = 1:6)
 \item{N}{the base of the Fourier frequencies against which the values in
 \code{freq} will be compared.}
 
-\item{steps}{a vector containing a subset of {1,2,3,4,5,6}, indicating
+\item{steps}{a vector containing a subset of \eqn{\{1,2,3,4,5,6\}}, indicating
 which of the steps are to be performed.}
 }
 \value{
